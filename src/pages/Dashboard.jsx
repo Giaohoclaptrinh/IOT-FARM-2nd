@@ -1,29 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebase/db.config";
-import { useNavigate } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase/db.config";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Theo dõi trạng thái đăng nhập
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      if (!currentUser) {
-        navigate("/sign-in");
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        try {
+          // Lấy dữ liệu từ Firestore
+          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+          if (userDoc.exists()) {
+            setUserName(userDoc.data().name);
+          }
+        } catch (error) {
+          console.error("Lỗi khi lấy dữ liệu người dùng:", error);
+        }
       } else {
-        setUser(currentUser);
+        setUserName("");
       }
     });
+
     return () => unsubscribe();
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      {user && <p>Xin chào, {user.email}!</p>}
+      <h1 className="text-2xl font-bold">Chào mừng, {userName || "Người dùng"}! 👋</h1>
+      <p className="mt-2 text-gray-600">Đây là bảng điều khiển của bạn.</p>
     </div>
   );
 };
+
+
 
 export default Dashboard;

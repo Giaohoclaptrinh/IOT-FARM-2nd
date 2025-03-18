@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase/db.config";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import PropTypes from "prop-types";
+
 
 const SignUp = ({ setShowLayout }) => {
   const [email, setEmail] = useState("");
@@ -23,11 +25,13 @@ const SignUp = ({ setShowLayout }) => {
         name: name,
         email: email,
         createdAt: new Date(),
+        pass: pass,
       });
 
       setShowLayout(true); // Hiển thị Sidebar sau khi đăng ký thành công
       navigate("/dashboards");
     } catch (error) {
+      console.error("Error during sign up:", error);
       setError("Đăng ký thất bại! Kiểm tra lại thông tin.");
     }
   };
@@ -76,5 +80,9 @@ const SignUp = ({ setShowLayout }) => {
     </div>
   );
 };
+SignUp.propTypes = {
+  setShowLayout: PropTypes.func.isRequired, // Xác định kiểu dữ liệu
+};
+  
 
 export default SignUp;

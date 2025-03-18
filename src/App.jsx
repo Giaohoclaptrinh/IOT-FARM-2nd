@@ -42,4 +42,39 @@ const MainContent = ({ showLayout, setShowLayout }) => {
   );
 };
 
-export default App;
+ export default App;
+
+
+
+// import React from "react";
+// import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+// import Sidebar from "./components/Sidebar";
+// import TopBar from "./components/TopBar";
+// import Dashboard from "./pages/Dashboard";
+// import Devices from "./pages/Devices";
+// import Products from "./pages/Products";
+
+// const App = () => {
+//   return (
+//     <Router>
+//       <div className="flex h-screen">
+//         <Sidebar />
+//         <div className="flex-1 bg-gray-100">
+//           <TopBar />
+//           <div className="p-6">
+//             <Routes>
+//               <Route path="/dashboards" element={<Dashboard />} />
+//               <Route path="/devices" element={<Devices />} />
+//               <Route path="/products" element={<Products />} />
+//               <Route path="/" element={<Dashboard />} />
+//             </Routes>
+//           </div>
+//         </div>
+//       </div>
+//     </Router>
+//   );
+// };
+
+// export default App;
+
+

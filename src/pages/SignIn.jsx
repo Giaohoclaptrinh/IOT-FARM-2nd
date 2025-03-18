@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase/db.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import PropTypes from "prop-types";
 
 const SignIn = ({ setShowLayout }) => {
   const [email, setEmail] = useState("");
@@ -16,6 +17,8 @@ const SignIn = ({ setShowLayout }) => {
       setShowLayout(true); // Hiển thị Sidebar sau khi đăng nhập thành công
       navigate("/dashboards");
     } catch (error) {
+      console.log.error
+      console.error("Error during sign up:", error);
       setError("Email hoặc mật khẩu không chính xác!");
     }
   };
@@ -56,5 +59,10 @@ const SignIn = ({ setShowLayout }) => {
     </div>
   );
 };
+
+SignIn.propTypes = {
+  setShowLayout: PropTypes.func.isRequired, // Xác định kiểu dữ liệu
+};
+
 
 export default SignIn;
