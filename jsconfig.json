@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src", // Đặt 'src' làm thư mục gốc
+    "paths": {
+      "@/*": ["*"] // Ánh xạ '@' tới thư mục 'src'
+    }
+  },
+  "include": [
+    "src/**/*" // Bao gồm tất cả các file bên trong thư mục 'src'
+  ],
+  "exclude": [
+    "node_modules", // Loại bỏ 'node_modules' khỏi quá trình kiểm tra
+    "dist" // Loại bỏ 'dist' (nếu có)
+  ]
+}
