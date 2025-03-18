@@ -25,7 +25,7 @@ const SignUp = ({ setShowLayout }) => {
         name: name,
         email: email,
         createdAt: new Date(),
-        pass: pass,
+        pass: password,
       });
 
       setShowLayout(true); // Hiển thị Sidebar sau khi đăng ký thành công
@@ -83,6 +83,6 @@ const SignUp = ({ setShowLayout }) => {
 SignUp.propTypes = {
   setShowLayout: PropTypes.func.isRequired, // Xác định kiểu dữ liệu
 };
-  
+
 
 export default SignUp;
