@@ -1,39 +1,25 @@
-import React from "react";
-import { Link } from "react-router-dom";
+// import React from "react";
+import { auth } from "../firebase/db.config";
+import { signOut } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    navigate("/sign-in");
+  };
+
   return (
-    <div className="w-64 bg-gray-800 text-white h-screen p-5">
-      <h2 className="text-xl font-bold mb-6">IOT FARM</h2>
-      <nav>
-        <ul>
-          <li className="mb-2">
-            <Link to="/dashboards" className="block p-2 hover:bg-gray-700 rounded">
-              📊 Dashboard
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/devices" className="block p-2 hover:bg-gray-700 rounded">
-              📟 Devices
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/products" className="block p-2 hover:bg-gray-700 rounded">
-              📦 Products
-            </Link>
-          </li>
-          <li className="mb-2">
-            <Link to="/sign-in" className="block p-2 hover:bg-gray-700 rounded">
-              🔑 Sign In
-            </Link>
-          </li>
-          <li>
-            <Link to="/sign-up" className="block p-2 hover:bg-gray-700 rounded">
-              📝 Sign Up
-            </Link>
-          </li>
-        </ul>
-      </nav>
+    <div className="w-64 bg-gray-900 text-white h-full p-6">
+      <h1 className="text-xl font-bold mb-6">IoT-Farm</h1>
+      <button
+        onClick={handleLogout}
+        className="w-full bg-red-500 p-2 rounded hover:bg-red-600"
+      >
+        Đăng xuất
+      </button>
     </div>
   );
 };
