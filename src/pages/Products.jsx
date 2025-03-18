@@ -5,12 +5,12 @@ const Products = () => {
 
   useEffect(() => {
     // Giả lập dữ liệu sản phẩm
-    const fakeProducts = [
-      { id: 1, name: "Phân bón hữu cơ", price: "200.000 VND" },
-      { id: 2, name: "Hạt giống lúa", price: "150.000 VND" },
-      { id: 3, name: "Máy bơm tưới", price: "2.000.000 VND" },
-    ];
-    setProducts(fakeProducts);
+    // const fakeProducts = [
+    //   { id: 1, name: "Phân bón hữu cơ", price: "200.000 VND" },
+    //   { id: 2, name: "Hạt giống lúa", price: "150.000 VND" },
+    //   { id: 3, name: "Máy bơm tưới", price: "2.000.000 VND" },
+    // ];
+    // setProducts(fakeProducts);
   }, []);
 
   return (

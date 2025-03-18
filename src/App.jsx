@@ -1,104 +1,45 @@
-// //import React from 'react';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import Sidebar from "./components/Sidebar";
+import TopBar from "./components/TopBar";
+import Dashboard from "./pages/Dashboard";
+import Devices from "./pages/Devices";
+import Products from "./pages/Products";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 
-// function App() {
-//   // Dữ liệu giả lập (có thể thay thế bằng API)
-//   const devices = [
-//     { id: 1, name: "Device 1", status: "Online", lastModified: "2023-09-25", createdAt: "2023-01-01" },
-//     { id: 2, name: "Device 2", status: "Offline", lastModified: "2023-09-20", createdAt: "2023-01-05" }
-//   ];
+const App = () => {
+  const [showLayout, setShowLayout] = useState(true);
 
-//   return (
-//     <div className="flex h-screen">
-//       {/* Sidebar */}
-//       <div className="w-64 bg-gray-900 text-white h-full shadow-lg">
-//         <div className="p-6">
-//           <h1 className="text-xl font-bold">IoT-Farm</h1>
-//         </div>
-//         <ul>
-//           {["Dashboards", "Devices", "Things", "Products", "Sign In", "Sign Up"].map((item, index) => (
-//             <li key={index} className="p-4 hover:bg-gray-700 cursor-pointer">
-//               {item}
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-
-//       {/* Main Content */}
-//       <div className="flex-1 bg-gray-100 p-6">
-//         {/* Top Bar */}
-//         <div className="flex items-center justify-between mb-6">
-//           <input 
-//             type="text" 
-//             placeholder="Search..." 
-//             className="border border-gray-300 p-2 rounded w-1/3 outline-none"
-//           />
-//           <button className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition">
-//             + Add Device
-//           </button>
-//         </div>
-
-//         {/* Table */}
-//         <div className="bg-white p-4 rounded shadow-md">
-//           <table className="w-full border-collapse">
-//             <thead className="bg-gray-200">
-//               <tr className="text-left">
-//                 <th className="p-3">Device Name</th>
-//                 <th className="p-3">Status</th>
-//                 <th className="p-3">Last Modified</th>
-//                 <th className="p-3">Creation Date</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {devices.map((device) => (
-//                 <tr key={device.id} className="border-b hover:bg-gray-100 transition">
-//                   <td className="p-3">{device.name}</td>
-//                   <td className={`p-3 font-semibold ${device.status === "Online" ? "text-green-600" : "text-red-600"}`}>
-//                     {device.status}
-//                   </td>
-//                   <td className="p-3">{device.lastModified}</td>
-//                   <td className="p-3">{device.createdAt}</td>
-//                 </tr>
-//               ))}
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default App;
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import TopBar from './components/TopBar';
-import Dashboard from './pages/Dashboard';
-import Devices from './pages/Devices';
-import Products from './pages/Products';
-import SignIn from './pages/SignIn';
-import SignUp from './pages/SignUp';
-
-function App() {
   return (
     <Router>
-      <div className="flex h-screen">
-        <Sidebar />
-        <div className="flex-1 bg-gray-100">
-          <TopBar />
-          <div className="p-6">
-            <Routes>
-              <Route path="/dashboards" element={<Dashboard />} />
-              <Route path="/devices" element={<Devices />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/sign-in" element={<SignIn />} />
-              <Route path="/sign-up" element={<SignUp />} />
-              <Route path="/" element={<Dashboard />} />
-            </Routes>
-          </div>
-        </div>
-      </div>
+      <MainContent showLayout={showLayout} setShowLayout={setShowLayout} />
     </Router>
   );
-}
+};
+
+const MainContent = ({ showLayout, setShowLayout }) => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === "/sign-in" || location.pathname === "/sign-up";
+
+  return (
+    <div className="flex h-screen">
+      {showLayout && !isAuthPage && <Sidebar />}
+      <div className="flex-1 bg-gray-100">
+        {showLayout && !isAuthPage && <TopBar />}
+        <div className="p-6">
+          <Routes>
+            <Route path="/dashboards" element={<Dashboard />} />
+            <Route path="/devices" element={<Devices />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
+            <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
+            <Route path="/" element={<Dashboard />} />
+          </Routes>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default App;
