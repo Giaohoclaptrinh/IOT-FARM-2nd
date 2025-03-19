@@ -35,26 +35,29 @@ const RoleManager = () => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    
+    <div className="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
       <h2 className="text-2xl font-bold mb-4">Quản lý phân quyền</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto">
           <thead>
             <tr className="bg-gray-100">
-              <th className="px-4 py-2">Tên</th>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Quyền hiện tại</th>
-              <th className="px-4 py-2">Thay đổi quyền</th>
+              <th className="text-left w-1/12 py-2 bg-center ">Tên</th>
+              <th className="text-left w-1/12 py-2 bg-center ">Email</th>
+              <th className="text-left w-1/12 py-2 bg-center">Quyền hiện tại</th>
+              <th className="text-left w-1/12 py-2 bg-center">Thay đổi quyền</th>
             </tr>
           </thead>
           <tbody>
+            {console.log(users)}
             {users.map((user) => (
               <tr key={user.id} className="border-b">
-                <td className="px-4 py-2">{user.name}</td>
-                <td className="px-4 py-2">{user.email}</td>
-                <td className="px-4 py-2">{user.role || 'client'}</td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 ">{user.name}</td>
+                <td className="px-4 py-2 ">{user.email}</td>
+                <td className="px-4 py-2 ">{user.role || 'client'}</td>
+                <td className="px-4 py-2 ">
                   <select
+                  
                     value={user.role || 'client'}
                     onChange={(e) => updateUserRole(user.id, e.target.value)}
                     className="border rounded px-2 py-1"

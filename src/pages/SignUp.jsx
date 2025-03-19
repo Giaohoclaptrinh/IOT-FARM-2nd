@@ -11,6 +11,7 @@ const SignUp = ({ setShowLayout }) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [role, setRole ] = useState("");
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
@@ -26,6 +27,7 @@ const SignUp = ({ setShowLayout }) => {
         email: email,
         createdAt: new Date(),
         pass: password,
+        role: role,
       });
 
       setShowLayout(true); // Hiển thị Sidebar sau khi đăng ký thành công
@@ -66,6 +68,14 @@ const SignUp = ({ setShowLayout }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          {/* <input
+            type="role"
+            placeholder="Vai Trò"
+            className="border p-2 w-full rounded"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+          /> */}
           <button type="submit" className="bg-green-500 text-white p-2 w-full rounded hover:bg-green-600 transition">
             Đăng Ký
           </button>

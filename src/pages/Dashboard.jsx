@@ -1,8 +1,8 @@
 // import React, { useEffect, useState } from "react";
-import { auth } from "../firebase/db.config";
- import { onAuthStateChanged } from "firebase/auth";
+//import { auth } from "../firebase/db.config";
+// import { onAuthStateChanged } from "firebase/auth";
  //import { doc, getDoc } from "firebase/firestore";
- import { db } from "../firebase/db.config";
+ //import { db } from "../firebase/db.config";
 
 // const Dashboard = () => {
 //   const [user, setUser] = useState(null);
@@ -41,11 +41,12 @@ import { auth } from "../firebase/db.config";
 
 // export default Dashboard;
 import React, { useEffect, useState } from "react";
-//import { auth, db } from "../firebase/db.config";
-//import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "../firebase/db.config";
+import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, collection, query, where, onSnapshot } from "firebase/firestore";
 import DeviceChart from "../components/DeviceChart";
 import RoleManager from "../components/RoleManager";
+import DeviceList from "@/components/DeviceList";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -90,8 +91,10 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
+    
+      
+    <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
+      <div className="mb-8 w-full table-fixed border-collapse">
         <h1 className="text-2xl font-bold">Chào mừng, {userName}! 👋</h1>
         <p className="text-gray-600">Quyền hạn: {userRole}</p>
       </div>
@@ -104,6 +107,7 @@ const Dashboard = () => {
 
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-4">Thiết bị của bạn</h2>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {devices.map(device => (
             <div
@@ -121,6 +125,7 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
+      <DeviceList devices={devices} setSelectedDevice={setSelectedDevice} />
 
       {selectedDevice && (
         <div className="mt-8">
@@ -128,6 +133,7 @@ const Dashboard = () => {
         </div>
       )}
     </div>
+    
   );
 };
 

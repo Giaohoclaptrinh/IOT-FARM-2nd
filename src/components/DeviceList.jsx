@@ -38,7 +38,7 @@ const DeviceList = () => {
 
       {/* Nút mở form thêm thiết bị */}
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-800 transition"
         onClick={() => setShowAddDevice(true)}
       >
         + Thêm thiết bị
@@ -49,14 +49,14 @@ const DeviceList = () => {
       <ul className="space-y-2">
         {devices.length > 0 ? (
           devices.map((device) => (
-            <li key={device.name} className="p-4 bg-gray-100 rounded shadow-md flex justify-between items-center">
+            <li key={device.name} className="p-4 bg-gray-100 rounded shadow-md flex justify-between items-center hover:bg-gray-400 transition">
               <div>
                 <h3 className="text-lg font-semibold">{device.name || "Không có tên"}</h3>
                 {/* <p>Loại: {device.type}</p> */}
                 <p>Trạng thái: {device.status}</p>
               </div>
               <button
-                className="bg-red-500 text-white px-3 py-1 rounded"
+                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
                 onClick={() => handleDelete(device.id)}
               >
                 Xóa
@@ -69,6 +69,47 @@ const DeviceList = () => {
       </ul>
     </div>
   );
+
+
+
+
+  // return (
+  //   <div className="bg-white p-6 rounded-lg shadow-md">
+  //     <h2 className="text-2xl font-bold mb-4 text-gray-800">📡 Danh Sách Thiết Bị</h2>
+
+  //     <button className="mb-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition">
+  //       + Thêm thiết bị
+  //     </button>
+
+  //     <div className="space-y-4">
+  //       {devices.map((device) => (
+  //         <div
+  //           key={device.id}
+  //           className="flex justify-between items-center p-4 rounded-lg shadow-sm bg-gray-50 border border-gray-200 
+  //                      hover:shadow-md transition cursor-pointer"
+  //           onClick={() => setSelectedDevice(device.id)}
+  //         >
+  //           <div>
+  //             <h3 className="font-semibold text-lg text-gray-700">{device.name}</h3>
+  //             <p
+  //               className={`text-sm font-medium ${
+  //                 device.status === "Online" ? "text-green-500" : "text-red-500"
+  //               }`}
+  //             >
+  //               🔵 Trạng thái: {device.status}
+  //             </p>
+  //           </div>
+
+  //           <button className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition">
+  //             ❌ Xóa
+  //           </button>
+  //         </div>
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
 };
+
+
 
 export default DeviceList;
