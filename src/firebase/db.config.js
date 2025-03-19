@@ -10,13 +10,13 @@ import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
-  measurementId: ""
+  apiKey: "AIzaSyBHymrSh8O_h_3efoC0q1wmb2WOFlKY0Os",
+  authDomain: "new-iotfarm.firebaseapp.com",
+  projectId: "new-iotfarm",
+  storageBucket: "new-iotfarm.firebasestorage.app",
+  messagingSenderId: "959576890023",
+  appId: "1:959576890023:web:a6f3cb33dda905d642d982",
+  measurementId: "G-YFX787N6T1"
 };
 
 // Initialize Firebase
