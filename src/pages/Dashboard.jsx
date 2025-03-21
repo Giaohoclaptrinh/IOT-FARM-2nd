@@ -127,7 +127,8 @@ const Dashboard = () => {
             <DeviceList devices={devices} setSelectedDevice={setSelectedDevice} />
 
             {selectedDevice && (
-              <div className="mt-8">
+              <div className="mt-8 p-4 border rounded-lg shadow bg-white">
+                <h2 className="text-lg font-semibold bg-white">Dữ liệu thiết bị: {selectedDevice}</h2>
                 <DeviceChart deviceId={selectedDevice} />
               </div>
             )}
