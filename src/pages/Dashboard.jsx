@@ -54,6 +54,7 @@ const Dashboard = () => {
   const [userRole, setUserRole] = useState("");
   const [devices, setDevices] = useState([]);
   const [selectedDevice, setSelectedDevice] = useState(null);
+  const [selectedFunction, setSelectedFunction] = useState("devices"); // Mặc định hiển thị danh sách thiết bị
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -91,50 +92,49 @@ const Dashboard = () => {
   }, []);
 
   return (
-    
-      
-    <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
-      <div className="max-h-px"></div>
-      <div className="mb-8 w-full table-fixed border-collapse">
-        <h1 className="text-2xl font-bold">Chào mừng, {userName}! 👋</h1>
-        <p className="text-gray-600">Quyền hạn: {userRole}</p>
-      </div>
+    <div className="p-6 h-full max-w-full overflow-auto bg-gray-100">
+      <h1 className="text-2xl font-bold">Chào mừng, {userName}! 👋</h1>
+      <p className="text-gray-600">Quyền hạn: {userRole}</p>
 
-      {userRole === 'admin' && (
-        <div className="mb-8">
-          <RoleManager />
+      {/* Menu chọn chức năng */}
+      {userRole === "admin" && (
+        <div className="flex space-x-4 mt-6">
+          <button
+            onClick={() => setSelectedFunction("roleManagement")}
+            className={`px-4 py-2 rounded-lg shadow ${
+              selectedFunction === "roleManagement" ? "bg-blue-500 text-white" : "bg-white"
+            }`}
+          >
+            Quản lý phân quyền
+          </button>
+          <button
+            onClick={() => setSelectedFunction("devices")}
+            className={`px-4 py-2 rounded-lg shadow ${
+              selectedFunction === "devices" ? "bg-blue-500 text-white" : "bg-white"
+            }`}
+          >
+            Thiết bị của bạn
+          </button>
         </div>
       )}
 
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Thiết bị của bạn</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {devices.map(device => (
-            <div
-              key={device.id}
-              className={`p-4 rounded-lg shadow cursor-pointer transition-all ${
-                selectedDevice === device.id ? 'bg-blue-100 border-blue-500' : 'bg-white'
-              }`}
-              onClick={() => setSelectedDevice(device.id)}
-            >
-              <h3 className="font-semibold">{device.name}</h3>
-              <p className={`text-sm ${device.status === 'Online' ? 'text-green-500' : 'text-red-500'}`}>
-                {device.status}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-      <DeviceList devices={devices} setSelectedDevice={setSelectedDevice} />
+      {/* Hiển thị nội dung dựa trên chức năng đã chọn */}
+      <div className="mt-6">
+        {selectedFunction === "roleManagement" && <RoleManager />}
+        {selectedFunction === "devices" && (
+          <>
+            <h2 className="text-xl font-semibold mb-4">Thiết bị của bạn</h2>
+            <DeviceList devices={devices} setSelectedDevice={setSelectedDevice} />
 
-      {selectedDevice && (
-        <div className="mt-8">
-          <DeviceChart deviceId={selectedDevice} />
-        </div>
-      )}
+            {selectedDevice && (
+              <div className="mt-8">
+                <DeviceChart deviceId={selectedDevice} />
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
-    
   );
 };
 
