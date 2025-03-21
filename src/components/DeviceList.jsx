@@ -210,7 +210,7 @@ const DeviceList = ({ setSelectedDevice }) => {
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            Trang sausad
+            Trang sau
           </button>
         </div>
       )}
