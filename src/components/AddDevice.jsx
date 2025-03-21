@@ -5,21 +5,27 @@ import { collection, addDoc } from "firebase/firestore";
 const AddDevice = ({ onClose }) => {
   const [deviceName, setDeviceName] = useState("");
   const [status, setStatus] = useState("Online");
+  const [location, setLocation] = useState("");
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       await addDoc(collection(db, "devices"), {
         name: deviceName,
         status: status,
         createdAt: new Date(),
+        location: location,
       });
 
       alert("Thiết bị đã được thêm!");
       onClose(); // Đóng form sau khi thêm thành công
     } catch (error) {
       console.error("Lỗi khi thêm thiết bị: ", error);
+    } finally{
+      setLoading(false);
     }
   };
 
@@ -35,7 +41,15 @@ const AddDevice = ({ onClose }) => {
             value={deviceName}
             onChange={(e) => setDeviceName(e.target.value)}
             required
-          />
+              />
+            <input
+            type="text"
+            placeholder="Vị trí thiết bị"
+            className="border p-2 w-full"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+            />
           <select
             className="border p-2 w-full"
             value={status}
@@ -44,13 +58,20 @@ const AddDevice = ({ onClose }) => {
             <option value="Online">Online</option>
             <option value="Offline">Offline</option>
           </select>
-          <button type="submit" className="bg-blue-500 text-white p-2 w-full">
-            Lưu
-          </button>
+          <button
+          type="submit"
+          className={`p-2 w-full ${
+            loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-700"
+          } text-white`}
+          disabled={loading}>
+          {loading ? "Đang lưu..." : "Lưu"}
+        </button>
         </form>
         <button className="mt-4 text-gray-500" onClick={onClose}>
           Hủy
         </button>
+        
+
       </div>
     </div>
   );

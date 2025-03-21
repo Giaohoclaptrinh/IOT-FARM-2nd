@@ -113,6 +113,140 @@
 
 
 // export default DeviceList;
+// import React, { useEffect, useState } from "react";
+// import { db } from "../firebase/db.config";
+// import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+// import AddDevice from "../components/AddDevice";
+
+// const DeviceList = ({ setSelectedDevice }) => {
+//   const itemsPerPage = 5;
+//   const [devices, setDevices] = useState([]);
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const [showAddDevice, setShowAddDevice] = useState(false);
+//   const [selectedLocation, setSelectedLocation] = useState("Tất cả");
+
+//   const uniqueLocations = ["Tất cả", ...new Set(devices.map(d => d.location || "Unknown device"))];
+
+//   const filteredDevices = devices.filter(device => 
+//   selectedLocation === "Tất cả" || device.location === selectedLocation
+// );
+
+
+//   useEffect(() => {
+//     const unsubscribe = onSnapshot(collection(db, "devices"), (snapshot) => {
+//       const deviceData = snapshot.docs.map((doc) => ({
+//         id: doc.id,
+//         ...doc.data(),
+//       }));
+//       setDevices(deviceData);
+//     });
+
+//     return () => unsubscribe();
+//   }, []);
+
+//   const handleDelete = async (deviceId) => {
+//     if (window.confirm("Bạn có chắc muốn xóa thiết bị này?")) {
+//       try {
+//         await deleteDoc(doc(db, "devices", deviceId));
+//         alert("Thiết bị đã được xóa thành công!");
+//       } catch (error) {
+//         console.error("Lỗi khi xóa thiết bị:", error);
+//       }
+//     }
+//   };
+
+//   const totalPages = Math.ceil(devices.length / itemsPerPage);
+//   const startIndex = (currentPage - 1) * itemsPerPage;
+//   const selectedDevices = devices.slice(startIndex, startIndex + itemsPerPage);
+
+//   return (
+//     <div className="p-6">
+//       <h1 className="text-2xl font-bold mb-4">Danh Sách Thiết Bị</h1>
+//       <select 
+//   className="border p-2 rounded mb-4"
+//   value={selectedLocation}
+//   onChange={(e) => setSelectedLocation(e.target.value)}
+// >
+//   {uniqueLocations.map((location, index) => (
+//     <option key={index} value={location}>{location}</option>
+//   ))}
+// </select>
+
+//       <div>
+//   <h3 className="font-semibold">{device.name || "Không có tên"}</h3>
+//   <p className="text-sm text-gray-600">
+//     Vị trí: {device.location ? device.location : "Unknown device"}
+//   </p>
+//   <p className={`text-sm ${device.status === 'Online' ? 'text-green-500' : 'text-red-500'}`}>
+//     {device.status}
+//   </p>
+// </div>
+
+//       <button
+//         className="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-800 transition"
+//         onClick={() => setShowAddDevice(true)}
+//       >
+//         + Thêm thiết bị
+//       </button>
+
+//       {showAddDevice && <AddDevice onClose={() => setShowAddDevice(false)} />}
+
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {selectedDevices.length > 0 ? (
+//           selectedDevices.map((device) => (
+//             <div
+//               key={device.id}
+//               className="p-4 rounded-lg shadow cursor-pointer bg-white flex justify-between items-center"
+//               onClick={() => setSelectedDevice(device.id)}
+//             >
+//               <div>
+//                 <h3 className="font-semibold">{device.name || "Không có tên"}</h3>
+//                 <p className={`text-sm ${device.status === 'Online' ? 'text-green-500' : 'text-red-500'}`}>
+//                   {device.status}
+//                 </p>
+//               </div>
+//               <button
+//                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+//                 onClick={(e) => {
+//                   e.stopPropagation();
+//                   handleDelete(device.id);
+//                 }}
+//               >
+//                 Xóa
+//               </button>
+//             </div>
+//           ))
+//         ) : (
+//           <p className="text-gray-500">Chưa có thiết bị nào.</p>
+//         )}
+//       </div>
+
+//       {/* Thanh chuyển trang */}
+//       {totalPages > 1 && (
+//         <div className="mt-4 flex justify-center items-center space-x-2">
+//           <button
+//             className={`px-4 py-2 border rounded-lg ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+//             onClick={() => setCurrentPage(currentPage - 1)}
+//             disabled={currentPage === 1}
+//           >
+//             Trang trước
+//           </button>
+//           <span>Trang {currentPage} / {totalPages}</span>
+//           <button
+//             className={`px-4 py-2 border rounded-lg ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
+//             onClick={() => setCurrentPage(currentPage + 1)}
+//             disabled={currentPage === totalPages}
+//           >
+//             Trang sau
+//           </button>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default DeviceList;
+
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase/db.config";
 import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
@@ -123,6 +257,7 @@ const DeviceList = ({ setSelectedDevice }) => {
   const [devices, setDevices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddDevice, setShowAddDevice] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState("Tất cả");
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "devices"), (snapshot) => {
@@ -147,14 +282,45 @@ const DeviceList = ({ setSelectedDevice }) => {
     }
   };
 
-  const totalPages = Math.ceil(devices.length / itemsPerPage);
+  // Lọc thiết bị theo vị trí
+  const filteredDevices = devices.filter(
+    (device) =>
+      selectedLocation === "Tất cả" ||
+      (selectedLocation === "Unknown device"
+        ? !device.location || device.location.trim() === ""
+        : device.location === selectedLocation)
+  );
+  
+
+  // Tạo danh sách vị trí duy nhất
+  const uniqueLocations = ["Tất cả", ...new Set(devices.map((d) => d.location || "Unknown device"))];
+
+  // Phân trang dựa trên danh sách đã lọc
+  const totalPages = Math.ceil(filteredDevices.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const selectedDevices = devices.slice(startIndex, startIndex + itemsPerPage);
+  const selectedDevices = filteredDevices.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Danh Sách Thiết Bị</h1>
 
+      {/* Bộ lọc vị trí */}
+      <select
+        className="border p-2 rounded mb-4"
+        value={selectedLocation}
+        onChange={(e) => {
+          setSelectedLocation(e.target.value);
+          setCurrentPage(1); // Reset về trang 1 khi đổi vị trí
+        }}
+      >
+        {uniqueLocations.map((location, index) => (
+          <option key={index} value={location}>
+            {location}
+          </option>
+        ))}
+      </select>
+
+      {/* Nút thêm thiết bị */}
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-800 transition"
         onClick={() => setShowAddDevice(true)}
@@ -164,6 +330,7 @@ const DeviceList = ({ setSelectedDevice }) => {
 
       {showAddDevice && <AddDevice onClose={() => setShowAddDevice(false)} />}
 
+      {/* Danh sách thiết bị */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {selectedDevices.length > 0 ? (
           selectedDevices.map((device) => (
@@ -174,7 +341,10 @@ const DeviceList = ({ setSelectedDevice }) => {
             >
               <div>
                 <h3 className="font-semibold">{device.name || "Không có tên"}</h3>
-                <p className={`text-sm ${device.status === 'Online' ? 'text-green-500' : 'text-red-500'}`}>
+                <p className="text-sm text-gray-600">
+                  Vị trí: {device.location ? device.location : "Unknown device"}
+                </p>
+                <p className={`text-sm ${device.status === "Online" ? "text-green-500" : "text-red-500"}`}>
                   {device.status}
                 </p>
               </div>
@@ -190,7 +360,7 @@ const DeviceList = ({ setSelectedDevice }) => {
             </div>
           ))
         ) : (
-          <p className="text-gray-500">Chưa có thiết bị nào.</p>
+          <p className="text-gray-500">Không có thiết bị nào ở vị trí này.</p>
         )}
       </div>
 
@@ -204,7 +374,9 @@ const DeviceList = ({ setSelectedDevice }) => {
           >
             Trang trước
           </button>
-          <span>Trang {currentPage} / {totalPages}</span>
+          <span>
+            Trang {currentPage} / {totalPages}
+          </span>
           <button
             className={`px-4 py-2 border rounded-lg ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={() => setCurrentPage(currentPage + 1)}
@@ -219,4 +391,3 @@ const DeviceList = ({ setSelectedDevice }) => {
 };
 
 export default DeviceList;
-
