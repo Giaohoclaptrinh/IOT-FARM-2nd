@@ -7,6 +7,7 @@ import Devices from "./pages/Devices";
 import Products from "./pages/Products";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import DeviceOverview from "./components/DeviceOverview";
 
 const App = () => {
   const [showLayout, setShowLayout] = useState(true);
@@ -23,18 +24,19 @@ const MainContent = ({ showLayout, setShowLayout }) => {
   const isAuthPage = location.pathname === "/sign-in" || location.pathname === "/sign-up";
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-full overflow-hidden max-w-full">
       {showLayout && !isAuthPage && <Sidebar />}
       <div className="flex-1 bg-gray-100">
         {showLayout && !isAuthPage && <TopBar />}
-        <div className="p-6">
+        <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
           <Routes>
             <Route path="/dashboards" element={<Dashboard />} />
+            <Route path="/Sidebar" element={<Sidebar />} />
             <Route path="/devices" element={<Devices />} />
             <Route path="/products" element={<Products />} />
             <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
             <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/DeviceOverview" element= {<DeviceOverview />} />
           </Routes>
         </div>
       </div>

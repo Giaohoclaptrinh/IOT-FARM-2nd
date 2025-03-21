@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return(
-  <div className="w-64 bg-gray-900 text-white h-screen p-4 flex flex-col">
+  <div className="w-64 bg-gray-900 text-white h-screen max-w-full overflow-y-hidden  p-4 flex flex-col">
   <h2 className="text-xl font-bold mb-4">IoT-Farm</h2>
   <ul className="flex-grow">
     <li>

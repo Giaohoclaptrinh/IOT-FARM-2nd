@@ -94,6 +94,7 @@ const Dashboard = () => {
     
       
     <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
+      <div className="max-h-px"></div>
       <div className="mb-8 w-full table-fixed border-collapse">
         <h1 className="text-2xl font-bold">Chào mừng, {userName}! 👋</h1>
         <p className="text-gray-600">Quyền hạn: {userRole}</p>
