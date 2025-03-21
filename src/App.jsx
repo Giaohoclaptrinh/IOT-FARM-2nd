@@ -36,7 +36,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
             <Route path="/products" element={<Products />} />
             <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
             <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
-            <Route path="/DeviceOverview" element= {<DeviceOverview />} />
+            <Route path="/device-overview" element= {<DeviceOverview />} />
           </Routes>
         </div>
       </div>
