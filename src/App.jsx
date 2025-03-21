@@ -8,6 +8,7 @@ import Products from "./pages/Products";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import DeviceOverview from "./components/DeviceOverview";
+import ProfileSettings from "./pages/ProfileSettings";
 
 const App = () => {
   const [showLayout, setShowLayout] = useState(true);
@@ -34,6 +35,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
             <Route path="/Sidebar" element={<Sidebar />} />
             <Route path="/devices" element={<Devices />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/profile-settings" element={<ProfileSettings />} />
             <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
             <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
             <Route path="/device-overview" element= {<DeviceOverview />} />

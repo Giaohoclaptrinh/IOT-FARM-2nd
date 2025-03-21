@@ -19,7 +19,12 @@ const Sidebar = () => {
     <li>
       <Link to="/products" className="block p-2 hover:bg-gray-700 rounded">Products</Link>
     </li>
+    
   </ul>
+    <div className="mt-auto">
+    
+          <Link to="/profile-settings" className="block p-2 hover:bg-gray-700">Cài đặt hồ sơ</Link>
+    </div>
 </div>
 );
 
