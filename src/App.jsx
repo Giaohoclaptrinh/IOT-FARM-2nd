@@ -9,9 +9,13 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import DeviceOverview from "./components/DeviceOverview";
 import ProfileSettings from "./pages/ProfileSettings";
+import DeviceDetail from "./components/DeviceDetail";
+import './App.css'
+
 
 const App = () => {
   const [showLayout, setShowLayout] = useState(true);
+  
 
   return (
     <Router>
@@ -39,6 +43,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
             <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
             <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
             <Route path="/device-overview" element= {<DeviceOverview />} />
+            <Route path="/device/:id" element= {<DeviceDetail/>} />
           </Routes>
         </div>
       </div>

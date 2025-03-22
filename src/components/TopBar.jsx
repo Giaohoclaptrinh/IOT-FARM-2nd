@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import { auth } from "../firebase/db.config";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where , orderBy, startAt, endAt, getDocs } from "firebase/firestore";
 import { db } from "../firebase/db.config"; 
+
 
 const TopBar = () => {
   const [user, setUser] = useState(null);
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true); // Thêm state loading
   const navigate = useNavigate();
+  const [search , setSearch] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  console.log(search)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -48,6 +52,41 @@ const TopBar = () => {
       console.error("Lỗi khi đăng xuất:", error);
     }
   };
+  const handleSearch = async (e) => {
+    const value = e.target.value.trim();
+    setSearch(value);
+
+    if (value === "") {
+      setSuggestions([]);
+      return;
+    }
+
+    try {
+      const usersRef = collection(db, "devices"); 
+      const q = query(
+        usersRef, 
+        orderBy("name"),
+        startAt(value),
+        endAt(value + "\uf8ff")
+      );
+      const querySnapshot = await getDocs(q);
+      const results = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setSuggestions(results);
+    } catch (error) {
+      console.error("Lỗi khi tìm kiếm:", error);
+    }
+  };
+    const handleSelect = (item) => {
+    setSearch(item.name); // Gán tên thiết bị vào ô tìm kiếm
+    setSuggestions([]); // Ẩn danh sách gợi ý
+  
+    // Điều hướng hoặc hiển thị thông tin thiết bị
+    navigate(`/device/${item.id}`); // ⚡ Nếu có trang chi tiết thiết bị
+  };
 
   return (
     <div className="bg-white shadow-md p-4 flex justify-between items-center">
@@ -56,9 +95,25 @@ const TopBar = () => {
       <div className="relative">
         <input
           type="text"
+          value={search}
+          onChange={handleSearch} 
           placeholder="Tìm kiếm..."
-          className="border rounded-lg px-3 py-2 w-64"
+          className="border  rounded-lg px-3 py-2 w-64"
         />
+        {suggestions.length > 0 && (
+          <ul className="absolute bg-white border rounded-lg mt-1 w-64 shadow-lg">
+            {suggestions.map((item) => (
+              <li 
+                key={item.id} 
+                className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelect(item)} // ⚡ Click để chọn
+              >
+                {item.name}
+              </li>  
+            ))}
+          </ul>
+)}
+
       </div>
 
       {loading ? (

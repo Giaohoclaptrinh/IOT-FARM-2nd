@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { db } from "../firebase/db.config"; // Kết nối Firebase
 import { collection, addDoc } from "firebase/firestore";
+import { Description } from "@mui/icons-material";
 
 const AddDevice = ({ onClose }) => {
   const [deviceName, setDeviceName] = useState("");
   const [status, setStatus] = useState("Online");
   const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false)
+  const [description, setDesciption] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +20,7 @@ const AddDevice = ({ onClose }) => {
         status: status,
         createdAt: new Date(),
         location: location,
+        description: description,
       });
 
       alert("Thiết bị đã được thêm!");
@@ -48,6 +51,14 @@ const AddDevice = ({ onClose }) => {
             className="border p-2 w-full"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            required
+            />
+            <input
+            type="text"
+            placeholder="Giới thiệu thiết bị"
+            className="border p-2 w-full"
+            value={description}
+            onChange={(e) => setDesciption(e.target.value)}
             required
             />
           <select
