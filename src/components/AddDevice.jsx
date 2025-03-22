@@ -23,7 +23,7 @@ const AddDevice = ({ onClose }) => {
         description: description,
       });
 
-      alert("Thiết bị đã được thêm!");
+     // alert("Thiết bị đã được thêm!");
       onClose(); // Đóng form sau khi thêm thành công
     } catch (error) {
       console.error("Lỗi khi thêm thiết bị: ", error);

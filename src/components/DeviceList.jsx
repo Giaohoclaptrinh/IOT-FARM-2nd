@@ -253,7 +253,7 @@ import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import AddDevice from "../components/AddDevice";
 
 const DeviceList = ({ setSelectedDevice }) => {
-  const itemsPerPage = 5;
+  const itemsPerPage = 15;
   const [devices, setDevices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddDevice, setShowAddDevice] = useState(false);
@@ -275,7 +275,7 @@ const DeviceList = ({ setSelectedDevice }) => {
     if (window.confirm("Bạn có chắc muốn xóa thiết bị này?")) {
       try {
         await deleteDoc(doc(db, "devices", deviceId));
-        alert("Thiết bị đã được xóa thành công!");
+        // alert("Thiết bị đã được xóa thành công!");
       } catch (error) {
         console.error("Lỗi khi xóa thiết bị:", error);
       }
@@ -336,7 +336,7 @@ const DeviceList = ({ setSelectedDevice }) => {
           selectedDevices.map((device) => (
             <div
               key={device.id}
-              className="p-4 rounded-lg shadow cursor-pointer bg-white flex justify-between items-center"
+              className="p-4 rounded-lg shadow cursor-pointer bg-white flex justify-between items-center "
               onClick={() => setSelectedDevice(device.id)}
             >
               <div>
@@ -366,7 +366,7 @@ const DeviceList = ({ setSelectedDevice }) => {
 
       {/* Thanh chuyển trang */}
       {totalPages > 1 && (
-        <div className="mt-4 flex justify-center items-center space-x-2">
+        <div className="fixed bottom-0 left-0 w-full border-l-orange-50shadow-md p-4 flex justify-center items-center space-x-2">
           <button
             className={`px-4 py-2 border rounded-lg ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={() => setCurrentPage(currentPage - 1)}

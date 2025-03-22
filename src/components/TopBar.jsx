@@ -13,6 +13,7 @@ const TopBar = () => {
   const navigate = useNavigate();
   const [search , setSearch] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const [searchResults, setSearchResults] = useState([]); 
   console.log(search)
 
   useEffect(() => {
@@ -88,6 +89,30 @@ const TopBar = () => {
     navigate(`/device/${item.id}`); // ⚡ Nếu có trang chi tiết thiết bị
   };
 
+  // const handleKeyPress = async (e) => {
+  //   if (e.key === "Enter" && search.trim() !== "") {
+  //     try {
+  //       const devicesRef = collection(db, "devices");
+  //       const q = query(
+  //         devicesRef,
+  //         orderBy("name"),
+  //         startAt(search),
+  //         endAt(search + "\uf8ff")
+  //       );
+  //       const querySnapshot = await getDocs(q);
+  //       const results = querySnapshot.docs.map((doc) => ({
+  //         id: doc.id,
+  //         ...doc.data(),
+  //       }));
+  
+  //       setSuggestions([]); // Ẩn gợi ý khi nhấn Enter
+  //       setSearchResults(results); // 🆕 Lưu kết quả tìm kiếm
+  //     } catch (error) {
+  //       console.error("Lỗi khi tìm kiếm:", error);
+  //     }
+  //   }
+  // };
+
   return (
     <div className="bg-white shadow-md p-4 flex justify-between items-center">
       <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
@@ -97,9 +122,24 @@ const TopBar = () => {
           type="text"
           value={search}
           onChange={handleSearch} 
+          // onKeyDown={handleKeyPress}
           placeholder="Tìm kiếm..."
           className="border  rounded-lg px-3 py-2 w-64"
         />
+        {searchResults.length > 0 && (
+            <ul className="mt-4 w-64 border rounded-lg bg-white shadow-lg">
+              <h3 className="text-sm text-gray-600 font-semibold p-2">Kết quả tìm kiếm:</h3>
+              {searchResults.map((item) => (
+                <li 
+                  key={item.id} 
+                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleSelect(item)}
+                >
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+)}
         {suggestions.length > 0 && (
           <ul className="absolute bg-white border rounded-lg mt-1 w-64 shadow-lg">
             {suggestions.map((item) => (
@@ -113,6 +153,7 @@ const TopBar = () => {
             ))}
           </ul>
 )}
+
 
       </div>
 
