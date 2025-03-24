@@ -251,6 +251,8 @@ import React, { useEffect, useState } from "react";
 import { db } from "../firebase/db.config";
 import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import AddDevice from "../components/AddDevice";
+import updateUserRole from "./RoleManager"
+
 
 const DeviceList = ({ setSelectedDevice }) => {
   const itemsPerPage = 15;
@@ -258,6 +260,7 @@ const DeviceList = ({ setSelectedDevice }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddDevice, setShowAddDevice] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("Tất cả");
+  
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "devices"), (snapshot) => {
@@ -304,6 +307,7 @@ const DeviceList = ({ setSelectedDevice }) => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Danh Sách Thiết Bị</h1>
 
+      
       {/* Bộ lọc vị trí */}
       <select
         className="border p-2 rounded mb-4"
