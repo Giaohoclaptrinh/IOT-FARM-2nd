@@ -15,7 +15,7 @@ const Devices = () => {
       {/* Chỉ hiển thị biểu đồ nếu có thiết bị được chọn */}
       {selectedDevice && (
         <div className="mt-8 p-4 border rounded-lg shadow bg-white">
-          <h2 className="text-lg font-semibold">Dữ liệu thiết bị: {selectedDevice}</h2>
+          <h2 className="text-lg text-black bg-red-400 font-semibold">Dữ liệu thiết bị: {selectedDevice}</h2>
           <DeviceChart deviceId={selectedDevice.id} />
         </div>
       )}

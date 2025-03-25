@@ -391,7 +391,7 @@ const DeviceList = ({ setSelectedDevice }) => {
 
       {/* Thanh chuyển trang */}
       {totalPages > 1 && (
-        <div className="fixed bottom-0 left-0 w-full border-l-orange-50shadow-md p-4 flex justify-center items-center space-x-2">
+        <div className="fixed z-50 bottom-0 left-auto right-0 w-[80%] ml-auto border-l-orange-50 shadow-md p-4 flex justify-center items-center space-x-2">
           <button
             className={`px-4 py-2 border rounded-lg ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={() => setCurrentPage(currentPage - 1)}

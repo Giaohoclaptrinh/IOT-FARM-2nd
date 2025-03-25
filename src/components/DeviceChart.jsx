@@ -45,7 +45,7 @@ const DeviceChart = ({ deviceId }) => {
       className={`bg-white p-4 rounded-lg shadow-lg ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}
     >
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Thống kê thiết bị</h3>
+        <h3 className="text-lg  font-semibold">Thống kê thiết bị</h3>
         <button
           onClick={toggleFullscreen}
           className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"

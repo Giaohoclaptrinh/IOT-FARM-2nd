@@ -85,7 +85,7 @@ const Dashboard = () => {
 
   return (
     
-    <div className="px-8 h-full max-w-full overflow-hidden bg-[#374151]">
+    <div className="px-8 h-full max-w-full overflow-scroll bg-[#374151]">
       {/* <h1 className="text-3xl font-bold mb-4">Bảng điều khiển</h1> */}
       
       {/* Tích hợp chức năng tìm kiếm */}
@@ -114,8 +114,8 @@ const Dashboard = () => {
            
             <DeviceList devices={devices} setSelectedDevice={setSelectedDevice} />
             {selectedDevice && (
-              <div className="mt-8 p-4 border rounded-lg shadow bg-white">
-                <h2 className="text-lg font-semibold">Dữ liệu thiết bị: {selectedDevice}</h2>
+              <div className="mt-12 p-8 mb-36 border rounded-lg shadow bg-blue-200">
+                <h2 className="text-lg font-semibold">Thiết Bị: {selectedDevice}</h2>
                 <DeviceChart deviceId={selectedDevice} />
               </div>
             )}
