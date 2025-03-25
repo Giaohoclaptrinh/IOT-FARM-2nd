@@ -36,7 +36,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
         {showLayout && !isAuthPage && <Sidebar />}
         <div className="flex-1 bg-gray-100">
           
-          <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
+          <div className=" text-white h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
           <Routes>
               <Route path="/dashboards" element={<Dashboard />} />
               <Route path="/Sidebar" element={<Sidebar />} />

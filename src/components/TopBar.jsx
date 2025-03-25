@@ -200,8 +200,8 @@ function  TopBar()
         <header className="w-full min-h-16 bg-[#374151]  border-b-[1px] border-white text-white
          flex items-center px-4
          justify-between">
-           <div className="flex justify-center items-center gap-1">
-                <a href="#!" className="scale-300 px-4 hover:opacity-70">
+           <div className="flex justify-center p-y-4 scale-150 items-center gap-1">
+                <a href="#!" className="scale-300 h-4 px-4 hover:opacity-70">
                     <IoLogoCodepen/> 
                     
                 </a>

@@ -85,7 +85,7 @@ const Dashboard = () => {
 
   return (
     
-    <div className="p-6 h-full max-w-full overflow-auto bg-gray-100">
+    <div className="px-8 h-full max-w-full overflow-hidden bg-[#374151]">
       {/* <h1 className="text-3xl font-bold mb-4">Bảng điều khiển</h1> */}
       
       {/* Tích hợp chức năng tìm kiếm */}
@@ -93,8 +93,8 @@ const Dashboard = () => {
 
 
 
-      <h1 className="text-2xl font-bold">Chào mừng, {userName}! 👋</h1>
-      <p className="text-gray-600">Quyền hạn: {userRole}</p>
+      
+     
 
       {userRole === "admin" && (
         <div className="flex space-x-4 mt-6">
@@ -111,7 +111,7 @@ const Dashboard = () => {
         {selectedFunction === "roleManagement" && userRole === "admin" && <RoleManager />}
         {selectedFunction === "devices" && (
           <>
-            <h2 className="text-xl font-semibold mb-4">Thiết bị của bạn</h2>
+           
             <DeviceList devices={devices} setSelectedDevice={setSelectedDevice} />
             {selectedDevice && (
               <div className="mt-8 p-4 border rounded-lg shadow bg-white">

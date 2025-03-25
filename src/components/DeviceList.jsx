@@ -254,7 +254,7 @@ import AddDevice from "../components/AddDevice";
 import EditDevice from "../components/EditDevice"; // Đảm bảo đường dẫn đúng
 
 const DeviceList = ({ setSelectedDevice }) => {
-  const itemsPerPage = 15;
+  const itemsPerPage = 12;
   const [devices, setDevices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddDevice, setShowAddDevice] = useState(false);
@@ -307,12 +307,12 @@ const DeviceList = ({ setSelectedDevice }) => {
   const selectedDevices = filteredDevices.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="p-6">
+    <div className="">
       <h1 className="text-2xl font-bold mb-4">Danh Sách Thiết Bị</h1>
 
       {/* Bộ lọc vị trí */}
       <select
-        className="border p-2 rounded mb-4"
+        className="border px-4  outline-none mr-4 rounded mb-4 appearance-none bg-blue-500 font-sans font-semibold"
         value={selectedLocation}
         onChange={(e) => {
           setSelectedLocation(e.target.value);
@@ -328,10 +328,10 @@ const DeviceList = ({ setSelectedDevice }) => {
 
       {/* Nút thêm thiết bị */}
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-800 transition"
+        className="bg-green-400 text-white px-4 py-2 rounded mb-4 hover:opacity-90 transition"
         onClick={() => setShowAddDevice(true)}
       >
-        + Thêm thiết bị
+        Thêm thiết bị
       </button>
 
       {showAddDevice && <AddDevice onClose={() => setShowAddDevice(false)} />}
@@ -342,19 +342,19 @@ const DeviceList = ({ setSelectedDevice }) => {
           selectedDevices.map((device) => (
             <div
               key={device.id}
-              className="p-4 rounded-lg shadow cursor-pointer bg-white flex justify-between items-center"
+              className="p-8 w-sm rounded-lg shadow-sm shadow-black cursor-pointer bg-white flex justify-between items-center"
               onClick={() => setSelectedDevice(device.id)}
             >
-              <div>
+              <div className="w-full h-10 flex-wrap -translate-y-[50%]  items-center justify-center">
                 <h3 className="font-semibold">{device.name || "Không có tên"}</h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm font-medium font-sans mb-2 text-nowrap text-gray-600">
                   Vị trí: {device.location ? device.location : "Unknown device"}
                 </p>
                 <p className={`text-sm ${device.status === "Online" ? "text-green-500" : "text-red-500"}`}>
                   {device.status}
                 </p>
               </div>
-              <div className="space-x-2">
+              <div className="space-x-2 flex w-full justify-center">
                 <button
                   className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
                   onClick={(e) => {
@@ -403,7 +403,7 @@ const DeviceList = ({ setSelectedDevice }) => {
             Trang {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 border rounded-lg ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`px-4 py-2 border rounded-lg ${currentPage === totalPages ? "opacity-90 cursor-not-allowed" : ""}`}
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
