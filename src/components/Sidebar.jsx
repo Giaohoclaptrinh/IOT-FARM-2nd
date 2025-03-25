@@ -71,7 +71,7 @@ const SideBar = () => {
                         {menu.subMenu && (
                             <button 
                                 onClick={() => handleToggleSubMenu(index)} 
-                                className={`absolute top-4 right-4 transition-transform ${openSubMenuIndex === index ? "rotate-180" : ""}`}
+                                className={`absolute top-4 right-4 transition-transform ${openSubMenuIndex === index ? "" : "rotate-180"}`}
                             >
                                 <IoArrowUpCircleOutline />
                             </button>
