@@ -251,8 +251,7 @@ import React, { useEffect, useState } from "react";
 import { db } from "../firebase/db.config";
 import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 import AddDevice from "../components/AddDevice";
-import updateUserRole from "./RoleManager"
-
+import EditDevice from "../components/EditDevice"; // Đảm bảo đường dẫn đúng
 
 const DeviceList = ({ setSelectedDevice }) => {
   const itemsPerPage = 15;
@@ -260,7 +259,8 @@ const DeviceList = ({ setSelectedDevice }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddDevice, setShowAddDevice] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("Tất cả");
-  
+  const [showEditDevice, setShowEditDevice] = useState(false);
+  const [selectedDeviceData, setSelectedDeviceData] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "devices"), (snapshot) => {
@@ -274,11 +274,15 @@ const DeviceList = ({ setSelectedDevice }) => {
     return () => unsubscribe();
   }, []);
 
+  const handleEdit = (device) => {
+    setSelectedDeviceData(device);
+    setShowEditDevice(true);
+  };
+
   const handleDelete = async (deviceId) => {
     if (window.confirm("Bạn có chắc muốn xóa thiết bị này?")) {
       try {
         await deleteDoc(doc(db, "devices", deviceId));
-        // alert("Thiết bị đã được xóa thành công!");
       } catch (error) {
         console.error("Lỗi khi xóa thiết bị:", error);
       }
@@ -293,7 +297,6 @@ const DeviceList = ({ setSelectedDevice }) => {
         ? !device.location || device.location.trim() === ""
         : device.location === selectedLocation)
   );
-  
 
   // Tạo danh sách vị trí duy nhất
   const uniqueLocations = ["Tất cả", ...new Set(devices.map((d) => d.location || "Unknown device"))];
@@ -307,14 +310,13 @@ const DeviceList = ({ setSelectedDevice }) => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Danh Sách Thiết Bị</h1>
 
-      
       {/* Bộ lọc vị trí */}
       <select
         className="border p-2 rounded mb-4"
         value={selectedLocation}
         onChange={(e) => {
           setSelectedLocation(e.target.value);
-          setCurrentPage(1); // Reset về trang 1 khi đổi vị trí
+          setCurrentPage(1);
         }}
       >
         {uniqueLocations.map((location, index) => (
@@ -340,7 +342,7 @@ const DeviceList = ({ setSelectedDevice }) => {
           selectedDevices.map((device) => (
             <div
               key={device.id}
-              className="p-4 rounded-lg shadow cursor-pointer bg-white flex justify-between items-center "
+              className="p-4 rounded-lg shadow cursor-pointer bg-white flex justify-between items-center"
               onClick={() => setSelectedDevice(device.id)}
             >
               <div>
@@ -352,21 +354,40 @@ const DeviceList = ({ setSelectedDevice }) => {
                   {device.status}
                 </p>
               </div>
-              <button
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(device.id);
-                }}
-              >
-                Xóa
-              </button>
+              <div className="space-x-2">
+                <button
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEdit(device);
+                  }}
+                >
+                  Sửa
+                </button>
+                <button
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(device.id);
+                  }}
+                >
+                  Xóa
+                </button>
+              </div>
             </div>
           ))
         ) : (
           <p className="text-gray-500">Không có thiết bị nào ở vị trí này.</p>
         )}
       </div>
+
+      {/* Form chỉnh sửa thiết bị */}
+      {showEditDevice && (
+        <EditDevice 
+          device={selectedDeviceData} 
+          onClose={() => setShowEditDevice(false)} 
+        />
+      )}
 
       {/* Thanh chuyển trang */}
       {totalPages > 1 && (
