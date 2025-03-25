@@ -192,85 +192,29 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/db.config";
 import SearchResult from "./SearchResult";
 
-const TopBar = () => {
-  const [user, setUser] = useState(null);
-  const [userName, setUserName] = useState("");
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isFocused, setIsFocused] = useState(false);
+import { IoLogoCodepen } from "react-icons/io";
+import { RiNotification4Line } from "react-icons/ri";
+function  TopBar()
+{
+    return (
+        <header className="w-full min-h-16 bg-[#374151]  border-b-[1px] border-white text-white
+         flex items-center px-4
+         justify-between">
+           <div className="flex justify-center items-center gap-1">
+                <a href="#!" className="scale-300 px-4 hover:opacity-70">
+                    <IoLogoCodepen/> 
+                    
+                </a>
+                <span  className="font-bold text-lg">Home</span>
+           </div>
+           <div className="relative">
+               <span className="w-8 h-8  scale-120 block flex items-center justify-center">
+                    <RiNotification4Line/>
+               </span>
+               <span className="inline-block p-1 rounded-full animate-pulse top-1 right-2  absolute z-10 bg-amber-400" ></span>
+           </div>
+        </header>
+    )
+}
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      setLoading(true);
-      if (currentUser) {
-        try {
-          const userDocRef = doc(db, "users", currentUser.uid);
-          const userDocSnap = await getDoc(userDocRef);
-          setUserName(userDocSnap.exists() ? userDocSnap.data().name || "Người dùng" : "Người dùng");
-        } catch (error) {
-          console.error("Lỗi khi lấy thông tin người dùng:", error);
-          setUserName("Người dùng");
-        }
-      } else {
-        setUserName("");
-      }
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/sign-in");
-    } catch (error) {
-      console.error("Lỗi khi đăng xuất:", error);
-    }
-  };
-
-  const handleSelectDevice = (device) => {
-    setSearchTerm(device.name);
-    setIsFocused(false);
-    navigate(`/device/${device.id}`);
-  };
-
-  return (
-    <div className="bg-white shadow-md p-4 flex justify-between items-center relative">
-      <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
-
-      {/* Ô tìm kiếm */}
-      <div className="relative w-64">
-        <input
-          type="text"
-          value={searchTerm}
-         onChange={(e) => setSearchTerm(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-          placeholder="Tìm kiếm thiết bị..."
-          className="border rounded-lg px-3 py-2 w-full"
-        />
-        {isFocused && <SearchResult searchTerm={searchTerm} onSelectDevice={handleSelectDevice} />}
-      </div>
-
-      {/* Thông tin người dùng */}
-      {loading ? (
-        <span className="text-gray-500">Đang tải...</span>
-      ) : user ? (
-        <div className="flex items-center space-x-4">
-          <span className="text-gray-700">👤 {userName}</span>
-          <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600">
-            Đăng xuất
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => navigate("/sign-in")} className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600">
-          Đăng nhập
-        </button>
-      )}
-    </div>
-  );
-};
-
-export default TopBar;
+export default  TopBar

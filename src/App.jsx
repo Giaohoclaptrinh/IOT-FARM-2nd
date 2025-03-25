@@ -13,6 +13,7 @@ import DeviceDetail from "./components/DeviceDetail";
 import './App.css'
 
 
+
 const App = () => {
   const [showLayout, setShowLayout] = useState(true);
   
@@ -29,22 +30,25 @@ const MainContent = ({ showLayout, setShowLayout }) => {
   const isAuthPage = location.pathname === "/sign-in" || location.pathname === "/sign-up";
 
   return (
-    <div className="flex h-screen overflow-hidden max-w-full">
-      {showLayout && !isAuthPage && <Sidebar />}
-      <div className="flex-1 bg-gray-100">
-        {showLayout && !isAuthPage && <TopBar />}
-        <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
+    <div className="overflow-hidden h-screen">
+      {showLayout && !isAuthPage && <TopBar />}
+      <div className="flex h-screen overflow-hidden max-w-full">
+        {showLayout && !isAuthPage && <Sidebar />}
+        <div className="flex-1 bg-gray-100">
+          
+          <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
           <Routes>
-            <Route path="/dashboards" element={<Dashboard />} />
-            <Route path="/Sidebar" element={<Sidebar />} />
-            <Route path="/devices" element={<Devices />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/profile-settings" element={<ProfileSettings />} />
-            <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
-            <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
-            <Route path="/device-overview" element= {<DeviceOverview />} />
-            <Route path="/device/:id" element= {<DeviceDetail/>} />
-          </Routes>
+              <Route path="/dashboards" element={<Dashboard />} />
+              <Route path="/Sidebar" element={<Sidebar />} />
+              <Route path="/devices" element={<Devices />} />
+              <Route path="/products" element={<Products />} />
+              <Route path="/profile-settings" element={<ProfileSettings />} />
+              <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
+              <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
+              <Route path="/device-overview" element= {<DeviceOverview />} />
+              <Route path="/device/:id" element= {<DeviceDetail/>} />
+            </Routes>
+          </div>
         </div>
       </div>
     </div>
