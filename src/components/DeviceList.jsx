@@ -348,6 +348,9 @@ const DeviceList = ({ setSelectedDevice }) => {
               <div>
                 <h3 className="font-semibold">{device.name || "Không có tên"}</h3>
                 <p className="text-sm text-gray-600">
+                  Mô tả: {device.description ? device.description : ""}
+                </p>
+                <p className="text-sm text-gray-600">
                   Vị trí: {device.location ? device.location : "Unknown device"}
                 </p>
                 <p className={`text-sm ${device.status === "Online" ? "text-green-500" : "text-red-500"}`}>
@@ -356,7 +359,7 @@ const DeviceList = ({ setSelectedDevice }) => {
               </div>
               <div className="space-x-2">
                 <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEdit(device);

@@ -30,6 +30,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
 
   return (
     <div className="flex h-screen overflow-hidden max-w-full">
+      
       {showLayout && !isAuthPage && <Sidebar />}
       <div className="flex-1 bg-gray-100">
         {showLayout && !isAuthPage && <TopBar />}
