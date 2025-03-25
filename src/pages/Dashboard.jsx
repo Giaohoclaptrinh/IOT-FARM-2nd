@@ -47,6 +47,7 @@ import { doc, getDoc, collection, query, where, onSnapshot } from "firebase/fire
 import DeviceChart from "../components/DeviceChart";
 import RoleManager from "../components/RoleManager";
 import DeviceList from "@/components/DeviceList";
+import SearchResult from "@/components/SearchResult";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -83,7 +84,15 @@ const Dashboard = () => {
   }, [userRole]);
 
   return (
+    
     <div className="p-6 h-full max-w-full overflow-auto bg-gray-100">
+      {/* <h1 className="text-3xl font-bold mb-4">Bảng điều khiển</h1> */}
+      
+      {/* Tích hợp chức năng tìm kiếm */}
+      {/* <SearchResult onSelectDevice={(device) => setSelectedDevice(device)} /> */}
+
+
+
       <h1 className="text-2xl font-bold">Chào mừng, {userName}! 👋</h1>
       <p className="text-gray-600">Quyền hạn: {userRole}</p>
 
