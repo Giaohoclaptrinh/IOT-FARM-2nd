@@ -29,7 +29,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
   const isAuthPage = location.pathname === "/sign-in" || location.pathname === "/sign-up";
 
   return (
-    <div className="flex h-full overflow-hidden max-w-full">
+    <div className="flex h-screen overflow-hidden max-w-full">
       {showLayout && !isAuthPage && <Sidebar />}
       <div className="flex-1 bg-gray-100">
         {showLayout && !isAuthPage && <TopBar />}

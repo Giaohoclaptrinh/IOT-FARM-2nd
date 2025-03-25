@@ -89,29 +89,29 @@ const TopBar = () => {
     navigate(`/device/${item.id}`); // ⚡ Nếu có trang chi tiết thiết bị
   };
 
-  // const handleKeyPress = async (e) => {
-  //   if (e.key === "Enter" && search.trim() !== "") {
-  //     try {
-  //       const devicesRef = collection(db, "devices");
-  //       const q = query(
-  //         devicesRef,
-  //         orderBy("name"),
-  //         startAt(search),
-  //         endAt(search + "\uf8ff")
-  //       );
-  //       const querySnapshot = await getDocs(q);
-  //       const results = querySnapshot.docs.map((doc) => ({
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       }));
+  const handleKeyPress = async (e) => {
+    if (e.key === "Enter" && search.trim() !== "") {
+      try {
+        const devicesRef = collection(db, "devices");
+        const q = query(
+          devicesRef,
+          orderBy("name"),
+          startAt(search),
+          endAt(search + "\uf8ff")
+        );
+        const querySnapshot = await getDocs(q);
+        const results = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
   
-  //       setSuggestions([]); // Ẩn gợi ý khi nhấn Enter
-  //       setSearchResults(results); // 🆕 Lưu kết quả tìm kiếm
-  //     } catch (error) {
-  //       console.error("Lỗi khi tìm kiếm:", error);
-  //     }
-  //   }
-  // };
+        setSuggestions([]); // Ẩn gợi ý khi nhấn Enter
+        setSearchResults(results); // 🆕 Lưu kết quả tìm kiếm
+      } catch (error) {
+        console.error("Lỗi khi tìm kiếm:", error);
+      }
+    }
+  };
 
   return (
     <div className="bg-white shadow-md p-4 flex justify-between items-center">
@@ -122,7 +122,7 @@ const TopBar = () => {
           type="text"
           value={search}
           onChange={handleSearch} 
-          // onKeyDown={handleKeyPress}
+           onKeyDown={handleKeyPress}
           placeholder="Tìm kiếm..."
           className="border  rounded-lg px-3 py-2 w-64"
         />
