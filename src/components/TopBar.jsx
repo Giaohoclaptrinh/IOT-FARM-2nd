@@ -183,7 +183,6 @@
 
 // export default TopBar;
 
-
 import React, { useEffect, useState } from "react";
 import { auth } from "../firebase/db.config";
 import { signOut, onAuthStateChanged } from "firebase/auth";
@@ -191,10 +190,11 @@ import { useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/db.config";
 import SearchResult from "./SearchResult";
+import { FaRegUser, FaSignOutAlt, FaSearch } from "react-icons/fa";
 
 const TopBar = () => {
   const [user, setUser] = useState(null);
-  const [userName, setUserName] = useState("");
+  const [userName, setUserName] = useState("Người dùng");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -211,10 +211,7 @@ const TopBar = () => {
           setUserName(userDocSnap.exists() ? userDocSnap.data().name || "Người dùng" : "Người dùng");
         } catch (error) {
           console.error("Lỗi khi lấy thông tin người dùng:", error);
-          setUserName("Người dùng");
         }
-      } else {
-        setUserName("");
       }
       setLoading(false);
     });
@@ -237,38 +234,42 @@ const TopBar = () => {
   };
 
   return (
-    <div className="bg-white shadow-md p-4 flex justify-between items-center relative">
-      <h1 className="text-xl font-bold text-gray-800">Dashboard</h1>
-
+    <div className="w-full min-h-16 bg-gray-900   text-black flex items-center px-6 justify-between">
+      <h1 className="text-xl font-semibold text-white">Dashboard</h1>
+      
       {/* Ô tìm kiếm */}
-      <div className="relative w-64">
+      <div className="relative w-64 flex items-center bg-gray-600 rounded-lg px-3 py-2">
+        <FaSearch className="text-gray-400 mr-2" />
         <input
           type="text"
           value={searchTerm}
-         onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           placeholder="Tìm kiếm thiết bị..."
-          className="border rounded-lg px-3 py-2 w-full"
+          className="w-full bg-gray-600 outline-none text-white border-none   focus:ring-0 "
         />
         {isFocused && <SearchResult searchTerm={searchTerm} onSelectDevice={handleSelectDevice} />}
       </div>
 
       {/* Thông tin người dùng */}
-      {loading ? (
-        <span className="text-gray-500">Đang tải...</span>
-      ) : user ? (
-        <div className="flex items-center space-x-4">
-          <span className="text-gray-700">👤 {userName}</span>
-          <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600">
-            Đăng xuất
+      <div className="flex items-center space-x-4">
+        {loading ? (
+          <span className="text-gray-400">Đang tải...</span>
+        ) : user ? (
+          <div className="flex items-center space-x-3">
+            <FaRegUser className="text-gray-300 text-lg" />
+            <span className="text-white font-medium">{userName}</span>
+            <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg flex items-center">
+              <FaSignOutAlt className="mr-2" /> Đăng xuất
+            </button>
+          </div>
+        ) : (
+          <button onClick={() => navigate("/sign-in")} className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg">
+            Đăng nhập
           </button>
-        </div>
-      ) : (
-        <button onClick={() => navigate("/sign-in")} className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600">
-          Đăng nhập
-        </button>
-      )}
+        )}
+      </div>
     </div>
   );
 };
