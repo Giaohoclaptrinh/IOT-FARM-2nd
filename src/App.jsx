@@ -30,6 +30,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
   const isAuthPage = location.pathname === "/sign-in" || location.pathname === "/sign-up";
 
   return (
+<<<<<<< HEAD
     <div className="overflow-hidden h-screen">
       {showLayout && !isAuthPage && <TopBar />}
       <div className="flex h-screen overflow-hidden max-w-full">
@@ -37,6 +38,14 @@ const MainContent = ({ showLayout, setShowLayout }) => {
         <div className="flex-1 bg-gray-100">
           
           <div className=" text-black h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
+=======
+    <div className="flex h-screen overflow-hidden max-w-full">
+      
+      {showLayout && !isAuthPage && <Sidebar />}
+      <div className="flex-1 bg-gray-100">
+        {showLayout && !isAuthPage && <TopBar />}
+        <div className="p-6 h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
+>>>>>>> firebase-connect
           <Routes>
               <Route path="/dashboards" element={<Dashboard />} />
               <Route path="/Sidebar" element={<Sidebar />} />
