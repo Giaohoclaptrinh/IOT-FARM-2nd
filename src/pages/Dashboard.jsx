@@ -1,45 +1,3 @@
-// import React, { useEffect, useState } from "react";
-//import { auth } from "../firebase/db.config";
-// import { onAuthStateChanged } from "firebase/auth";
- //import { doc, getDoc } from "firebase/firestore";
- //import { db } from "../firebase/db.config";
-
-// const Dashboard = () => {
-//   const [user, setUser] = useState(null);
-//   const [userName, setUserName] = useState("");
-
-//   useEffect(() => {
-//     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-//       setUser(currentUser);
-//       if (currentUser) {
-//         try {
-//           // Lấy dữ liệu từ Firestore
-//           const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-//           if (userDoc.exists()) {
-//             setUserName(userDoc.data().name);
-//           }
-//         } catch (error) {
-//           console.error("Lỗi khi lấy dữ liệu người dùng:", error);
-//         }
-//       } else {
-//         setUserName("");
-//       }
-//     });
-
-//     return () => unsubscribe();
-//   }, []);
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold">Chào mừng, {userName || "Người dùng"}! 👋</h1>
-//       <p className="mt-2 text-gray-600">Đây là bảng điều khiển của bạn.</p>
-//     </div>
-//   );
-// };
-
-
-
-// export default Dashboard;
 import React, { useEffect, useState } from "react";
 import { auth, db } from "../firebase/db.config";
 import { onAuthStateChanged } from "firebase/auth";
@@ -67,9 +25,8 @@ const Dashboard = () => {
           setUserRole(userDoc.data().role || 'client');
         }
 
-        // Lấy thiết bị dựa trên quyền
         const devicesQuery = userRole === "admin"
-          ? collection(db, "devices") // Admin xem toàn bộ thiết bị
+          ? collection(db, "devices")
           : query(collection(db, "devices"), where("userId", "==", currentUser.uid));
 
         const unsubscribeDevices = onSnapshot(devicesQuery, (snapshot) => {
@@ -84,38 +41,30 @@ const Dashboard = () => {
   }, [userRole]);
 
   return (
-    
-    <div className="px-8 h-full max-w-full overflow-scroll bg-[#374151]">
-      {/* <h1 className="text-3xl font-bold mb-4">Bảng điều khiển</h1> */}
+    <div className="px-8 py-6 h-full max-w-full overflow-auto bg-gray-50">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Bảng điều khiển</h1>
       
-      {/* Tích hợp chức năng tìm kiếm */}
-      {/* <SearchResult onSelectDevice={(device) => setSelectedDevice(device)} /> */}
-
-
-
-      
-     
-
       {userRole === "admin" && (
-        <div className="flex space-x-4 mt-6">
-          <button onClick={() => setSelectedFunction("roleManagement")} className={`px-4 py-2 rounded-lg shadow ${selectedFunction === "roleManagement" ? "bg-blue-500 text-white" : "bg-white"}`}>
+        <div className="flex space-x-4 mb-6">
+          <button onClick={() => setSelectedFunction("roleManagement")} 
+            className={`px-4 py-2 rounded-lg shadow transition-colors ${selectedFunction === "roleManagement" ? "bg-blue-600 text-white" : "bg-white hover:bg-gray-100"}`}>
             Quản lý phân quyền
           </button>
-          <button onClick={() => setSelectedFunction("devices")} className={`px-4 py-2 rounded-lg shadow ${selectedFunction === "devices" ? "bg-blue-500 text-white" : "bg-white"}`}>
+          <button onClick={() => setSelectedFunction("devices")} 
+            className={`px-4 py-2 rounded-lg shadow transition-colors ${selectedFunction === "devices" ? "bg-blue-600 text-white" : "bg-white hover:bg-gray-100"}`}>
             Thiết bị của bạn
           </button>
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="bg-white p-6 rounded-lg shadow-md">
         {selectedFunction === "roleManagement" && userRole === "admin" && <RoleManager />}
         {selectedFunction === "devices" && (
           <>
-           
             <DeviceList devices={devices} setSelectedDevice={setSelectedDevice} />
             {selectedDevice && (
-              <div className="mt-12 p-8 mb-36 border rounded-lg shadow bg-blue-200">
-                <h2 className="text-lg font-semibold">Thiết Bị: {selectedDevice}</h2>
+              <div className="mt-6 p-6 border rounded-lg shadow bg-blue-50">
+                <h2 className="text-lg font-semibold text-gray-700">Thiết Bị: {selectedDevice}</h2>
                 <DeviceChart deviceId={selectedDevice} />
               </div>
             )}
@@ -127,4 +76,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

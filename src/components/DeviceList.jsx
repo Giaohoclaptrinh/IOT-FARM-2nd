@@ -312,7 +312,7 @@ const DeviceList = ({ setSelectedDevice }) => {
 
       {/* Bộ lọc vị trí */}
       <select
-        className="border px-4  outline-none mr-4 rounded mb-4 appearance-none bg-blue-500 font-sans font-semibold"
+        className="border px-4  outline-none mr-4 rounded mb-4 appearance-none bg-white font-sans font-semibold"
         value={selectedLocation}
         onChange={(e) => {
           setSelectedLocation(e.target.value);
@@ -391,9 +391,9 @@ const DeviceList = ({ setSelectedDevice }) => {
 
       {/* Thanh chuyển trang */}
       {totalPages > 1 && (
-        <div className="fixed z-50 bottom-0 left-auto right-0 w-[80%] ml-auto border-l-orange-50 shadow-md p-4 flex justify-center items-center space-x-2">
+        <div className="text-white fixed z-50 bottom-0 left-auto right-0 w-[80%] ml-auto border-l-orange-50 shadow-md p-4 flex justify-center items-center space-x-2">
           <button
-            className={`px-4 py-2 border rounded-lg ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`text-white px-4 py-2 border rounded-lg ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
           >
@@ -403,7 +403,7 @@ const DeviceList = ({ setSelectedDevice }) => {
             Trang {currentPage} / {totalPages}
           </span>
           <button
-            className={`px-4 py-2 border rounded-lg ${currentPage === totalPages ? "opacity-90 cursor-not-allowed" : ""}`}
+            className={`text-white px-4 py-2 border rounded-lg ${currentPage === totalPages ? "opacity-90 cursor-not-allowed" : ""}`}
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
