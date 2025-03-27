@@ -235,7 +235,7 @@ const TopBar = () => {
 
   return (
     <div className="w-full min-h-16 bg-gray-900   text-black flex items-center px-6 justify-between">
-      <h1 className="text-xl font-semibold text-white">Dashboard</h1>
+      <h1 className="text-xl font-semibold text-white">HTR-HueTronics</h1>
       
       {/* Ô tìm kiếm */}
       <div className="relative w-64 flex items-center bg-gray-600 rounded-lg px-3 py-2">

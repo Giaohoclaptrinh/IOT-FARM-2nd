@@ -1,86 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import { db } from '../firebase/db.config';
-// import { collection, doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
-
-// const RoleManager = () => {
-//   const [users, setUsers] = useState([]);
-//   const [loading, setLoading] = useState(true);
-
-//   useEffect(() => {
-//     const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
-//       const usersData = snapshot.docs.map(doc => ({
-//         id: doc.id,
-//         ...doc.data()
-//       }));
-//       setUsers(usersData);
-//       setLoading(false);
-//     });
-
-//     return () => unsubscribe();
-//   }, []);
-
-//   const updateUserRole = async (userId, newRole) => {
-//     try {
-//       const userRef = doc(db, 'users', userId);
-//       await updateDoc(userRef, {
-//         role: newRole
-//       });
-//     } catch (error) {
-//       console.error('Lỗi khi cập nhật role:', error);
-//     }
-//   };
-
-//   if (loading) {
-//     return <div>Đang tải...</div>;
-//   }
-
-//   return (
-    
-//     <div className="bg-white p-6 rounded-lg shadow-lg overflow-x-auto">
-//       <h2 className="text-2xl font-bold mb-4">Quản lý phân quyền</h2>
-//       <div className="overflow-x-auto">
-//         <table className="min-w-full table-auto">
-//           <thead>
-//             <tr className="bg-gray-100">
-//               <th className="text-left w-1/12 py-2 bg-center ">Tên</th>
-//               <th className="text-left w-1/12 py-2 bg-center ">Email</th>
-//               <th className="text-left w-1/12 py-2 bg-center">Quyền hiện tại</th>
-//               <th className="text-left w-1/12 py-2 bg-center">Thay đổi quyền</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {console.log(users)}
-//             {users.map((user) => (
-//               <tr key={user.id} className="border-b">
-//                 <td className="px-4 py-2 ">{user.name}</td>
-//                 <td className="px-4 py-2 ">{user.email}</td>
-//                 <td className="px-4 py-2 ">{user.role || 'client'}</td>
-//                 <td className="px-4 py-2 ">
-//                   <select
-                  
-//                     value={user.role || 'client'}
-//                     onChange={(e) => updateUserRole(user.id, e.target.value)}
-//                     className="border rounded px-2 py-1"
-//                   >
-//                     <option value="client">Client</option>
-//                     <option value="staff">Staff</option>
-//                     <option value="admin">Admin</option>
-//                   </select>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default RoleManager;
-
-
-
-
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../firebase/db.config';
 import { collection, doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
@@ -89,17 +6,15 @@ import { onAuthStateChanged } from 'firebase/auth';
 const RoleManager = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserRole, setCurrentUserRole] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null);
-  
+  const [currentUser, setCurrentUser] = useState(null);
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setCurrentUserId(user.uid);
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
-          setCurrentUserRole(userDoc.data().role);
+          setCurrentUser({ id: user.uid, role: userDoc.data().role });
         }
       }
     });
@@ -116,57 +31,71 @@ const RoleManager = () => {
   }, []);
 
   const updateUserRole = async (userId, newRole) => {
-    if (currentUserRole !== 'admin') {
-      alert('Bạn không có quyền thay đổi vai trò!');
+    if (!currentUser || currentUser.role !== 'admin') {
+      setMessage({ type: 'error', text: 'Bạn không có quyền thay đổi vai trò!' });
       return;
     }
-    if (userId === currentUserId) {
-      alert('Bạn không thể thay đổi quyền của chính mình!');
+    if (userId === currentUser.id) {
+      setMessage({ type: 'error', text: 'Bạn không thể thay đổi quyền của chính mình!' });
       return;
     }
-
+    
+    const targetUser = users.find(user => user.id === userId);
+    if (targetUser && targetUser.role === 'admin') {
+      setMessage({ type: 'error', text: 'Bạn không thể thay đổi quyền của một admin khác!' });
+      return;
+    }
+    
+    if (newRole === 'admin') {
+      setMessage({ type: 'error', text: 'Bạn không thể nâng người dùng lên admin!' });
+      return;
+    }
+    
     try {
       await updateDoc(doc(db, 'users', userId), { role: newRole });
+      setMessage({ type: 'success', text: 'Cập nhật vai trò thành công!' });
     } catch (error) {
       console.error('Lỗi khi cập nhật role:', error);
+      setMessage({ type: 'error', text: 'Lỗi khi cập nhật vai trò!' });
     }
   };
 
-  if (loading) {
-    return <div>Đang tải...</div>;
-  }
-
-  if (currentUserRole !== 'admin') {
-    return <div>Bạn không có quyền truy cập trang này!</div>;
+  if (loading) return <div className='text-center p-4'>Đang tải...</div>;
+  if (!currentUser || currentUser.role !== 'admin') {
+    return <div className='text-red-500 text-center p-4'>Bạn không có quyền truy cập trang này!</div>;
   }
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">Quản lý phân quyền</h2>
-      <table className="min-w-full table-auto">
+    <div className='bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto'>
+      <h2 className='text-2xl font-bold mb-4 text-center'>Quản lý phân quyền</h2>
+      {message && (
+        <div className={`p-2 mb-4 text-center ${message.type === 'success' ? 'bg-green-200 text-green-700' : 'bg-red-200 text-red-700'}`}>
+          {message.text}
+        </div>
+      )}
+      <table className='min-w-full border rounded-lg'>
         <thead>
-          <tr className="bg-gray-100">
-            <th className="text-left py-2">Tên</th>
-            <th className="text-left py-2">Email</th>
-            <th className="text-left py-2">Quyền hiện tại</th>
-            <th className="text-left py-2">Thay đổi quyền</th>
+          <tr className='bg-gray-100'>
+            <th className='py-2 px-4'>Tên</th>
+            <th className='py-2 px-4'>Email</th>
+            <th className='py-2 px-4'>Quyền hiện tại</th>
+            <th className='py-2 px-4'>Thay đổi quyền</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id} className="border-b">
-              <td className="px-4 py-2">{user.name}</td>
-              <td className="px-4 py-2">{user.email}</td>
-              <td className="px-4 py-2">{user.role || 'client'}</td>
-              <td className="px-4 py-2">
-                {user.id !== currentUserId && (
+            <tr key={user.id} className='border-b text-center'>
+              <td className='py-2 px-4'>{user.name}</td>
+              <td className='py-2 px-4'>{user.email}</td>
+              <td className='py-2 px-4'>{user.role || 'client'}</td>
+              <td className='py-2 px-4'>
+                {user.id !== currentUser.id && user.role !== 'admin' && (
                   <select
                     value={user.role || 'client'}
                     onChange={(e) => updateUserRole(user.id, e.target.value)}
-                    className="border rounded px-2 py-1">
-                    <option value="client">Client</option>
-                    <option value="staff">Staff</option>
-                    <option value="admin">Admin</option>
+                    className='border rounded px-2 py-1'>
+                    <option value='client'>Client</option>
+                    <option value='staff'>Staff</option>
                   </select>
                 )}
               </td>
