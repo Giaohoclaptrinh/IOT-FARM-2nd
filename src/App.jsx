@@ -11,6 +11,7 @@ import DeviceOverview from "./components/DeviceOverview";
 import ProfileSettings from "./pages/ProfileSettings";
 import DeviceDetail from "./components/DeviceDetail";
 import './App.css'
+import UserPage from "./pages/User";
 
 
 const App = () => {
@@ -38,6 +39,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
           <div className=" text-black h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
           <Routes>
             <Route path="/dashboards" element={<Dashboard />} />
+            <Route path="/user" element={<UserPage />} />
             <Route path="/Sidebar" element={<Sidebar />} />
             <Route path="/devices" element={<Devices />} />
             <Route path="/products" element={<Products />} />

@@ -10,7 +10,7 @@ const Sidebar = () => {
     const menuList = [
         { title: "Dashboard", href: "/dashboards" },
         { title: "Devices", href: "/devices" },
-        { title: "Products", href: "/products" },
+        { title: "User", href: "/user" },
         {
             title: "Settings",
             subMenu: [
