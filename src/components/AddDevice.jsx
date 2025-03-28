@@ -1,36 +1,55 @@
-import { useState } from "react";
-import { db } from "../firebase/db.config"; // Kết nối Firebase
+import { useState, useEffect } from "react";
+import { db, auth } from "../firebase/db.config"; // Thêm auth để lấy user
 import { collection, addDoc } from "firebase/firestore";
-import { Description } from "@mui/icons-material";
 
-const AddDevice = ({ onClose }) => {
+const AddDevice = ({ onClose, onDeviceAdded }) => {
   const [deviceName, setDeviceName] = useState("");
   const [status, setStatus] = useState("Online");
   const [location, setLocation] = useState("");
-  const [loading, setLoading] = useState(false)
-  const [description, setDesciption] = useState("");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    return () => unsubscribe();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      alert("Bạn cần đăng nhập để thêm thiết bị!");
+      return;
+    }
+  
+    if (!deviceName.trim() || !location.trim() || !description.trim()) {
+      alert("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+  
     setLoading(true);
-
     try {
       await addDoc(collection(db, "devices"), {
-        name: deviceName,
-        status: status,
+        name: deviceName.trim(),
+        status,
+        location: location.trim(),
+        description: description.trim(),
+        userUID: user.uid,
         createdAt: new Date(),
-        location: location,
-        description: description,
       });
-
-     // alert("Thiết bị đã được thêm!");
-      onClose(); // Đóng form sau khi thêm thành công
+  
+      alert("Thiết bị đã được thêm thành công!");
+  
+      onDeviceAdded(); // Gọi callback cập nhật danh sách
     } catch (error) {
-      console.error("Lỗi khi thêm thiết bị: ", error);
-    } finally{
+      console.error("Lỗi khi thêm thiết bị:", error);
+    } finally {
       setLoading(false);
+      onClose(); // Đóng form
     }
   };
+  
+  
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
@@ -44,23 +63,23 @@ const AddDevice = ({ onClose }) => {
             value={deviceName}
             onChange={(e) => setDeviceName(e.target.value)}
             required
-              />
-            <input
+          />
+          <input
             type="text"
             placeholder="Vị trí thiết bị"
             className="border p-2 w-full"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             required
-            />
-            <input
+          />
+          <input
             type="text"
             placeholder="Giới thiệu thiết bị"
             className="border p-2 w-full"
             value={description}
-            onChange={(e) => setDesciption(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
             required
-            />
+          />
           <select
             className="border p-2 w-full"
             value={status}
@@ -70,19 +89,18 @@ const AddDevice = ({ onClose }) => {
             <option value="Offline">Offline</option>
           </select>
           <button
-          type="submit"
-          className={`p-2 w-full ${
-            loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-700"
-          } text-white`}
-          disabled={loading}>
-          {loading ? "Đang lưu..." : "Lưu"}
-        </button>
+            type="submit"
+            className={`p-2 w-full text-white ${
+              loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-700"
+            }`}
+            disabled={loading}
+          >
+            {loading ? "Đang lưu..." : "Lưu"}
+          </button>
         </form>
-        <button className="mt-4 text-gray-500" onClick={onClose}>
+        <button type="button" className="mt-4 text-gray-500" onClick={onClose}>
           Hủy
         </button>
-        
-
       </div>
     </div>
   );
