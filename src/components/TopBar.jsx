@@ -206,7 +206,7 @@ const TopBar = ({ onSearch }) => {
                   navigate(location.pathname.includes("device") ? `/device/${result.id}` : `/user/${result.id}`);
                 }}
               >
-                {location.pathname.includes("device") ? result.name : result.email}
+                {location.pathname.includes("device") ? result.name : result.name}
               </div>
             ))}
           </div>
