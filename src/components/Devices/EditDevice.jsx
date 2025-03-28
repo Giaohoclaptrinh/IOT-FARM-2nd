@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { db } from "../firebase/db.config";
+import { db } from "@/firebase/db.config";
 import { doc, updateDoc } from "firebase/firestore";
 import { Description } from "@mui/icons-material";
 

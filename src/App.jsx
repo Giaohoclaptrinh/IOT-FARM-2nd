@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
-import TopBar from "./components/TopBar";
+import Sidebar from "./components/SideBar/Sidebar";
+import TopBar from "./components/TopBar and Search/TopBar";
 import Dashboard from "./pages/Dashboard";
 import Devices from "./pages/Devices";
 import Products from "./pages/Products";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import DeviceOverview from "./components/DeviceOverview";
+import DeviceOverview from "./components/Devices/DeviceOverview";
 import ProfileSettings from "./pages/ProfileSettings";
-import DeviceDetail from "./components/DeviceDetail";
+import DeviceDetail from "./components/Devices/DeviceDetail";
 import './App.css'
 import UserPage from "./pages/User";
 

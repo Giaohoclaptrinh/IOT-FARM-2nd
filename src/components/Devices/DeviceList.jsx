@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { db, auth } from "../firebase/db.config";
+import { db, auth } from '@/firebase/db.config';
 import { collection, onSnapshot, query, where, deleteDoc, doc } from "firebase/firestore";
-import AddDevice from "../components/AddDevice";
-import EditDevice from "../components/EditDevice";
+import AddDevice from "../Devices/AddDevice";
+import EditDevice from "../Devices/EditDevice";
 
 const DeviceList = () => {
   const [devices, setDevices] = useState([]);

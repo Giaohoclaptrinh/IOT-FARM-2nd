@@ -95,11 +95,10 @@
 // export default TopBar;
 
 import React, { useEffect, useState } from "react";
-import { auth } from "../firebase/db.config";
+import { db, auth } from "@/firebase/db.config";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase/db.config";
 import { FaRegUser, FaSignOutAlt, FaSearch } from "react-icons/fa";
 
 const TopBar = ({ onSearch }) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { db } from '../firebase/db.config';
+import { db } from '@/firebase/db.config';
 import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 
 const DeviceChart = ({ deviceId }) => {

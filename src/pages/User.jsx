@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import TopBar from "../components/TopBar";
-import RoleManager from "../components/RoleManager";
+import TopBar from "../components/TopBar and Search/TopBar";
+import RoleManager from "../components/Role/RoleManager";
 
 const UserPage = () => {
   const [searchTerm, setSearchTerm] = useState("");

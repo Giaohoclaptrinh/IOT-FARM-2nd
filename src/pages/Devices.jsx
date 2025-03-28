@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import DeviceList from "../components/DeviceList";
-import DeviceChart from "@/components/DeviceChart";
+import DeviceList from "../components/Devices/DeviceList";
+import DeviceChart from "@/components/Devices/DeviceChart";
 
 const Devices = () => {
   const [selectedDevice, setSelectedDevice] = useState(null); // Lưu cả đối tượng thiết bị

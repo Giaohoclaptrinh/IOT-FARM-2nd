@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { db, auth } from "../firebase/db.config"; // Thêm auth để lấy user
+import { db, auth } from "@/firebase/db.config"; // Thêm auth để lấy user
 import { collection, addDoc } from "firebase/firestore";
 
 const AddDevice = ({ onClose, onDeviceAdded }) => {
