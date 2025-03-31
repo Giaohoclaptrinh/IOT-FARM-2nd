@@ -3,10 +3,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 const data = [
   { name: "00:00", temp: 22 },
-  { name: "06:00", temp: 24 },
+  { name: "06:00", temp: 0 },
   { name: "12:00", temp: 28 },
   { name: "18:00", temp: 26 },
-  { name: "24:00", temp: 23 },
+  { name: "24:00", temp: 60 },
 ];
 
 const ChartSection = () => {
