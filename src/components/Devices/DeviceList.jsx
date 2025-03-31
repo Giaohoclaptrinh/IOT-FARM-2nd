@@ -9,7 +9,7 @@ const DeviceList = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddDevice, setShowAddDevice] = useState(false);
-  const [selectedDevice, setSelectedDevice] = useState(null); // Thêm trạng thái này
+  const [selectedDevice, setSelectedDevice] = useState(null); 
   const [selectedLocation, setSelectedLocation] = useState("Tất cả");
 
   useEffect(() => {

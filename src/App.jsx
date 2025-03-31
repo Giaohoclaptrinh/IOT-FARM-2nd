@@ -12,6 +12,7 @@ import ProfileSettings from "./pages/ProfileSettings";
 import DeviceDetail from "./components/Devices/DeviceDetail";
 import './App.css'
 import UserPage from "./pages/User";
+import ChatBox from "@/components/Chatbox/Chatbox.jsx";
 
 
 const App = () => {
@@ -47,9 +48,12 @@ const MainContent = ({ showLayout, setShowLayout }) => {
             <Route path="/sign-in" element={<SignIn setShowLayout={setShowLayout} />} />
             <Route path="/sign-up" element={<SignUp setShowLayout={setShowLayout} />} />
             <Route path="/device-overview" element= {<DeviceOverview />} />
-            <Route path="/device/:id" element= {<DeviceDetail/>} />
+            <Route path="/device/:id" element= {<DeviceDetail/>} /> 
           </Routes>
-        </div>
+        </div>  
+         <div className="fixed bottom-4 right-4 z-50 ">
+          <ChatBox/> 
+         </div>
       </div>
     </div>
     </div>

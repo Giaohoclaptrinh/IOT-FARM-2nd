@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { db, auth } from "@/firebase/db.config"; // Thêm auth để lấy user
+import { db, auth } from "@/firebase/db.config";
 import { collection, addDoc } from "firebase/firestore";
 
 const AddDevice = ({ onClose, onDeviceAdded }) => {
@@ -40,7 +40,11 @@ const AddDevice = ({ onClose, onDeviceAdded }) => {
   
       alert("Thiết bị đã được thêm thành công!");
   
-      onDeviceAdded(); // Gọi callback cập nhật danh sách
+      if (typeof onDeviceAdded === "function") {
+        onDeviceAdded(); // Gọi callback cập nhật danh sách
+      } else {
+        console.warn("onDeviceAdded không phải là một hàm");
+      }
     } catch (error) {
       console.error("Lỗi khi thêm thiết bị:", error);
     } finally {
@@ -48,8 +52,6 @@ const AddDevice = ({ onClose, onDeviceAdded }) => {
       onClose(); // Đóng form
     }
   };
-  
-  
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
