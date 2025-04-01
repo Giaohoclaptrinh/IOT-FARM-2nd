@@ -12,6 +12,10 @@ const DeviceList = () => {
   const [selectedDevice, setSelectedDevice] = useState(null); 
   const [selectedLocation, setSelectedLocation] = useState("Tất cả");
 
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
@@ -48,6 +52,11 @@ const DeviceList = () => {
     }
   };
 
+  // Tính toán danh sách thiết bị hiển thị theo trang
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedDevices = devices.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(devices.length / itemsPerPage);
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Danh Sách Thiết Bị</h1>
@@ -81,8 +90,8 @@ const DeviceList = () => {
           {selectedDevice && <EditDevice device={selectedDevice} onClose={() => setSelectedDevice(null)} />}  
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {devices.length > 0 ? (
-              devices.map((device) => (
+            {paginatedDevices.length > 0 ? (
+              paginatedDevices.map((device) => (
                 <div key={device.id} className="p-4 rounded-lg shadow bg-white flex justify-between items-center">
                   <div>
                     <h3 className="font-semibold">{device.name || "Không có tên"}</h3>
@@ -109,6 +118,27 @@ const DeviceList = () => {
               <p className="text-gray-500">Không có thiết bị nào.</p>
             )}
           </div>
+
+          {/* Nút phân trang */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4 space-x-2">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Trang trước
+              </button>
+              <span className="px-4 py-2">{currentPage} / {totalPages}</span>
+              <button
+                className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Trang sau
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
