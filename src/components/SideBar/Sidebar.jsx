@@ -43,7 +43,7 @@ const Sidebar = () => {
 
     return (
         <aside className="w-64 h-full min-h-screen bg-gray-900 text-white overflow-auto p-4 flex flex-col">
-            <h2 className="text-xl font-bold mb-4">IoT-Farm</h2>
+            <h2 className="text-xl font-bold mb-4"></h2>
             <ul className="flex-grow">
                 {menuList.map((menu, index) => (
                     <li 
