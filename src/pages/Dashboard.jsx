@@ -56,7 +56,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/db.config";
 import { doc, getDoc } from "firebase/firestore";
-import TemperatureChart from "@/components/Chart/TemperatureChart";
+import TemperatureChart from "@/components/Chart/TemperatureAndHumidityChart";
 import TemperatureInput from "@/components/Chart/TemperatureInput";
 
 const Dashboard = () => {
