@@ -24,7 +24,7 @@ export default function HomeWrap({children}) {
        }, []);
   return (
     <div className={
-        `fixed ${userCurrent ?('min-w-top-bar h-full'):('min-w-full')} mt-[70px] p-2 min-h-16 z-50 font-primary  border-b border-gray-300 top-0 right-0  bg-white`
+        `fixed ${userCurrent ?('min-w-top-bar h-full'):('min-w-full')} max-w-top-bar h-full mt-[70px] overflow-scroll p-2 min-h-16 z-50 font-primary  border-b border-gray-300 top-0 right-0  bg-white`
       }>{children}</div>
   )
 }
