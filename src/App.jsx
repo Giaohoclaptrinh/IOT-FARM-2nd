@@ -10,7 +10,7 @@ import SignUp from "./pages/SignUp";
 import DeviceOverview from "./components/Devices/DeviceOverview";
 import ProfileSettings from "./pages/ProfileSettings";
 import DeviceDetail from "./components/Devices/DeviceDetail";
-import './App.css';
+
 import UserPage from "./pages/User";
 import ChatBox from "@/components/Chatbox/Chatbox.jsx";
 
@@ -48,13 +48,6 @@ const MainContent = ({ showLayout, setShowLayout }) => {
               <Route path="/device/:id" element={<DeviceDetail />} />
             </Routes>
           </div>
-<<<<<<< HEAD
-         
-=======
-          {/* <div className="fixed bottom-4 right-4 z-50">
-            <ChatBox />
-          </div> */}
->>>>>>> origin/firebase-connect
         </div>
       </div>
     </div>

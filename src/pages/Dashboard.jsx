@@ -54,7 +54,7 @@
 // export default Dashboard;
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { db } from "../firebase/db.config";
+import { auth, db } from "../firebase/db.config";
 import { doc, getDoc } from "firebase/firestore";
 import TemperatureChart from "@/components/Chart/TemperatureChart";
 import TemperatureInput from "@/components/Chart/TemperatureInput";
@@ -76,7 +76,6 @@ const Dashboard = () => {
     fetchDeviceData();
   }, [deviceUid]);
 
-<<<<<<< HEAD
     const q = query(collection(db, "devices"), where("userUID", "==", user.uid));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -84,13 +83,10 @@ const Dashboard = () => {
       if (deviceList.length > 0) setDeviceId(deviceList[0].id);
     });
    
-=======
+  
   if (!deviceData) {
     return (<div>
-      {/* <div className="p-4">Không tìm thấy dữ liệu thiết bị.</div> */}
->>>>>>> origin/firebase-connect
-
-      {/* <div>UID  : { window.location.pathname}</div> */}
+     
     </div>)
   }
 
