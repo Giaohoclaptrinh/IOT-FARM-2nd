@@ -36,7 +36,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
         <div className="flex-1 bg-gray-100">
           <div className="text-black h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
             <Routes>
-              <Route path="/dashboards" element={<Dashboard />} />
+              <Route path="/dashboards/:deviceUid" element={<Dashboard />} />
               <Route path="/user" element={<UserPage />} />
               <Route path="/Sidebar" element={<Sidebar />} />
               <Route path="/devices" element={<Devices />} />
@@ -48,9 +48,9 @@ const MainContent = ({ showLayout, setShowLayout }) => {
               <Route path="/device/:id" element={<DeviceDetail />} />
             </Routes>
           </div>
-          <div className="fixed bottom-4 right-4 z-50">
+          {/* <div className="fixed bottom-4 right-4 z-50">
             <ChatBox />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
