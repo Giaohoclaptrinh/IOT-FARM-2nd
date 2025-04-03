@@ -31,7 +31,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
   return (
     <div className="overflow-hidden h-screen">
       {showLayout && !isAuthPage && <TopBar />}
-      <div className="flex h-screen overflow-hidden max-w-full">
+      <div className="flex h-screen overflow-auto max-w-full">
         {showLayout && !isAuthPage && <Sidebar />}
         <div className="flex-1 bg-gray-100">
           <div className="text-black h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">

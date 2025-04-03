@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { db } from "@/firebase/db.config";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import DeviceChart from "../Devices/DeviceChart";
+import HomeWrap from "@/pages/HomeWrap";
 
 const TemperatureHumidityInput = ({ deviceId }) => {
   const [temperature, setTemperature] = useState("");
@@ -81,42 +82,45 @@ const handleSubmit = async (e) => {
 };
 
   return (
-    <div className="mt-6 p-4 bg-white shadow-lg rounded-lg">
-      <h3 className="text-lg font-bold mb-3">🌡️ Nhập nhiệt độ & độ ẩm</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Nhiệt độ (°C):</label>
-            <input
-              type="number"
-              value={temperature}
-              onChange={(e) => setTemperature(e.target.value)}
-              placeholder="Nhập nhiệt độ"
-              className="mt-1 p-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
+   
+    
+      <div className="h-full  bg-white shadow-lg rounded-lg">
+        <h3 className="text-lg font-bold mb-3">🌡️ Nhập nhiệt độ & độ ẩm</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Nhiệt độ (°C):</label>
+              <input
+                type="number"
+                value={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+                placeholder="Nhập nhiệt độ"
+                className="mt-1 p-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Độ ẩm (%):</label>
+              <input
+                type="number"
+                value={humidity}
+                onChange={(e) => setHumidity(e.target.value)}
+                placeholder="Nhập độ ẩm"
+                className="mt-1 p-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Độ ẩm (%):</label>
-            <input
-              type="number"
-              value={humidity}
-              onChange={(e) => setHumidity(e.target.value)}
-              placeholder="Nhập độ ẩm"
-              className="mt-1 p-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-            />
-          </div>
-        </div>
-        <button
-          type="submit"
-          className={`w-full py-2 text-white text-lg font-semibold rounded-lg transition ${loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-700"}`}
-          disabled={loading}
-        >
-          {loading ? "Đang gửi..." : "Gửi dữ liệu"}
-        </button>
-      </form>
-    </div>
+          <button
+            type="submit"
+            className={`w-full py-2 text-white text-lg font-semibold rounded-lg transition ${loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-700"}`}
+            disabled={loading}
+          >
+            {loading ? "Đang gửi..." : "Gửi dữ liệu"}
+          </button>
+        </form>
+      </div>
+   
   );
 };
 

@@ -34,6 +34,7 @@ import { useEffect, useState } from "react";
 import { db, auth } from "../firebase/db.config";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import DeviceChart from "@/components/Devices/DeviceChart"; // Đảm bảo đã import đúng component biểu đồ
+import HomeWrap from "./HomeWrap";
 
 const Devices = () => {
   const navigate = useNavigate();
@@ -60,7 +61,8 @@ const Devices = () => {
   };
 
   return (
-    <div className="p-4">
+    <HomeWrap>
+       <div className="p-4 w-full">
       <h2 className="text-xl font-bold">Danh sách thiết bị</h2>
       <ul>
         {devices.length > 0 ? (
@@ -86,6 +88,8 @@ const Devices = () => {
         </div>
       )}
     </div>
+    </HomeWrap>
+   
   );
 };
 
