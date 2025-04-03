@@ -77,12 +77,14 @@ const Dashboard = () => {
     fetchDeviceData();
   }, [deviceUid]);
 
-    const q = query(collection(db, "devices"), where("userUID", "==", auth.currentUser.uid));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setDevices(deviceList);
-      if (deviceList.length > 0) setDeviceId(deviceList[0].id);
-    });
+
+  // console.log(window.location.pathname)
+  //   const q = query(collection(db, "devices"), where("userUID", "==", auth.currentUser.uid));
+  //   const unsubscribe = onSnapshot(q, (snapshot) => {
+  //     const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  //     // setDevices(deviceList);
+  //     if (deviceList.length > 0) setDeviceId(deviceList[0].id);
+  //   });
    
   
   if (!deviceData) {
@@ -93,7 +95,7 @@ const Dashboard = () => {
 
   return (
     <HomeWrap>
-      <div className="p-6 max-w-4xl mx-auto">
+      <div className=" max-w-full mx-auto">
         <h1 className="text-2xl font-bold mb-4">🌡️ Quản lý Nhiệt độ Thiết bị</h1>
         <h2 className="text-xl font-bold">Dashboard - {deviceUid}</h2>
         {/* <p>Nhiệt độ: {deviceData.temperature}°C</p>
