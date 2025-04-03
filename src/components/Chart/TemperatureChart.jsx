@@ -44,7 +44,7 @@ const TemperatureChart = ({ deviceId }) => {
           temp3: doc.data().temp3 !== undefined ? doc.data().temp3 : 22, // Giá trị mặc định nếu không có
         };
       });
-      console.log(logs); // Kiểm tra dữ liệu
+ 
       setData(logs);
     });
 

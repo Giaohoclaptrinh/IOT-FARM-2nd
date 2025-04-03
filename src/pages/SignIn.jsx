@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../firebase/db.config";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../firebase/db.config";
+import { signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import PropTypes from "prop-types";
+import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
 
 const SignIn = ({ setShowLayout }) => {
   const [email, setEmail] = useState("");
@@ -14,7 +15,26 @@ const SignIn = ({ setShowLayout }) => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+       const  getName  = async()=>{
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        const userDoc = await getDoc(docRef);
+        if (userDoc.exists()) {
+          console.log("Tên người dùng từ Firestore:", userDoc.data().name);
+        return userDoc.data().name; 
+        }else{
+          console.log("khong lay dc doc")
+        }
+        
+       }
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user;
+      const displayName = await getName();
+      if (displayName) {
+        await updateProfile(auth.currentUser, { displayName: displayName });
+        console.log("Tên người dùng đã được cập nhật:", displayName);
+      } else {
+        console.log("Không có tên để cập nhật.");
+      }
       setShowLayout(true); // Hiển thị Sidebar sau khi đăng nhập thành công
       navigate("/dashboards");
     } catch (error) {

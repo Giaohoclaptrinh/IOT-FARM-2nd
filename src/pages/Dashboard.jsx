@@ -18,6 +18,7 @@ const Dashboard = () => {
       setDevices(deviceList);
       if (deviceList.length > 0) setDeviceId(deviceList[0].id);
     });
+   
 
     return () => unsubscribe();
   }, []);

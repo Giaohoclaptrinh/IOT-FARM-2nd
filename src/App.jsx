@@ -48,9 +48,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
               <Route path="/device/:id" element={<DeviceDetail />} />
             </Routes>
           </div>
-          <div className="fixed bottom-4 right-4 z-50">
-            <ChatBox />
-          </div>
+         
         </div>
       </div>
     </div>
