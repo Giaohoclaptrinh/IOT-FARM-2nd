@@ -70,6 +70,7 @@ const Dashboard = () => {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         setDeviceData(docSnap.data());
+        console.log("data",docSnap.data())
       } else {
         setDeviceData(deviceUid);
       }

@@ -71,7 +71,7 @@ const Sidebar = () => {
     const menuList = [
         { title: "Account Settings", href: "/", icon: RiUserSettingsLine },
         { title: "Billing", href: "/", icon: FaHornbill },
-        { title: "SignOut", href: "/signOut", icon: VscSignOut },
+        { title: "SignOut", href:handleLogout, icon: VscSignOut },
     ];
 
     useEffect(() => {
@@ -111,14 +111,21 @@ const Sidebar = () => {
                     <div className={`w-min-full absolute top-[75px] left-2 z-10 shadow-lg bg-white transition-all duration-300 ease-out overflow-hidden
                     ${userDown ? 'h-[146px] opacity-100' : 'h-0 opacity-0 pointer-events-none'}`}>
                         {
-                            menuList.map((item) => (
-                                <Link key={item.title} className="flex items-center space-y-2 border-b px-2 py-2 hover:bg-gray-300 hover:bg-bgMain pr-14" to={item.href}>
+                            menuList.map((item) => {return ((item.title === "SignOut")) ? (
+                                <Link onClick={handleLogout} key={item.title} className="flex items-center space-y-2 border-b px-2 py-2 hover:bg-gray-300 hover:bg-bgMain pr-14" to={item.href}>
                                     <div className="mr-2 text-lg">
                                         {item.icon && React.createElement(item.icon)}
                                     </div>
                                     <div className="ml-4">{item.title}</div>
                                 </Link>
-                            ))
+                            ):(
+                                <Link key={item.title} className="flex items-center space-y-2 border-b px-2 py-2 hover:bg-gray-300 hover:bg-bgMain pr-14" to={item.href}>
+                                <div className="mr-2 text-lg">
+                                    {item.icon && React.createElement(item.icon)}
+                                </div>
+                                <div className="ml-4">{item.title}</div>
+                            </Link> 
+                            )})
                         }
                     </div>
                 </div>
