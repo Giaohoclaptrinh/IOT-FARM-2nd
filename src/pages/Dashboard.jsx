@@ -55,9 +55,10 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/db.config";
-import { doc, getDoc } from "firebase/firestore";
-import TemperatureChart from "@/components/Chart/TemperatureAndHumidityChart";
-import TemperatureInput from "@/components/Chart/TemperatureInput";
+import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
+import TemperatureAndHumidityChart from "@/components/Chart/TemperatureAndHumidityChart";
+import TemperatureAndHumidityInput from "@/components/Chart/TemperatureAndHumidityInput";
+import HomeWrap from "./HomeWrap";
 
 const Dashboard = () => {
   const { deviceUid } = useParams();
@@ -76,12 +77,14 @@ const Dashboard = () => {
     fetchDeviceData();
   }, [deviceUid]);
 
-    const q = query(collection(db, "devices"), where("userUID", "==", user.uid));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setDevices(deviceList);
-      if (deviceList.length > 0) setDeviceId(deviceList[0].id);
-    });
+
+  // console.log(window.location.pathname)
+  //   const q = query(collection(db, "devices"), where("userUID", "==", auth.currentUser.uid));
+  //   const unsubscribe = onSnapshot(q, (snapshot) => {
+  //     const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  //     // setDevices(deviceList);
+  //     if (deviceList.length > 0) setDeviceId(deviceList[0].id);
+  //   });
    
   
   if (!deviceData) {
@@ -91,14 +94,19 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">🌡️ Quản lý Nhiệt độ Thiết bị</h1>
-      <h2 className="text-xl font-bold">Dashboard - {deviceUid}</h2>
-      {/* <p>Nhiệt độ: {deviceData.temperature}°C</p>
-      <p>Độ ẩm: {deviceData.humidity}%</p> */}
-      <TemperatureChart deviceId={deviceUid} />
-      <TemperatureInput deviceId={deviceUid} />
-    </div>
+    <HomeWrap>
+      <div className=" w-full mx-auto">
+        <h1 className="text-2xl font-bold mb-4">🌡️ Quản lý Nhiệt độ Thiết bị</h1>
+        <h2 className="text-xl font-bold">Dashboard - {deviceUid}</h2>
+        {/* <p>Nhiệt độ: {deviceData.temperature}°C</p>
+        <p>Độ ẩm: {deviceData.humidity}%</p> */}
+        <TemperatureAndHumidityChart deviceId={deviceUid} />
+        <TemperatureAndHumidityInput deviceId={deviceUid} />
+        <div className="min-w-full">
+          
+        </div>
+      </div>
+    </HomeWrap>
   );
 };
 
