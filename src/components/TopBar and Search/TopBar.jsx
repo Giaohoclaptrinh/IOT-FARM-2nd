@@ -216,6 +216,7 @@ const TopBar = ({ onSearch }) => {
   //   </div>
   // );
 
+
   const handleSelectSearchResult = (result) => {
     setSearchTerm(location.pathname.includes("device") ? result.name : result.email);
     setIsFocused(false);
@@ -227,6 +228,7 @@ const TopBar = ({ onSearch }) => {
     <div className={
       `fixed ${user ?('min-w-top-bar'):('min-w-full')} p-2 min-h-16 z-50 font-primary  border-b border-gray-300 top-0 right-0  bg-white`//fixed ${user ?('min-w-top-bar'):('min-w-full')} bị lỗi
       //  "fixed w-full p-2 min-h-16 z-50 font-primary border-b border-gray-300 top-0 right-0 bg-white"
+
     }>
     <div>
         <div className="flex items-center">
@@ -234,6 +236,7 @@ const TopBar = ({ onSearch }) => {
             <AiFillOpenAI className="text-5xl text-blue-500"/>
             <b>HTR</b>
           </div>
+
 
           
           <div className="relative w-64 flex items-center bg-white border-gray-300 rounded-lg px-3 py-2 ml-6">
@@ -262,6 +265,7 @@ const TopBar = ({ onSearch }) => {
           )}
         </div>
 
+
           { (user) ?
             (<div className="flex  gap-x-4 ml-auto">
             <div className="flex flex-row-reverse  min-w-24 px-4 py-px cursor-pointer bg-bgMain  hover:bg-slate-300 rounded-lg gap-x-4 items-center">
@@ -286,7 +290,6 @@ const TopBar = ({ onSearch }) => {
               
               ">Online</p></div>
 
-              
             <TfiWallet className="text-2xl"/>
             </div>
             <div className="flex flex-row-reverse  min-w-24 px-4 py-px cursor-pointer bg-bgMain  hover:bg-slate-300 rounded-lg gap-x-4 items-center">
@@ -294,7 +297,6 @@ const TopBar = ({ onSearch }) => {
               </div>
             <BiNotification className="text-2xl"/>
             </div>
-            
             
 
           </div>):(

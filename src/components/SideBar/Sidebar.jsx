@@ -53,8 +53,10 @@ const Sidebar = () => {
 
     const handleLogout = async () => {
         try {
-            await signOut(auth); // Đăng xuất người dùng
-            navigate("/sign-in"); // Điều hướng tới trang đăng nhập
+
+            await signOut(auth);
+            navigate("/sign-in");
+
         } catch (error) {
             console.error("Lỗi khi đăng xuất:", error);
         }
@@ -69,9 +71,11 @@ const Sidebar = () => {
     const navigate = useNavigate();
 
     const menuList = [
+
         { title: "Account Settings", href: "/profile-settings", icon: RiUserSettingsLine },
         { title: "Billing", href: "/", icon: FaHornbill },
         { title: "SignOut", onClick: handleLogout, icon: VscSignOut },
+
     ];
 
     useEffect(() => {
@@ -81,6 +85,8 @@ const Sidebar = () => {
                     userName: user.displayName,
                     email: user.email,
                 });
+        console.log(userCurrent);
+
             } else {
                 console.log("User not logged in");
             }
@@ -102,7 +108,9 @@ const Sidebar = () => {
                             {userCurrent.userName.split("").slice(0, 2)}
                         </span>
                         <div className="ml-4">
+
                             <b className="block max-w-36 overflow-hidden text-ellipsis text-md font-semibold">{userCurrent.userName}</b>
+
                             <span className="block max-w-36 overflow-hidden text-[15px] text-gray-500 text-ellipsis whitespace-nowrap">{userCurrent.email}</span>
                         </div>
                         <div className="ml-auto mr-4 flex items-center"><FaCaretDown /></div>
@@ -111,7 +119,10 @@ const Sidebar = () => {
                     ${userDown ? 'h-[146px] opacity-100' : 'h-0 opacity-0 pointer-events-none'}`}>
                         {
                             menuList.map((item) => (
+
                                 <Link key={item.title} className="flex items-center space-y-2 border-b px-2 py-2 hover:bg-gray-300 hover:bg-bgMain pr-14" to={item.href} onClick={item.onClick}>
+
+
                                     <div className="mr-2 text-lg">
                                         {item.icon && React.createElement(item.icon)}
                                     </div>
@@ -122,7 +133,9 @@ const Sidebar = () => {
                     </div>
                 </div>
 
+
                 {/* Các menu khác */}
+
                 {urlList.map((item) => (
                     <div className="px-2" key={item.href}>
                         <Link to={item.href} className={`flex min-w-full items-center mt-4 p-2 relative

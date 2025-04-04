@@ -56,8 +56,10 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/db.config";
 import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
+
 import TemperatureAndHumidityChart from "@/components/Chart/TemperatureAndHumidityChart";
 import TemperatureAndHumidityInput from "@/components/Chart/TemperatureAndHumidityInput";
+
 import HomeWrap from "./HomeWrap";
 
 const Dashboard = () => {
@@ -100,10 +102,12 @@ const Dashboard = () => {
         <h2 className="text-xl font-bold">Dashboard - {deviceUid}</h2>
         {/* <p>Nhiệt độ: {deviceData.temperature}°C</p>
         <p>Độ ẩm: {deviceData.humidity}%</p> */}
+
         <TemperatureAndHumidityChart deviceId={deviceUid} />
         <TemperatureAndHumidityInput deviceId={deviceUid} />
         <div className="min-w-full">
           
+
         </div>
       </div>
     </HomeWrap>

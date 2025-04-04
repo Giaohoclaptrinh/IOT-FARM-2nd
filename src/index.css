@@ -4,5 +4,8 @@
 :root {
     --primary-font: 'Poppins', sans-serif;
     --seconds-font: 'Roboto',sans-serif;
+    --my-padding:30px;
+    --primary-color:#ecf3f6;
+    --top-bar:calc(100% - 260px);
 
   }

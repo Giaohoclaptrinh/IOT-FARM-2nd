@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { db } from "@/firebase/db.config";
-import { doc, getDoc } from "firebase/firestore";
+
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import DeviceChart from "../Devices/DeviceChart";
+import HomeWrap from "@/pages/HomeWrap";
+
 
 const TemperatureHumidityChart = ({ deviceId }) => {
   const [chartData, setChartData] = useState({
@@ -54,9 +58,11 @@ const TemperatureHumidityChart = ({ deviceId }) => {
   }, [deviceId]);
 
   return (
+
     <div className="p-4 bg-white shadow-lg rounded-lg">
       <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
     </div>
+
   );
 };
 
