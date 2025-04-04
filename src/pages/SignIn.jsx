@@ -55,8 +55,7 @@ const SignIn = ({ setShowLayout }) => {
   };
 
   return (
-    <HomeWrap>
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center   min-h-screen bg-gray-100">
       <div className="p-8 max-w-md w-full bg-white shadow-md rounded-lg">
         <h1 className="text-2xl font-bold text-center mb-4">Đăng Nhập</h1>
         {error && <p className="text-red-500 text-center mb-2">{error}</p>}
@@ -89,7 +88,6 @@ const SignIn = ({ setShowLayout }) => {
         </p>
       </div>
     </div>
-    </HomeWrap>
   );
 };
 

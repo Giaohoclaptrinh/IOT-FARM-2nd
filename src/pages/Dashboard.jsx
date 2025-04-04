@@ -105,6 +105,7 @@ const Dashboard = () => {
 
         <TemperatureAndHumidityChart deviceId={deviceUid} />
         <TemperatureAndHumidityInput deviceId={deviceUid} />
+       
         <div className="min-w-full">
           
 

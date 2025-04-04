@@ -96,10 +96,10 @@ const MainContent = ({ showLayout, setShowLayout }) => {
 
   return (
 
-    <div className="  flex h-screen overflow-auto max-w-full">
-      {!isAuthPage && <Sidebar />}
-      <div className="overflow-hidden h-screen">
-        {!isAuthPage && < TopBar />}
+    <div className=" overflow-hidden h-screen ">
+      {!isAuthPage && <TopBar />}
+      <div className="  flex h-screen overflow-auto max-w-full">
+        {!isAuthPage && <  Sidebar />}
 
         <div className="flex-1 bg-gray-100">
           <div className="text-black h-full max-w-full overflow-auto bg-gray-100 overflow-x-auto">
