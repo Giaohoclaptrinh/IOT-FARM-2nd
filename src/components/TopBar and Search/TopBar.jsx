@@ -215,9 +215,20 @@ const TopBar = ({ onSearch }) => {
   //     </div>
   //   </div>
   // );
+
+
+  const handleSelectSearchResult = (result) => {
+    setSearchTerm(location.pathname.includes("device") ? result.name : result.email);
+    setIsFocused(false);
+    navigate(location.pathname.includes("device") ? `/device/${result.id}` : `/user/${result.id}`);
+  };
+
+  
   return(
     <div className={
-      `fixed ${user ?('min-w-top-bar'):('min-w-full')} p-2 min-h-16 z-50 font-primary  border-b border-gray-300 top-0 right-0  bg-white`
+      `fixed ${user ?('min-w-top-bar'):('min-w-full')} p-2 min-h-16 z-50 font-primary  border-b border-gray-300 top-0 right-0  bg-white`//fixed ${user ?('min-w-top-bar'):('min-w-full')} bị lỗi
+      //  "fixed w-full p-2 min-h-16 z-50 font-primary border-b border-gray-300 top-0 right-0 bg-white"
+
     }>
     <div>
         <div className="flex items-center">
@@ -225,6 +236,34 @@ const TopBar = ({ onSearch }) => {
             <AiFillOpenAI className="text-5xl text-blue-500"/>
             <b>HTR</b>
           </div>
+
+
+          
+          {/* <div className="relative w-64 flex items-center bg-white rounded-lg px-3 py-2 ml-6">
+          <FaSearch className="text-gray-400 mr-2" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+            placeholder={placeholderText}
+            className="w-full bg-white outline-none text-gray-600 border-none "
+          />
+          {isFocused && searchResults.length > 0 && (
+            <div className="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10">
+              {searchResults.map((result) => (
+                <div
+                  key={result.id}
+                  className="p-2 hover:bg-gray-200 cursor-pointer"
+                  onClick={() => handleSelectSearchResult(result)}
+                >
+                  {location.pathname.includes("device") ? result.name : result.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div> */}
 
 
           { (user) ?
@@ -250,6 +289,7 @@ const TopBar = ({ onSearch }) => {
               before:bg-gray-500
               
               ">Online</p></div>
+
             <TfiWallet className="text-2xl"/>
             </div>
             <div className="flex flex-row-reverse  min-w-24 px-4 py-px cursor-pointer bg-bgMain  hover:bg-slate-300 rounded-lg gap-x-4 items-center">
@@ -258,6 +298,7 @@ const TopBar = ({ onSearch }) => {
             <BiNotification className="text-2xl"/>
             </div>
             
+
           </div>):(
             <div className="ml-auto">
               <Link to='/sign-in' className="px-8 py-3 rounded-md font-seconds text-xl  bg-blue-500

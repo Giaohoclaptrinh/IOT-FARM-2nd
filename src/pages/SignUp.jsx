@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase/db.config";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import PropTypes from "prop-types";
-
 
 const SignUp = ({ setShowLayout }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [role, setRole] = useState("user"); // Mặc định vai trò là 'user'
   const [error, setError] = useState("");
-  const [role, setRole ] = useState("");
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
@@ -20,17 +19,19 @@ const SignUp = ({ setShowLayout }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Cập nhật tên hiển thị cho user trên Firebase Auth
+      await updateProfile(user, { displayName: name });
+
       // Lưu thông tin user vào Firestore
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         name: name,
         email: email,
         createdAt: new Date(),
-        pass: password,
         role: role,
       });
 
-      setShowLayout(true); // Hiển thị Sidebar sau khi đăng ký thành công
+      if (setShowLayout) setShowLayout(true); // Kiểm tra trước khi gọi
       navigate("/dashboards");
     } catch (error) {
       console.error("Error during sign up:", error);
@@ -68,14 +69,16 @@ const SignUp = ({ setShowLayout }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {/* <input
-            type="role"
-            placeholder="Vai Trò"
+          {/* <select
             className="border p-2 w-full rounded"
             value={role}
             onChange={(e) => setRole(e.target.value)}
             required
-          /> */}
+          >
+            <option value="user">Người dùng</option>
+            <option value="admin">Quản trị viên</option>
+          </select> */}
+
           <button type="submit" className="bg-green-500 text-white p-2 w-full rounded hover:bg-green-600 transition">
             Đăng Ký
           </button>
@@ -90,9 +93,13 @@ const SignUp = ({ setShowLayout }) => {
     </div>
   );
 };
+
 SignUp.propTypes = {
-  setShowLayout: PropTypes.func.isRequired, // Xác định kiểu dữ liệu
+  setShowLayout: PropTypes.func,
 };
 
+SignUp.defaultProps = {
+  setShowLayout: () => {}, 
+};
 
 export default SignUp;

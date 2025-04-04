@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase/db.config";
 import { signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import PropTypes from "prop-types";
-import { collection, doc, getDoc, getDocs, query } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
+import HomeWrap from "./HomeWrap";
 
 const SignIn = ({ setShowLayout }) => {
   const [email, setEmail] = useState("");
@@ -12,40 +13,49 @@ const SignIn = ({ setShowLayout }) => {
 
   const navigate = useNavigate();
 
+  // Hàm lấy tên người dùng từ Firestore
+  const getName = async (uid) => {
+    try {
+      const docRef = doc(db, "users", uid);
+      const userDoc = await getDoc(docRef);
+      if (userDoc.exists()) {
+        console.log("Tên người dùng từ Firestore:", userDoc.data().name);
+        return userDoc.data().name;
+      } else {
+        console.log("Không tìm thấy tài liệu người dùng.");
+        return null;
+      }
+    } catch (err) {
+      console.error("Lỗi khi lấy tên người dùng:", err);
+      return null;
+    }
+  };
+
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-       const  getName  = async()=>{
-        const docRef = doc(db, "users", auth.currentUser.uid);
-        const userDoc = await getDoc(docRef);
-        if (userDoc.exists()) {
-          console.log("Tên người dùng từ Firestore:", userDoc.data().name);
-        return userDoc.data().name; 
-        }else{
-          console.log("khong lay dc doc")
-        }
-        
-       }
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      const displayName = await getName();
+
+      // Lấy tên từ Firestore
+      const displayName = await getName(user.uid);
       if (displayName) {
-        await updateProfile(auth.currentUser, { displayName: displayName });
+        await updateProfile(user, { displayName });
         console.log("Tên người dùng đã được cập nhật:", displayName);
       } else {
         console.log("Không có tên để cập nhật.");
       }
-      setShowLayout(true); // Hiển thị Sidebar sau khi đăng nhập thành công
+
+      if (setShowLayout) setShowLayout(true); // Kiểm tra trước khi gọi
       navigate("/dashboards");
     } catch (error) {
-      console.log.error
-      console.error("Error during sign up:", error);
+      console.error("Error during sign in:", error);
       setError("Email hoặc mật khẩu không chính xác!");
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center   min-h-screen bg-gray-100">
       <div className="p-8 max-w-md w-full bg-white shadow-md rounded-lg">
         <h1 className="text-2xl font-bold text-center mb-4">Đăng Nhập</h1>
         {error && <p className="text-red-500 text-center mb-2">{error}</p>}
@@ -82,8 +92,11 @@ const SignIn = ({ setShowLayout }) => {
 };
 
 SignIn.propTypes = {
-  setShowLayout: PropTypes.func.isRequired, // Xác định kiểu dữ liệu
+  setShowLayout: PropTypes.func, 
 };
 
+SignIn.defaultProps = {
+  setShowLayout: () => {}, 
+};
 
 export default SignIn;

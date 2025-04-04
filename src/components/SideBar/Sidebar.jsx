@@ -14,6 +14,7 @@ import { GrResources } from "react-icons/gr";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { FaHornbill } from "react-icons/fa";
 import { VscSignOut } from "react-icons/vsc";
+import { LuUserRoundCog } from "react-icons/lu";
 
 const Sidebar = () => {
     const urlList = [
@@ -39,9 +40,9 @@ const Sidebar = () => {
             icon: BiNotification,
         },
         {
-            title: "Template",
-            href: "/template",
-            icon: GoRepoTemplate,
+            title: "User",
+            href: "/user",
+            icon: LuUserRoundCog,
             marker: true
         },
         {
@@ -53,8 +54,10 @@ const Sidebar = () => {
 
     const handleLogout = async () => {
         try {
+
             await signOut(auth);
             navigate("/sign-in");
+
         } catch (error) {
             console.error("Lỗi khi đăng xuất:", error);
         }
@@ -69,9 +72,10 @@ const Sidebar = () => {
     const navigate = useNavigate();
 
     const menuList = [
-        { title: "Account Settings", href: "/", icon: RiUserSettingsLine },
+
+        { title: "Account Settings", href: "/profile-settings", icon: RiUserSettingsLine },
         { title: "Billing", href: "/", icon: FaHornbill },
-        { title: "SignOut", href:handleLogout, icon: VscSignOut },
+        { title: "SignOut", href: "/signOut", icon: VscSignOut },
     ];
 
     useEffect(() => {
@@ -81,7 +85,8 @@ const Sidebar = () => {
                     userName: user.displayName,
                     email: user.email,
                 });
-                console.log(userCurrent);
+        console.log(userCurrent);
+
             } else {
                 console.log("User not logged in");
             }
@@ -133,7 +138,7 @@ const Sidebar = () => {
                     <div className="px-2" key={item.href}>
                         <Link to={item.href} className={`flex min-w-full items-center mt-4 p-2 relative
                             hover:bg-blue-100 hover:rounded-lg cursor-pointer
-                            ${item.marker && ('border border-l-0 border-r-0 hover:rounded-none')}`}>
+${item.marker && ('border border-l-0 border-r-0 hover:rounded-none')}`}>
                             <div className="mr-2">
                                 {item.icon && React.createElement(item.icon)}
                             </div>

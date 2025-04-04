@@ -1,127 +1,59 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Chart from "react-apexcharts";
 import { db } from "@/firebase/db.config";
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import DeviceChart from "../Devices/DeviceChart";
-import HomeWrap from "@/pages/HomeWrap";
+import { doc, onSnapshot } from "firebase/firestore";
 
-const TemperatureHumidityInput = ({ deviceId }) => {
-  const [temperature, setTemperature] = useState("");
-  const [humidity, setHumidity] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (!deviceId) return;
-
-  //   setLoading(true);
-  //   try {
-  //     const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, "dataString");
-  //     const docSnap = await getDoc(docRef);
-
-  //     const newEntry = `{"timestamp":"${new Date().toISOString()}","temperature":${parseFloat(temperature)},"humidity":${parseFloat(humidity)}}`;
-  //     let updatedDataString = newEntry;
-
-  //     if (docSnap.exists()) {
-  //       const currentData = docSnap.data().data;
-  //       updatedDataString = currentData + " ; " + newEntry;
-  //     }
-
-  //     await setDoc(docRef, { data: updatedDataString });
-
-  //     console.log("Dữ liệu đã gửi:", updatedDataString);
-
-  //     setTemperature("");
-  //     setHumidity("");
-  //   } catch (error) {
-  //     console.error("Lỗi khi gửi dữ liệu:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!deviceId) return;
-
-  setLoading(true);
-  try {
-    const timestamp = new Date().toISOString();
-    const newEntry = { timestamp, temperature: parseFloat(temperature), humidity: parseFloat(humidity) };
-
-    const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
-    const docSnap = await getDoc(docRef);
-
-    let updatedData = []; // Đảm bảo updatedData luôn là một mảng
-
-    if (docSnap.exists()) {
-      const rawData = docSnap.data().data;
-      try {
-        updatedData = JSON.parse(rawData || "[]"); // Nếu null, set thành []
-        if (!Array.isArray(updatedData)) {
-          updatedData = []; // Nếu dữ liệu không phải mảng, reset lại
-        }
-      } catch (error) {
-        console.error("Lỗi khi parse JSON:", error);
-        updatedData = []; // Nếu lỗi parse, reset thành []
-      }
+const TemperatureHumidityChart = ({ deviceId }) => {
+  const [chartData, setChartData] = useState({
+    series: [
+      { name: "Nhiệt độ (°C)", data: [] },
+      { name: "Độ ẩm (%)", data: [] }
+    ],
+    options: {
+      chart: { type: "line", height: 350 },
+      xaxis: { categories: [] },
+      stroke: { curve: "smooth" },
+      title: { text: "Biểu đồ Nhiệt độ & Độ ẩm", align: "center" },
+      dataLabels: { enabled: false }
     }
+  });
 
-    updatedData.push(newEntry); // Thêm dữ liệu mới vào mảng
+  useEffect(() => {
+    if (!deviceId) return;
 
-    await setDoc(docRef, { data: JSON.stringify(updatedData) });
+    // Lắng nghe thay đổi realtime
+    const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const rawData = JSON.parse(docSnap.data().data || "[]");
+        if (Array.isArray(rawData)) {
+          const categories = rawData.map((entry) => new Date(entry.timestamp).toLocaleTimeString());
+          const temperatureData = rawData.map((entry) => entry.temperature);
+          const humidityData = rawData.map((entry) => entry.humidity);
 
-    console.log("Dữ liệu đã cập nhật:", updatedData);
-    setTemperature("");
-    setHumidity("");
-  } catch (error) {
-    console.error("Lỗi khi gửi dữ liệu:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+          setChartData({
+            series: [
+              { name: "Nhiệt độ (°C)", data: temperatureData },
+              { name: "Độ ẩm (%)", data: humidityData }
+            ],
+            options: {
+              ...chartData.options,
+              xaxis: { categories }
+            }
+          });
+        }
+      }
+    });
+
+    // Cleanup listener khi component unmount hoặc deviceId thay đổi
+    return () => unsubscribe();
+  }, [deviceId]);
 
   return (
-   
-    
-      <div className="h-full  bg-white shadow-lg rounded-lg">
-        <h3 className="text-lg font-bold mb-3">🌡️ Nhập nhiệt độ & độ ẩm</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Nhiệt độ (°C):</label>
-              <input
-                type="number"
-                value={temperature}
-                onChange={(e) => setTemperature(e.target.value)}
-                placeholder="Nhập nhiệt độ"
-                className="mt-1 p-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Độ ẩm (%):</label>
-              <input
-                type="number"
-                value={humidity}
-                onChange={(e) => setHumidity(e.target.value)}
-                placeholder="Nhập độ ẩm"
-                className="mt-1 p-2 w-full border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-                required
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            className={`w-full py-2 text-white text-lg font-semibold rounded-lg transition ${loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-700"}`}
-            disabled={loading}
-          >
-            {loading ? "Đang gửi..." : "Gửi dữ liệu"}
-          </button>
-        </form>
-      </div>
-   
+    <div className="p-4 bg-white shadow-lg rounded-lg">
+      <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
+    </div>
   );
 };
 
-export default TemperatureHumidityInput;
+export default TemperatureHumidityChart;

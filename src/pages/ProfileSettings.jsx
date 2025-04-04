@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { db, auth } from "../firebase/db.config"; // Import Firebase
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import HomeWrap from "./HomeWrap";
 
 const ProfileSettings = () => {
   const [userData, setUserData] = useState({ name: "", email: "" });
@@ -94,6 +95,7 @@ const ProfileSettings = () => {
   };
 
   return (
+    <HomeWrap>
     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-4">Cài đặt hồ sơ</h2>
 
@@ -156,6 +158,7 @@ const ProfileSettings = () => {
         </button>
       </div>
     </div>
+    </HomeWrap>
   );
 };
 
