@@ -4,6 +4,7 @@ import { auth, db } from "../firebase/db.config";
 import { signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import PropTypes from "prop-types";
 import { doc, getDoc } from "firebase/firestore";
+import HomeWrap from "./HomeWrap";
 
 const SignIn = ({ setShowLayout }) => {
   const [email, setEmail] = useState("");
@@ -54,6 +55,7 @@ const SignIn = ({ setShowLayout }) => {
   };
 
   return (
+    <HomeWrap>
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="p-8 max-w-md w-full bg-white shadow-md rounded-lg">
         <h1 className="text-2xl font-bold text-center mb-4">Đăng Nhập</h1>
@@ -87,6 +89,7 @@ const SignIn = ({ setShowLayout }) => {
         </p>
       </div>
     </div>
+    </HomeWrap>
   );
 };
 

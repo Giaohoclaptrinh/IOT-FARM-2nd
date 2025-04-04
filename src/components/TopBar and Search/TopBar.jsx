@@ -239,7 +239,7 @@ const TopBar = ({ onSearch }) => {
 
 
           
-          <div className="relative w-64 flex items-center bg-white border-gray-300 rounded-lg px-3 py-2 ml-6">
+          {/* <div className="relative w-64 flex items-center bg-white rounded-lg px-3 py-2 ml-6">
           <FaSearch className="text-gray-400 mr-2" />
           <input
             type="text"
@@ -248,10 +248,10 @@ const TopBar = ({ onSearch }) => {
             onFocus={() => setIsFocused(true)}
             onBlur={() => setTimeout(() => setIsFocused(false), 200)}
             placeholder={placeholderText}
-            className="w-full bg-white outline-none text-gray-600 border-none focus:ring-0"
+            className="w-full bg-white outline-none text-gray-600 border-none "
           />
           {isFocused && searchResults.length > 0 && (
-            <div className="absolute top-full left-0 w-full bg-white border border-gray-300 rounded-lg mt-1 shadow-lg z-10">
+            <div className="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10">
               {searchResults.map((result) => (
                 <div
                   key={result.id}
@@ -263,7 +263,7 @@ const TopBar = ({ onSearch }) => {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
 
 
           { (user) ?

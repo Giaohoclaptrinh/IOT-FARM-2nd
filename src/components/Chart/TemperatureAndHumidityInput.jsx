@@ -1,84 +1,116 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "@/firebase/db.config";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import DeviceChart from "../Devices/DeviceChart";
 
 const TemperatureHumidityInput = ({ deviceId }) => {
   const [temperature, setTemperature] = useState("");
   const [humidity, setHumidity] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAutoSending, setIsAutoSending] = useState(false); // Trạng thái tự động gửi dữ liệu
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (!deviceId) return;
+  // Hàm tạo số liệu ngẫu nhiên cho nhiệt độ và độ ẩm trong phạm vi 1-120°C và 1-100%
+  const generateRandomData = () => {
+    // Sinh ra giá trị ngẫu nhiên cho nhiệt độ (từ 1°C đến 120°C)
+    const temperature = (Math.random() * 119 + 1).toFixed(2); // (1 đến 120)
 
-  //   setLoading(true);
-  //   try {
-  //     const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, "dataString");
-  //     const docSnap = await getDoc(docRef);
+    // Sinh ra giá trị ngẫu nhiên cho độ ẩm (từ 1% đến 100%)
+    const humidity = (Math.random() * 99 + 1).toFixed(2); // (1 đến 100)
 
-  //     const newEntry = `{"timestamp":"${new Date().toISOString()}","temperature":${parseFloat(temperature)},"humidity":${parseFloat(humidity)}}`;
-  //     let updatedDataString = newEntry;
+    return { temperature, humidity };
+  };
 
-  //     if (docSnap.exists()) {
-  //       const currentData = docSnap.data().data;
-  //       updatedDataString = currentData + " ; " + newEntry;
-  //     }
-
-  //     await setDoc(docRef, { data: updatedDataString });
-
-  //     console.log("Dữ liệu đã gửi:", updatedDataString);
-
-  //     setTemperature("");
-  //     setHumidity("");
-  //   } catch (error) {
-  //     console.error("Lỗi khi gửi dữ liệu:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!deviceId) return;
-
-  setLoading(true);
-  try {
+  // Hàm gửi dữ liệu giả lập
+  const sendData = async () => {
+    const { temperature, humidity } = generateRandomData();
     const timestamp = new Date().toISOString();
     const newEntry = { timestamp, temperature: parseFloat(temperature), humidity: parseFloat(humidity) };
 
-    const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
-    const docSnap = await getDoc(docRef);
+    try {
+      const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
+      const docSnap = await getDoc(docRef);
 
-    let updatedData = []; // Đảm bảo updatedData luôn là một mảng
+      let updatedData = [];
 
-    if (docSnap.exists()) {
-      const rawData = docSnap.data().data;
-      try {
-        updatedData = JSON.parse(rawData || "[]"); // Nếu null, set thành []
-        if (!Array.isArray(updatedData)) {
-          updatedData = []; // Nếu dữ liệu không phải mảng, reset lại
+      if (docSnap.exists()) {
+        const rawData = docSnap.data().data;
+        try {
+          updatedData = JSON.parse(rawData || "[]");
+          if (!Array.isArray(updatedData)) {
+            updatedData = [];
+          }
+        } catch (error) {
+          console.error("Lỗi khi parse JSON:", error);
+          updatedData = [];
         }
-      } catch (error) {
-        console.error("Lỗi khi parse JSON:", error);
-        updatedData = []; // Nếu lỗi parse, reset thành []
       }
+
+      updatedData.push(newEntry); // Thêm dữ liệu mới vào mảng
+
+      await setDoc(docRef, { data: JSON.stringify(updatedData) });
+
+      console.log("Dữ liệu đã cập nhật:", updatedData);
+    } catch (error) {
+      console.error("Lỗi khi gửi dữ liệu:", error);
+    }
+  };
+
+  // Hàm gửi dữ liệu mỗi 2 giây nếu chế độ tự động bật
+  useEffect(() => {
+    let intervalId;
+
+    if (isAutoSending) {
+      intervalId = setInterval(() => {
+        sendData();
+      }, 2000); // Gửi dữ liệu mỗi 2 giây
+    } else {
+      clearInterval(intervalId); // Dừng gửi khi tắt
     }
 
-    updatedData.push(newEntry); // Thêm dữ liệu mới vào mảng
+    // Cleanup khi component unmount hoặc khi tắt auto sending
+    return () => clearInterval(intervalId);
+  }, [isAutoSending, deviceId]);
 
-    await setDoc(docRef, { data: JSON.stringify(updatedData) });
+  // Hàm xử lý gửi thủ công
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!deviceId) return;
 
-    console.log("Dữ liệu đã cập nhật:", updatedData);
-    setTemperature("");
-    setHumidity("");
-  } catch (error) {
-    console.error("Lỗi khi gửi dữ liệu:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    try {
+      const timestamp = new Date().toISOString();
+      const newEntry = { timestamp, temperature: parseFloat(temperature), humidity: parseFloat(humidity) };
+
+      const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
+      const docSnap = await getDoc(docRef);
+
+      let updatedData = [];
+
+      if (docSnap.exists()) {
+        const rawData = docSnap.data().data;
+        try {
+          updatedData = JSON.parse(rawData || "[]");
+          if (!Array.isArray(updatedData)) {
+            updatedData = [];
+          }
+        } catch (error) {
+          console.error("Lỗi khi parse JSON:", error);
+          updatedData = [];
+        }
+      }
+
+      updatedData.push(newEntry); // Thêm dữ liệu mới vào mảng
+
+      await setDoc(docRef, { data: JSON.stringify(updatedData) });
+
+      console.log("Dữ liệu đã cập nhật:", updatedData);
+      setTemperature("");
+      setHumidity("");
+    } catch (error) {
+      console.error("Lỗi khi gửi dữ liệu:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="mt-6 p-4 bg-white shadow-lg rounded-lg">
@@ -116,6 +148,14 @@ const handleSubmit = async (e) => {
           {loading ? "Đang gửi..." : "Gửi dữ liệu"}
         </button>
       </form>
+      <div className="mt-4">
+        <button
+          onClick={() => setIsAutoSending(!isAutoSending)}
+          className="w-full py-2 text-white text-lg font-semibold rounded-lg transition bg-green-500 hover:bg-green-700"
+        >
+          {isAutoSending ? "Dừng gửi dữ liệu tự động" : "Bắt đầu gửi dữ liệu tự động"}
+        </button>
+      </div>
     </div>
   );
 };

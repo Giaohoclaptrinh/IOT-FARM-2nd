@@ -14,6 +14,7 @@ import { GrResources } from "react-icons/gr";
 import { RiUserSettingsLine } from "react-icons/ri";
 import { FaHornbill } from "react-icons/fa";
 import { VscSignOut } from "react-icons/vsc";
+import { LuUserRoundCog } from "react-icons/lu";
 
 const Sidebar = () => {
     const urlList = [
@@ -39,9 +40,9 @@ const Sidebar = () => {
             icon: BiNotification,
         },
         {
-            title: "Template",
-            href: "/template",
-            icon: GoRepoTemplate,
+            title: "User",
+            href: "/user",
+            icon: LuUserRoundCog,
             marker: true
         },
         {

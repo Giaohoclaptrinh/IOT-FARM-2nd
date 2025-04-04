@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
 import { db } from "@/firebase/db.config";
-
-import { doc, setDoc, getDoc } from "firebase/firestore";
-import DeviceChart from "../Devices/DeviceChart";
-import HomeWrap from "@/pages/HomeWrap";
-
+import { doc, onSnapshot } from "firebase/firestore";
 
 const TemperatureHumidityChart = ({ deviceId }) => {
   const [chartData, setChartData] = useState({
@@ -25,44 +21,38 @@ const TemperatureHumidityChart = ({ deviceId }) => {
   useEffect(() => {
     if (!deviceId) return;
 
-    const fetchData = async () => {
-      try {
-        const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
-        const docSnap = await getDoc(docRef);
+    // Lắng nghe thay đổi realtime
+    const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const rawData = JSON.parse(docSnap.data().data || "[]");
+        if (Array.isArray(rawData)) {
+          const categories = rawData.map((entry) => new Date(entry.timestamp).toLocaleTimeString());
+          const temperatureData = rawData.map((entry) => entry.temperature);
+          const humidityData = rawData.map((entry) => entry.humidity);
 
-        if (docSnap.exists()) {
-          const rawData = JSON.parse(docSnap.data().data || "[]");
-          if (Array.isArray(rawData)) {
-            const categories = rawData.map((entry) => new Date(entry.timestamp).toLocaleTimeString());
-            const temperatureData = rawData.map((entry) => entry.temperature);
-            const humidityData = rawData.map((entry) => entry.humidity);
-
-            setChartData({
-              series: [
-                { name: "Nhiệt độ (°C)", data: temperatureData },
-                { name: "Độ ẩm (%)", data: humidityData }
-              ],
-              options: {
-                ...chartData.options,
-                xaxis: { categories }
-              }
-            });
-          }
+          setChartData({
+            series: [
+              { name: "Nhiệt độ (°C)", data: temperatureData },
+              { name: "Độ ẩm (%)", data: humidityData }
+            ],
+            options: {
+              ...chartData.options,
+              xaxis: { categories }
+            }
+          });
         }
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu từ Firestore:", error);
       }
-    };
+    });
 
-    fetchData();
+    // Cleanup listener khi component unmount hoặc deviceId thay đổi
+    return () => unsubscribe();
   }, [deviceId]);
 
   return (
-
     <div className="p-4 bg-white shadow-lg rounded-lg">
       <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
     </div>
-
   );
 };
 
