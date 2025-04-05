@@ -63,7 +63,8 @@ const Devices = () => {
               <tr className=" bg-slate-200 rounded-t-md font-semibold text-md    ">
                 <th className="py-2  rounded-tl-md ">Name Device</th>
                 <th className="py-2  ">Date </th>
-                <th  className="py-2  rounded-tr-md">Status</th>
+                <th  className="py-2  x">Status</th>
+                <th  className="py-2  rounded-tr-md"></th>
               </tr>
             </thead>
             <tbody className="">
@@ -75,10 +76,12 @@ const Devices = () => {
                   const year = createdAt.getFullYear();  // Lấy năm
                   const formattedDate = `${day}-${month}-${year}`
                   return (
-                    <tr className="border-b last:border-none">
+                    <tr className="border-b  last:border-none">
                       <td className="  font-bold ">{item.data().name}</td>
                       <td className="text-gray-600 font-normal" >{formattedDate}</td>
                       <td  className="text-gray-600 font-normal">{item.data().status  }</td>
+                      <td  className="text-gray-600 font-normal py-2">
+                        <button className="bg-blue-300   px-6  rounded-md">edit</button></td>
                     </tr>
                   )
                 })
