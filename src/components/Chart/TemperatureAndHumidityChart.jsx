@@ -3,7 +3,7 @@ import Chart from "react-apexcharts";
 import { db } from "@/firebase/db.config";
 import { doc, onSnapshot } from "firebase/firestore";
 
-const TemperatureHumidityChart = ({ deviceId }) => {
+const TemperatureHumidityChart = ({ deviceId,arg  }) => {
   const [chartData, setChartData] = useState({
     series: [
       { name: "Nhiệt độ (°C)", data: [] },

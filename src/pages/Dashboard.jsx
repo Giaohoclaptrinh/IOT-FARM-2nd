@@ -1,57 +1,5 @@
-// import React, { useState, useEffect } from "react";
-// import { db, auth } from "@/firebase/db.config";
-// import { collection, query, where, onSnapshot } from "firebase/firestore";
-// import TemperatureChart from "@/components/Chart/TemperatureChart";
-// import TemperatureInput from "@/components/Chart/TemperatureInput";
 
-// const Dashboard = () => {
-//   const [devices, setDevices] = useState([]);
-//   const [deviceId, setDeviceId] = useState("");
-
-//   useEffect(() => {
-//     const user = auth.currentUser;
-//     if (!user) return;
-
-//     const q = query(collection(db, "devices"), where("userUID", "==", user.uid));
-//     const unsubscribe = onSnapshot(q, (snapshot) => {
-//       const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-//       setDevices(deviceList);
-//       if (deviceList.length > 0) setDeviceId(deviceList[0].id);
-//     });
-
-//     return () => unsubscribe();
-//   }, []);
-
-//   return (
-//     <div className="p-6 max-w-4xl mx-auto">
-//       <h1 className="text-2xl font-bold mb-4">🌡️ Quản lý Nhiệt độ Thiết bị</h1>
-
-//       <div className="mb-4">
-//         <label className="block font-medium">Chọn thiết bị:</label>
-//         <select
-//           value={deviceId}
-//           onChange={(e) => setDeviceId(e.target.value)}
-//           className="mt-1 p-2 border rounded w-full"
-//         >
-//           {devices.length > 0 ? (
-//             devices.map((device) => (
-//               <option key={device.id} value={device.id}>
-//                 {device.name || `Thiết bị ${device.id}`}
-//               </option>
-//             ))
-//           ) : (
-//             <option disabled>Không có thiết bị nào</option>
-//           )}
-//         </select>
-//       </div>
-
-//       {deviceId && <TemperatureChart deviceId={deviceId} />}
-//       {deviceId && <TemperatureInput deviceId={deviceId} />}
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
+// export default Dashboard; parameter
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/db.config";
@@ -61,57 +9,54 @@ import TemperatureAndHumidityChart from "@/components/Chart/TemperatureAndHumidi
 import TemperatureAndHumidityInput from "@/components/Chart/TemperatureAndHumidityInput";
 
 import HomeWrap from "./HomeWrap";
+import ChartGrid from "@/components/Chart/ChartGrid";
+import { getCollectionDevice } from "@/components/Database/Services";
+import ChartRadialBar from "@/components/Chart/ChartRadialBar";
 
 const Dashboard = () => {
   const { deviceUid } = useParams();
-  const [deviceData, setDeviceData] = useState(null);
-
-  useEffect(() => {
-    const fetchDeviceData = async () => {
-      const docRef = doc(db, "devices", deviceUid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setDeviceData(docSnap.data());
-        console.log("data",docSnap.data())
-      } else {
-        setDeviceData(deviceUid);
-      }
-    };
-    fetchDeviceData();
-  }, [deviceUid]);
-
-
-  // console.log(window.location.pathname)
-  //   const q = query(collection(db, "devices"), where("userUID", "==", auth.currentUser.uid));
-  //   const unsubscribe = onSnapshot(q, (snapshot) => {
-  //     const deviceList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  //     // setDevices(deviceList);
-  //     if (deviceList.length > 0) setDeviceId(deviceList[0].id);
-  //   });
-   
+  function generateTemperatureData(startDate, endDate, numPoints) {
+    // Chuyển đổi ngày bắt đầu và kết thúc thành timestamp (miliseconds)
+    const startTimestamp = new Date(startDate).getTime();
+    const endTimestamp = new Date(endDate).getTime();
   
-  if (!deviceData) {
-    return (<div>
-     
-    </div>)
+
+    const timeStep = (endTimestamp - startTimestamp) / numPoints;
+  
+    const data = [];
+  
+    for (let i = 0; i < numPoints; i++) {
+      const timestamp = startTimestamp + timeStep * i;
+      
+      const temperature = Math.random() * (40 - 20) + 20;
+  
+      data.push([timestamp, temperature.toFixed(1)]);
+    }
+  
+    return data;
   }
+  
+  const startDate = '2024-01-01';
+  const endDate = '2025-4-10';
+  const numPoints = 50; 
+  
+  const temperatureData = generateTemperatureData(startDate, endDate, numPoints);
+  
 
   return (
     <HomeWrap>
-      <div className=" w-full mx-auto">
-        <h1 className="text-2xl font-bold mb-4">🌡️ Quản lý Nhiệt độ Thiết bị</h1>
-        <h2 className="text-xl font-bold">Dashboard - {deviceUid}</h2>
-        {/* <p>Nhiệt độ: {deviceData.temperature}°C</p>
-        <p>Độ ẩm: {deviceData.humidity}%</p> */}
+   
+      <div>sidetop bar option</div>
+       <div className="mt-16 grid  grid-cols-[1fr_9fr]  gap-y-40">
+     <ChartRadialBar temperature={28} divID={"item-2-child"}></ChartRadialBar>
+      <ChartGrid humidity={temperatureData} typeChart="area"  divID={"item-2"}  />
+  
+      {/* <ChartRadialBar temperature={28} divID={"item-1-child"}></ChartRadialBar>
+      <ChartGrid humidity={temperatureData} typeChart="area"  divID={"item-1"}  /> */}
+     
+    </div>
 
-        <TemperatureAndHumidityChart deviceId={deviceUid} />
-        <TemperatureAndHumidityInput deviceId={deviceUid} />
-       
-        <div className="min-w-full">
-          
 
-        </div>
-      </div>
     </HomeWrap>
   );
 };
