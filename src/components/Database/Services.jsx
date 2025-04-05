@@ -1,5 +1,5 @@
 import { db } from "@/firebase/db.config";
-import { doc, setDoc, getDoc, collection, addDoc, query, getDocs } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, addDoc, query, getDocs, updateDoc } from "firebase/firestore";
 
 /**
  * Lấy dữ liệu nhiệt độ và độ ẩm từ Firestore.
@@ -41,22 +41,16 @@ const addPage = async (userID, deviceID) => {
   try {
 
     const pagesRef = collection(db, `users/${userID}/pages`);
-    const docRef = await addDoc(pagesRef, { deviceID });
-    console.log("Page added with ID:", docRef.id);
+    const docRef = await addDoc(pagesRef, {allDevice: [] });
+   console.log(docRef)
 
-
-    const userRef = doc(db, "users", userID);
-
-
-    await setDoc(userRef, {
-      allDevice: arrayUnion(deviceID)
-    }, { merge: true });
-
-    console.log("Device ID updated in allDevice array.");
+   
   } catch (error) {
     console.error("Error adding page or updating allDevice:", error);
   }
 };
+
+
 
 /**
  * @param {void} param - description void
