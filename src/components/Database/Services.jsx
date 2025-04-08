@@ -1,13 +1,16 @@
 import { db } from "@/firebase/db.config";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, addDoc, query, getDocs, updateDoc } from "firebase/firestore";
 
 /**
  * Lấy dữ liệu nhiệt độ và độ ẩm từ Firestore.
  * @param {string} deviceId ID của thiết bị
- * @returns {Array} Mảng chứa dữ liệu lịch sử
+ * @returns {humidity, temperature} Mảng chứa dữ liệu lịch sử
  */
 export const fetchTemperatureHumidityData = async (deviceId) => {
   if (!deviceId) return [];
+
+
+    
 
   try {
     const docRef = doc(db, `devices/${deviceId}/temperatureAndHumidityLogs`, deviceId);
@@ -15,13 +18,66 @@ export const fetchTemperatureHumidityData = async (deviceId) => {
 
     if (docSnap.exists()) {
       const rawData = JSON.parse(docSnap.data().data || "[]");  
-      return Array.isArray(rawData) ? rawData : [];
+      return {
+        humidity:rawData.map((item)=>{
+            return {
+                x:item.humidity,
+                y:item.timestamp
+            }
+
+        },),
+        temperature:rawData.map((item)=>{
+            return item.temperature},)
+      }
     }
   } catch (error) {
     console.error("Lỗi khi lấy dữ liệu từ Firestore:", error);
   }
-  return [];
+  return null;
+}; 
+
+
+const addPage = async (userID, deviceID) => {
+  try {
+
+    const pagesRef = collection(db, `users/${userID}/pages`);
+    const docRef = await addDoc(pagesRef, {allDevice: [] });
+   console.log(docRef)
+
+   
+  } catch (error) {
+    console.error("Error adding page or updating allDevice:", error);
+  }
 };
+
+
+
+/**
+ * @param {void} param - description void
+ * @return {Array } return Array  container  element  doc are  device
+ */
+
+
+const   getCollectionDevice  = async ()=>{
+     const collectionRef =  collection(db,'devices')
+     const  getData =  await getDocs(collectionRef);
+     return  getData.docs 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Gửi dữ liệu nhiệt độ và độ ẩm lên Firestore.
@@ -81,3 +137,4 @@ export const startFakeDataGeneration = (deviceId) => {
     console.log("Đã dừng tạo dữ liệu giả.");
   };
 };
+export {addPage,getCollectionDevice};

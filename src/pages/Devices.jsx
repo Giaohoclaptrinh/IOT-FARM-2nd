@@ -35,59 +35,61 @@ import { db, auth } from "../firebase/db.config";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import DeviceChart from "@/components/Devices/DeviceChart"; // Đảm bảo đã import đúng component biểu đồ
 import HomeWrap from "./HomeWrap";
+import { getCollectionDevice } from "@/components/Database/Services";
 
 const Devices = () => {
   const navigate = useNavigate();
-  const [devices, setDevices] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null); // Lưu đối tượng thiết bị đã chọn
+  const [deviceData, setDeviceData] = useState([]);
+  
+  useEffect(()=>{
+    const getCollection = async()=>{
+      const device =  await getCollectionDevice();
+      setDeviceData(device);
+    }
+    getCollection();
+    
 
-  useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
+  },[])
 
-    const q = query(collection(db, "devices"), where("userUID", "==", user.uid));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const deviceList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setDevices(deviceList);
-    });
+ console.log(deviceData)
 
-    return () => unsubscribe();
-  }, []);
-
-  const handleDeviceClick = (deviceUid) => {
-    const device = devices.find(d => d.id === deviceUid); // Tìm thiết bị trong danh sách
-    setSelectedDevice(device); // Cập nhật thiết bị đã chọn
-    navigate(`/dashboards/${deviceUid}`); // Điều hướng đến trang Dashboard
-  };
+  
 
   return (
     <HomeWrap>
-       <div className="p-4 w-full">
-      <h2 className="text-xl font-bold">Danh sách thiết bị</h2>
-      <ul>
-        {devices.length > 0 ? (
-          devices.map((device) => (
-            <li
-              key={device.id}
-              className="p-2 border cursor-pointer hover:bg-gray-200"
-              onClick={() => handleDeviceClick(device.id)}
-            >
-              {device.name || `Thiết bị ${device.id}`}
-            </li>
-          ))
-        ) : (
-          <li className="text-gray-500">Không có thiết bị nào</li>
-        )}
-      </ul>
-
-      {/* Hiển thị biểu đồ nếu có thiết bị được chọn */}
-      {selectedDevice && (
-        <div className="mt-8 p-4 border rounded-lg shadow bg-white">
-          <h2 className="text-lg font-semibold">Dữ liệu thiết bị: {selectedDevice.name}</h2>
-          <DeviceChart deviceId={selectedDevice.id} /> {/* Biểu đồ cho thiết bị đã chọn */}
-        </div>
-      )}
-    </div>
+      <div className=" font-seconds border rounded-md">
+      <table className="table-auto border-collapse  divide-y  relative text-left  w-full">
+            <thead className="">
+              <tr className=" bg-slate-200 rounded-t-md font-semibold text-md    ">
+                <th className="py-2  rounded-tl-md ">Name Device</th>
+                <th className="py-2  ">Date </th>
+                <th  className="py-2  x">Status</th>
+                <th  className="py-2  rounded-tr-md"></th>
+              </tr>
+            </thead>
+            <tbody className="">
+              {
+                deviceData.map((item,index)=>{
+                  const createdAt = item.data().createdAt.toDate();  // Chuyển timestamp thành Date
+                  const day = createdAt.getDate();  // Lấy ngày
+                  const month = createdAt.getMonth() + 1;  // Lấy tháng (chú ý: tháng bắt đầu từ 0, nên cần +1)
+                  const year = createdAt.getFullYear();  // Lấy năm
+                  const formattedDate = `${day}-${month}-${year}`
+                  return (
+                    <tr className="border-b  last:border-none">
+                      <td className="  font-bold ">{item.data().name}</td>
+                      <td className="text-gray-600 font-normal" >{formattedDate}</td>
+                      <td  className="text-gray-600 font-normal">{item.data().status  }</td>
+                      <td  className="text-gray-600 font-normal py-2">
+                        <button className="bg-blue-300   px-6  rounded-md">edit</button></td>
+                    </tr>
+                  )
+                })
+              }
+            </tbody>
+        </table>
+      </div>
+        
     </HomeWrap>
    
   );

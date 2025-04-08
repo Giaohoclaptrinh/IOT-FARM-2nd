@@ -70,6 +70,8 @@ import ProfileSettings from "./pages/ProfileSettings";
 import DeviceDetail from "./components/Devices/DeviceDetail";
 import UserPage from "./pages/User";
 import ChatBox from "@/components/Chatbox/Chatbox.jsx";
+import ControlsDevice from "./pages/ControlsDevice";
+import TestAddPage from "./components/Devices/TestAddPage";
 
 const App = () => {
   const [showLayout, setShowLayout] = useState(true);
@@ -113,6 +115,9 @@ const MainContent = ({ showLayout, setShowLayout }) => {
               <Route path="/sign-up" element={<SignUp />} />
               <Route path="/device-overview" element={<DeviceOverview />} />
               <Route path="/device/:id" element={<DeviceDetail />} />
+              <Route path="/controlsdevices" element={<ControlsDevice />} />
+              <Route  path="/testaddpage" element={<TestAddPage/>}/>
+              
             </Routes>
           </div>
         </div>
