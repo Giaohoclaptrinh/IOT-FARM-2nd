@@ -1,33 +1,3 @@
-// import React, { useState } from "react";
-// import DeviceList from "../components/Devices/DeviceList";
-// import DeviceChart from "@/components/Devices/DeviceChart";
-// import { useNavigate } from "react-router-dom";
-
-// const Devices = () => {
-//   const navigate = useNavigate();
-//   const [selectedDevice, setSelectedDevice] = useState(null); // Lưu cả đối tượng thiết bị
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold mb-4">Quản lý Thiết bị</h1>
-
-//       {/* Truyền setSelectedDevice vào DeviceList để cập nhật khi click vào thiết bị */}
-//       <DeviceList setSelectedDevice={(device) => setSelectedDevice(device)} />
-
-//       {/* Chỉ hiển thị biểu đồ nếu có thiết bị được chọn */}
-//       {selectedDevice && (
-//         <div className="mt-8 p-4 border rounded-lg shadow bg-white">
-//           <h2 className="text-lg font-semibold">Dữ liệu thiết bị: {selectedDevice}</h2>
-//           <DeviceChart deviceId={selectedDevice.id} />
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Devices;
-
-
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db, auth } from "../firebase/db.config";
@@ -39,14 +9,11 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import DeviceChart from "@/components/Devices/DeviceChart";
 import HomeWrap from "./HomeWrap";
-import EditDevice from "@/components/Devices/EditDevice";
 
 const Devices = () => {
   const navigate = useNavigate();
   const [deviceData, setDeviceData] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
 
   // Theo dõi người dùng hiện tại
@@ -62,7 +29,7 @@ const Devices = () => {
     if (!currentUser) return;
 
     const deviceRef = collection(db, "devices");
-    const isAdmin = currentUser.email === "1@gmail.com"; // ⚠️ ⚠️⚠️⚠️đổi thành email admin 
+    const isAdmin = currentUser.email === "1@gmail.com"; // Đổi thành email admin thực tế
 
     const q = isAdmin
       ? deviceRef
@@ -75,6 +42,7 @@ const Devices = () => {
     return () => unsubscribe();
   }, [currentUser]);
 
+  // Xoá thiết bị
   const handleDeleteDevice = async (id) => {
     const confirm = window.confirm("Bạn có chắc muốn xoá thiết bị này?");
     if (!confirm) return;
@@ -85,6 +53,11 @@ const Devices = () => {
     } catch (error) {
       console.error("Lỗi khi xoá thiết bị:", error);
     }
+  };
+
+  // ➜ Điều hướng khi nhấn "Sửa"
+  const handleEdit = (uid) => {
+    navigate(`/controlsdevices/${uid}`);
   };
 
   return (
@@ -114,15 +87,13 @@ const Devices = () => {
                   <td className="text-gray-600">{data.status}</td>
                   <td className="text-gray-600 py-2 space-x-2">
                     <button
-                      className="bg-blue-400 px-4 rounded-md text-white"
-                      onClick={() =>
-                        setSelectedDevice({ id: item.id, ...data })
-                      }
+                      className="bg-blue-500 px-4 py-1 rounded-md text-white"
+                      onClick={() => handleEdit(item.id)} // 🔁 chuyển trang tại đây
                     >
                       Sửa
                     </button>
                     <button
-                      className="bg-red-500 px-4 rounded-md text-white"
+                      className="bg-red-500 px-4 py-1 rounded-md text-white"
                       onClick={() => handleDeleteDevice(item.id)}
                     >
                       Xoá
@@ -134,15 +105,6 @@ const Devices = () => {
           </tbody>
         </table>
       </div>
-
-      {selectedDevice && (
-        <EditDevice
-          device={selectedDevice}
-          onClose={() => {
-            setSelectedDevice(null);
-          }}
-        />
-      )}
     </HomeWrap>
   );
 };

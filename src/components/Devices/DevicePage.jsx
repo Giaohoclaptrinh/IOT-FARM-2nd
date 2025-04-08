@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchDevices } from "@/services/deviceService";
+import { fetchDevices } from "@/components/Database/Services";
 import { setDoc, doc, getDocs, collection } from "firebase/firestore";
 import { db } from "@/firebase/db.config";
 
