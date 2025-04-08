@@ -25,6 +25,7 @@ function ControlsDevice() {
       clearInterval(interval);
     };
   }, []);
+  console.log("render  trang vi gia tri useState  cap nhat ! ")
 
   return (
     <HomeWrap>
