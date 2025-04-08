@@ -109,3 +109,4 @@ const AddDevice = ({ onClose, onDeviceAdded }) => {
 };
 
 export default AddDevice;
+

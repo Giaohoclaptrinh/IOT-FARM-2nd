@@ -43,7 +43,7 @@ const EditDevice = ({ device, onClose }) => {
     />
 
     <label className="block text-lg font-medium mb-1">Vị Trí</label>
-    <input 
+    <input  
       className="border p-3 rounded w-full mb-3 text-lg" 
       value={location} 
       onChange={(e) => setLocation(e.target.value)} 

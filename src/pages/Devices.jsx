@@ -1,97 +1,111 @@
-// import React, { useState } from "react";
-// import DeviceList from "../components/Devices/DeviceList";
-// import DeviceChart from "@/components/Devices/DeviceChart";
-// import { useNavigate } from "react-router-dom";
-
-// const Devices = () => {
-//   const navigate = useNavigate();
-//   const [selectedDevice, setSelectedDevice] = useState(null); // Lưu cả đối tượng thiết bị
-
-//   return (
-//     <div className="p-6">
-//       <h1 className="text-2xl font-bold mb-4">Quản lý Thiết bị</h1>
-
-//       {/* Truyền setSelectedDevice vào DeviceList để cập nhật khi click vào thiết bị */}
-//       <DeviceList setSelectedDevice={(device) => setSelectedDevice(device)} />
-
-//       {/* Chỉ hiển thị biểu đồ nếu có thiết bị được chọn */}
-//       {selectedDevice && (
-//         <div className="mt-8 p-4 border rounded-lg shadow bg-white">
-//           <h2 className="text-lg font-semibold">Dữ liệu thiết bị: {selectedDevice}</h2>
-//           <DeviceChart deviceId={selectedDevice.id} />
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Devices;
-
-
-
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { db, auth } from "../firebase/db.config";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
-import DeviceChart from "@/components/Devices/DeviceChart"; // Đảm bảo đã import đúng component biểu đồ
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import HomeWrap from "./HomeWrap";
-import { getCollectionDevice } from "@/components/Database/Services";
 
 const Devices = () => {
   const navigate = useNavigate();
   const [deviceData, setDeviceData] = useState([]);
-  
-  useEffect(()=>{
-    const getCollection = async()=>{
-      const device =  await getCollectionDevice();
-      setDeviceData(device);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Theo dõi người dùng hiện tại
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Lấy danh sách thiết bị
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const deviceRef = collection(db, "devices");
+    const isAdmin = currentUser.email === "1@gmail.com"; // Đổi thành email admin thực tế
+
+    const q = isAdmin
+      ? deviceRef
+      : query(deviceRef, where("userUID", "==", currentUser.uid));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setDeviceData(snapshot.docs);
+    });
+
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // Xoá thiết bị
+  const handleDeleteDevice = async (id) => {
+    const confirm = window.confirm("Bạn có chắc muốn xoá thiết bị này?");
+    if (!confirm) return;
+
+    try {
+      await deleteDoc(doc(db, "devices", id));
+      setDeviceData((prev) => prev.filter((device) => device.id !== id));
+    } catch (error) {
+      console.error("Lỗi khi xoá thiết bị:", error);
     }
-    getCollection();
-    
+  };
 
-  },[])
-
- console.log(deviceData)
-
-  
+  // ➜ Điều hướng khi nhấn "Sửa"
+  const handleEdit = (uid) => {
+    navigate(`/controlsdevices/${uid}`);
+  };
 
   return (
     <HomeWrap>
-      <div className=" font-seconds border rounded-md">
-      <table className="table-auto border-collapse  divide-y  relative text-left  w-full">
-            <thead className="">
-              <tr className=" bg-slate-200 rounded-t-md font-semibold text-md    ">
-                <th className="py-2  rounded-tl-md ">Name Device</th>
-                <th className="py-2  ">Date </th>
-                <th  className="py-2  x">Status</th>
-                <th  className="py-2  rounded-tr-md"></th>
-              </tr>
-            </thead>
-            <tbody className="">
-              {
-                deviceData.map((item,index)=>{
-                  const createdAt = item.data().createdAt.toDate();  // Chuyển timestamp thành Date
-                  const day = createdAt.getDate();  // Lấy ngày
-                  const month = createdAt.getMonth() + 1;  // Lấy tháng (chú ý: tháng bắt đầu từ 0, nên cần +1)
-                  const year = createdAt.getFullYear();  // Lấy năm
-                  const formattedDate = `${day}-${month}-${year}`
-                  return (
-                    <tr className="border-b  last:border-none">
-                      <td className="  font-bold ">{item.data().name}</td>
-                      <td className="text-gray-600 font-normal" >{formattedDate}</td>
-                      <td  className="text-gray-600 font-normal">{item.data().status  }</td>
-                      <td  className="text-gray-600 font-normal py-2">
-                        <button className="bg-blue-300   px-6  rounded-md">edit</button></td>
-                    </tr>
-                  )
-                })
-              }
-            </tbody>
+      <div className="font-seconds border rounded-md">
+        <table className="table-auto border-collapse divide-y relative text-left w-full">
+          <thead>
+            <tr className="bg-slate-200 font-semibold text-md">
+              <th className="py-2 rounded-tl-md">Name Device</th>
+              <th className="py-2">Date</th>
+              <th className="py-2">Status</th>
+              <th className="py-2 rounded-tr-md"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {deviceData.map((item) => {
+              const data = item.data();
+              const createdAt = data.createdAt?.toDate();
+              const formattedDate = createdAt
+                ? `${createdAt.getDate()}-${createdAt.getMonth() + 1}-${createdAt.getFullYear()}`
+                : "N/A";
+
+              return (
+                <tr key={item.id} className="border-b last:border-none">
+                  <td className="font-bold">{data.name}</td>
+                  <td className="text-gray-600">{formattedDate}</td>
+                  <td className="text-gray-600">{data.status}</td>
+                  <td className="text-gray-600 py-2 space-x-2">
+                    <button
+                      className="bg-blue-500 px-4 py-1 rounded-md text-white"
+                      onClick={() => handleEdit(item.id)} // 🔁 chuyển trang tại đây
+                    >
+                      Sửa
+                    </button>
+                    <button
+                      className="bg-red-500 px-4 py-1 rounded-md text-white"
+                      onClick={() => handleDeleteDevice(item.id)}
+                    >
+                      Xoá
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </div>
-        
     </HomeWrap>
-   
   );
 };
 

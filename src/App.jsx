@@ -72,6 +72,7 @@ import UserPage from "./pages/User";
 import ChatBox from "@/components/Chatbox/Chatbox.jsx";
 import ControlsDevice from "./pages/ControlsDevice";
 import TestAddPage from "./components/Devices/TestAddPage";
+import Things  from "./pages/Things";
 
 const App = () => {
   const [showLayout, setShowLayout] = useState(true);
@@ -117,7 +118,9 @@ const MainContent = ({ showLayout, setShowLayout }) => {
               <Route path="/device/:id" element={<DeviceDetail />} />
               <Route path="/controlsdevices" element={<ControlsDevice />} />
               <Route  path="/testaddpage" element={<TestAddPage/>}/>
-              
+              <Route path="/things" element={<Things />} />              {/* test thing dung xoa */}
+              <Route path="/controlsdevices/:deviceUid" element={<ControlsDevice />} />
+
             </Routes>
           </div>
         </div>
