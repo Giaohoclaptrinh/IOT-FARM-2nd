@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db, auth } from '@/firebase/db.config';
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 const RoleManager = () => {
@@ -9,18 +9,27 @@ const RoleManager = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    // Lấy thông tin user hiện tại
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userDoc = await getDocs(collection(db, "users"));
-        const userData = userDoc.docs.find((doc) => doc.id === user.uid);
-        if (userData) {
-          setCurrentUser({ id: user.uid, role: userData.data().role });
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const role = userSnap.data().role || "client";
+            setCurrentUser({ id: user.uid, role });
+          } else {
+            console.warn("Không tìm thấy user:", user.uid);
+            setCurrentUser({ id: user.uid, role: "client" }); // fallback an toàn
+          }
+        } catch (error) {
+          console.error("Lỗi khi lấy thông tin user:", error);
         }
+      } else {
+        setCurrentUser(null);
       }
     });
 
-    // Lấy danh sách người dùng từ Firestore
     const fetchUsers = async () => {
       try {
         const userSnapshot = await getDocs(collection(db, "users"));
@@ -36,10 +45,10 @@ const RoleManager = () => {
     };
 
     fetchUsers();
+
     return () => unsubscribeAuth();
   }, []);
 
-  // Hàm cập nhật quyền của người dùng
   const updateUserRole = async (id, newRole) => {
     if (!currentUser || currentUser.role !== "admin") {
       alert("Bạn không có quyền thay đổi vai trò!");
@@ -62,14 +71,17 @@ const RoleManager = () => {
     }
   };
 
-  // Lọc danh sách người dùng theo tìm kiếm
   const filteredUsers = users.filter(
     (user) =>
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+      (user.email?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+       user.name?.toLowerCase().includes(searchQuery.toLowerCase())))
 
-  if (!currentUser || currentUser.role !== "admin") {
+
+  if (currentUser === null) {
+    return <div className="text-center p-4">Đang tải...</div>;
+  }
+
+  if (currentUser.role !== "admin") {
     return (
       <div className="text-red-500 text-center p-4">
         Bạn không có quyền truy cập trang này!
@@ -81,7 +93,6 @@ const RoleManager = () => {
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-4">Quản lý người dùng</h1>
 
-      {/* Thanh tìm kiếm */}
       <div className="mb-4">
         <input
           type="text"
@@ -92,7 +103,6 @@ const RoleManager = () => {
         />
       </div>
 
-      {/* Bảng danh sách người dùng */}
       <div className="overflow-x-auto">
         <table className="min-w-full table-fixed border-collapse border border-gray-300">
           <thead>
