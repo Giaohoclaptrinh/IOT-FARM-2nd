@@ -20,18 +20,21 @@ export const getUserPages = async (userId) => {
 export const getDevicesInPage = async (pageId) => {
   const ref = collection(db, `things/${pageId}/devices`);
   const snap = await getDocs(ref);
-  return snap.docs.map(d => d.data());
+  return snap.docs.map(d => ({ uid: d.id, ...d.data() })); // ✅ Thêm uid vào
 };
+
 
 // Lấy thiết bị chưa có trong Page
 export const getDevicesNotInPage = async (pageId) => {
   const allDevicesSnap = await getDocs(collection(db, "devices"));
   const linkedSnap = await getDocs(collection(db, `things/${pageId}/devices`));
   const linkedUIDs = new Set(linkedSnap.docs.map(d => d.id));
+  
   return allDevicesSnap.docs
-    .map(doc => doc.data())
+    .map(doc => ({ uid: doc.id, ...doc.data() })) 
     .filter(d => !linkedUIDs.has(d.uid));
 };
+
 
 // Thêm thiết bị vào Page
 export const addDeviceToPage = async (pageId, device) => {
