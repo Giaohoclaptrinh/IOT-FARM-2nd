@@ -10,7 +10,7 @@ import { auth } from "@/firebase/db.config";
 const PageDetail = ({ pageId, onBack }) => {
   const [linkedDevices, setLinkedDevices] = useState([]);
   const [availableDevices, setAvailableDevices] = useState([]);
-  const [showAddModal, setShowAddModal] = useState(false); // ✅
+  const [showAddModal, setShowAddModal] = useState(false); 
 
   const fetchData = async () => {
     const user = auth.currentUser;
@@ -29,7 +29,7 @@ const PageDetail = ({ pageId, onBack }) => {
 
   const handleAdd = async (device) => {
     await addDeviceToPage(pageId, device);
-    setShowAddModal(false); // ✅ Đóng bảng khi thêm
+    setShowAddModal(false); //  Đóng bảng khi thêm
     fetchData();
   };
 
@@ -53,7 +53,7 @@ const PageDetail = ({ pageId, onBack }) => {
       </ul>
 
       <button onClick={() => setShowAddModal(true)} className="bg-blue-500 text-white px-4 py-2 rounded mb-4">
-        ➕ Thêm thiết bị
+       Thêm thiết bị
       </button>
 
       {/* Modal */}
