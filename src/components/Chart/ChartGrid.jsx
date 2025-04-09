@@ -57,34 +57,54 @@ export default function ChartGrid({ humidity, temperature, ph, divID, typeChart 
       chart: {
         type: typeChart,
         height: 350,
+        width: "100%",
         zoom: {
           autoScaleYaxis: true
         },
-        width: "100%",
-     
-
-        
       },
       series: [
         {
           name: "Humidity",
-          data: humidity
+          data: humidity, // Dữ liệu dạng: [{ x: timestamp, y: value }]
         }
       ],
-     
       tooltip: {
         x: {
-          format: 'dd/MM/yyyy HH:mm:ss'
+          formatter: (val) => {
+            return new Date(val).toLocaleString("vi-VN", {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour12: false,
+              timeZone: 'Asia/Ho_Chi_Minh'
+            });
+          }
         }
       },
       xaxis: {
         type: 'datetime',
+        labels: {
+          formatter: (val) => {
+            return new Date(val).toLocaleTimeString("vi-VN", {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
+              timeZone: 'Asia/Ho_Chi_Minh'
+            });
+          }
+        }
       },
       yaxis: {
-        
+        title: {
+          text: "Humidity (%)"
+        }
       },
       stroke: {
-        show:true,
+        show: true,
         curve: "smooth"
       },
       dataLabels: {
@@ -94,10 +114,8 @@ export default function ChartGrid({ humidity, temperature, ph, divID, typeChart 
         size: 0,
         style: 'hollow',
       },
-   
-    
-      
     };
+    
 
     setOption(chartOptions);
 

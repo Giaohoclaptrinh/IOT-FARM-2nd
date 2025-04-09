@@ -28,12 +28,22 @@ function ChartDynamic({ humidity, divID }) {
       series: [
         {
           name: 'Humidity',
-          data: humidity, // dữ liệu ban đầu
+          data: humidity,
         },
       ],
       xaxis: {
         type: 'datetime',
-        range: 30000, // 30 giây
+        range: 30000,
+        labels: {
+          formatter: (value) =>
+            new Date(value).toLocaleTimeString("vi-VN", {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false,
+              timeZone: "Asia/Ho_Chi_Minh"
+            }),
+        },
       },
       yaxis: {
         max: 100,
@@ -49,6 +59,7 @@ function ChartDynamic({ humidity, divID }) {
         align: 'left',
       },
     };
+    
 
     const chart = new ApexCharts(document.getElementById(containerID), options);
     chart.render();
