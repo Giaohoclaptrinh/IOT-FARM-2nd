@@ -129,7 +129,7 @@ export const startFakeDataGeneration = (deviceId) => {
     const fakeTemperature = Math.floor(Math.random() * 120) + 1;
     const fakeHumidity = Math.floor(Math.random() * 100) + 1;
     sendTemperatureHumidityData(deviceId, fakeTemperature, fakeHumidity);
-  }, 2000);
+  }, 5000);
 
   console.log("Bắt đầu tạo dữ liệu giả...");
   return () => {

@@ -1,35 +1,23 @@
-import React from "react";
-import DevicesPage from "../components/Devices/DevicePage";
-import HomeWrap from "./HomeWrap";
-import { addDoc, collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
-import { db } from "@/firebase/db.config";
+import React, { useState } from "react";
+import HomeWrap from "@/pages/HomeWrap";
+import PageList from "@/components/Things/PageList";
+import PageDetail from "@/components/Things/PageDetail";
 
 const Things = () => {
-  // Ví dụ: hiện một page cụ thể hoặc danh sách page
-  const examplePageId = "example-page-id";
-/**
- * addPage
- * @param {String} param - NameUser
- * @param {String} param - userID
- * @return {Promise} Promise
- */
-  const   addPage = async (namePage,userId)=>{
-    const path  =  `users/${userId}/pages`
-    const   documentRef =   doc(db,path,namePage)
-    const getSnapShot = await  setDoc(documentRef,{})
-    console.log(getSnapShot)
-  }
+  const [selectedPageId, setSelectedPageId] = useState(null);
 
   return (
     <HomeWrap>
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Things</h1>
-      <DevicesPage addPage = {addPage} pageId={examplePageId} onSelectDevice={(uid) => console.log("Selected", uid)} />
-    </div>
-  
-  </HomeWrap>
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Things</h1>
+        {!selectedPageId ? (
+          <PageList onSelectPage={setSelectedPageId} />
+        ) : (
+          <PageDetail pageId={selectedPageId} onBack={() => setSelectedPageId(null)} />
+        )}
+      </div>
+    </HomeWrap>
   );
 };
 
 export default Things;
-    

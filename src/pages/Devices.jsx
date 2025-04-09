@@ -56,7 +56,7 @@ const Devices = () => {
   };
 
   // ➜ Điều hướng khi nhấn "Sửa"
-  const handleEdit = (uid) => {
+  const handleWatch = (uid) => {
     navigate(`/controlsdevices/${uid}`);
   };
 
@@ -88,7 +88,7 @@ const Devices = () => {
                   <td className="text-gray-600 py-2 space-x-2">
                     <button
                       className="bg-blue-500 px-4 py-1 rounded-md text-white"
-                      onClick={() => handleEdit(item.id)} // 🔁 chuyển trang tại đây
+                      onClick={() => handleWatch(item.id)} // 🔁 chuyển trang tại đây
                     >
                       Sửa
                     </button>

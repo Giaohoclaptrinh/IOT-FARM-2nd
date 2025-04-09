@@ -1,9 +1,7 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import {
-  fetchTemperatureHumidityData,
-  startFakeDataGeneration,
-} from "../components/Database/Services";
+import { useState } from "react";
+import { startFakeDataGeneration } from "../components/Database/Services";
+import { useDeviceData } from "../components/Database/useDataRealtime";
 
 import HomeWrap from "./HomeWrap";
 import ChartDynamic from "../components/Chart/ChartDynamic";
@@ -13,33 +11,24 @@ import DeviceChart from "../components/Chart/DeviceChart";
 
 const ControlsDevice = () => {
   const { deviceUid } = useParams();
-  const [data, setData] = useState({ humidity: [], temperature: [] });
+  const data = useDeviceData(deviceUid);
   const [stopGenerating, setStopGenerating] = useState(null);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      
-      const newHumidity = Math.random() * (100 - 0) + 0; 
-      const timestamp = new Date().getTime();
-
-      setHumidityData((prevData) => [
-        ...prevData,
-        [timestamp, newHumidity.toFixed(1)], 
-      ]);
-    }, 5000); 
-
-  
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  // Xử lý dữ liệu
+  const latest = data[data.length - 1] || {};
+  const humidity = data.map(d => ({
+    x: new Date(d.timestamp),
+    y: d.humidity
+  }));
+  const temperature = data.map(d => d.temperature);
+  const humidityValues = data.map(d => d.humidity);
 
   const handleFakeData = () => {
     if (stopGenerating) {
-      stopGenerating(); // stop
+      stopGenerating(); // Dừng
       setStopGenerating(null);
     } else {
-      const stop = startFakeDataGeneration(deviceUid); // start
+      const stop = startFakeDataGeneration(deviceUid); // Bắt đầu
       setStopGenerating(() => stop);
     }
   };
@@ -65,7 +54,7 @@ const ControlsDevice = () => {
             <h3 className="text-lg font-semibold">Biểu đồ động</h3>
             {renderFakeButton()}
           </div>
-          <ChartDynamic temperatureData={data.temperature} humidityData={data.humidity} />
+          <ChartDynamic humidity={humidity} divID="dynamic1" />
         </div>
 
         {/* Grid Chart */}
@@ -74,7 +63,7 @@ const ControlsDevice = () => {
             <h3 className="text-lg font-semibold">Biểu đồ lưới</h3>
             {renderFakeButton()}
           </div>
-          <ChartGrid temperatureData={data.temperature} humidityData={data.humidity} />
+          <ChartGrid temperatureData={temperature} humidityData={humidityValues} />
         </div>
 
         {/* Radial Bar Chart */}
@@ -83,7 +72,7 @@ const ControlsDevice = () => {
             <h3 className="text-lg font-semibold">Biểu đồ vòng</h3>
             {renderFakeButton()}
           </div>
-          <ChartRadialBar temperatureData={data.temperature} humidityData={data.humidity} />
+          <ChartRadialBar temperature={latest.temperature} divID="radial1" />
         </div>
 
         {/* Device Chart */}
