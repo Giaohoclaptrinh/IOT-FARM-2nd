@@ -42,7 +42,7 @@ const ControlsDevice = () => {
   const renderFakeButton = () => (
     <button
       onClick={handleFakeData}
-      className={`px-3 py-1 rounded text-white font-medium transition 
+      className={`px-3 ml-auto py-1 rounded text-white font-medium transition 
         ${stopGenerating ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"}`}
     >
       {stopGenerating ? "Dừng tạo dữ liệu giả" : "Tạo dữ liệu giả"}
@@ -51,44 +51,33 @@ const ControlsDevice = () => {
 
   return (
     <HomeWrap>
-      <div className="p-4">
-        <h2 className="text-xl font-bold mb-4">Thiết bị: {deviceUid}</h2>
+    <div className="grid grid-cols-[3fr_7fr] gap-x-4">
+          {/* Radial Bar Chart */}
+          <div className="mb-6 border p-4 rounded shadow bg-white">
+            
+            <ChartRadialBar temperature={latest.temperature} divID="radial1" />
+          </div>
+  
+          {/* Grid Chart */}
+          <div className="mb-6 border p-4 rounded shadow bg-white">
+            
+            <ChartGrid divID={"grid-item"} humidity={humidityValues} />
+          </div>
+    </div>
+      <div className="pb-32">
+       
 
         {/* Dynamic Chart */}
         <div className="mb-6 border p-4 rounded shadow bg-white">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold">Biểu đồ động</h3>
+            
             {renderFakeButton()}
           </div>
           <ChartDynamic humidity={humidity} divID="dynamic1" />
         </div>
 
-        {/* Grid Chart */}
-        <div className="mb-6 border p-4 rounded shadow bg-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold">Biểu đồ lưới</h3>
-            {renderFakeButton()}
-          </div>
-          <ChartGrid divID={"grid-item"} humidity={humidityValues} />
-        </div>
 
-        {/* Radial Bar Chart */}
-        <div className="mb-6 border p-4 rounded shadow bg-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold">Biểu đồ vòng</h3>
-            {renderFakeButton()}
-          </div>
-          <ChartRadialBar temperature={latest.temperature} divID="radial1" />
-        </div>
-
-        {/* Device Chart */}
-        <div className="mb-6 border p-4 rounded shadow bg-white">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold">Biểu đồ thiết bị</h3>
-            {renderFakeButton()}
-          </div>
-          <DeviceChart deviceId={deviceUid} />
-        </div>
+       
       </div>
     </HomeWrap>
   );

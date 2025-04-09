@@ -57,7 +57,7 @@
           }
         }, [options, divID]);
     return (
-      <div className='flex items-center justify-center' id={divID}></div>
+      <div className='flex items-center justify-center translate-y-10' id={divID}></div>
     )
   }
 

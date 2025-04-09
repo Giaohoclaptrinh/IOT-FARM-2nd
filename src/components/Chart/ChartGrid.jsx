@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ApexCharts from 'apexcharts';
-import { fontFamily, fontWeight } from '@mui/system';
+import { fontFamily, fontSize, fontWeight } from '@mui/system';
 
 export default function ChartGrid({ humidity, temperature, ph, divID, typeChart = "line" }) {
   const [options, setOption] = useState({});
@@ -98,11 +98,7 @@ export default function ChartGrid({ humidity, temperature, ph, divID, typeChart 
           }
         }
       },
-      yaxis: {
-        title: {
-          text: "Humidity (%)"
-        }
-      },
+     
       stroke: {
         show: true,
         curve: "smooth"

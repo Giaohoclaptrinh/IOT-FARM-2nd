@@ -65,8 +65,8 @@ const Devices = () => {
       <div className="font-seconds border rounded-md">
         <table className="table-auto border-collapse divide-y relative text-left w-full">
           <thead>
-            <tr className="bg-slate-200 font-semibold text-md">
-              <th className="py-2 rounded-tl-md">Name Device</th>
+            <tr className="bg-slate-200 font-semibold text-md ">
+              <th className="py-2 rounded-tl-md pl-4 ">Name Device</th>
               <th className="py-2">Date</th>
               <th className="py-2">Status</th>
               <th className="py-2 rounded-tr-md"></th>
@@ -82,7 +82,7 @@ const Devices = () => {
 
               return (
                 <tr key={item.id} className="border-b last:border-none">
-                  <td className="font-bold">{data.name}</td>
+                  <td className=" pl-4 font-semibold">{data.name}</td>
                   <td className="text-gray-600">{formattedDate}</td>
                   <td className="text-gray-600">{data.status}</td>
                   <td className="text-gray-600 py-2 space-x-2">

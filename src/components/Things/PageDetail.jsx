@@ -29,7 +29,9 @@ const PageDetail = ({ pageId, onBack }) => {
 
   const handleAdd = async (device) => {
     await addDeviceToPage(pageId, device);
+
     setShowAddModal(false); //  Đóng bảng khi thêm
+
     fetchData();
   };
 
