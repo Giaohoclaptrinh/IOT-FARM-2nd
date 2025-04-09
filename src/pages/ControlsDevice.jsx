@@ -17,16 +17,22 @@ const ControlsDevice = () => {
   const [stopGenerating, setStopGenerating] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const result = await fetchTemperatureHumidityData(deviceUid);
-      if (result) setData(result);
+    const interval = setInterval(() => {
+      
+      const newHumidity = Math.random() * (100 - 0) + 0; 
+      const timestamp = new Date().getTime();
+
+      setHumidityData((prevData) => [
+        ...prevData,
+        [timestamp, newHumidity.toFixed(1)], 
+      ]);
+    }, 5000); 
+
+  
+    return () => {
+      clearInterval(interval);
     };
-
-    fetchData(); // Initial fetch
-    const interval = setInterval(fetchData, 3000); // Update every 3 seconds
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [deviceUid]);
+  }, []);
 
   const handleFakeData = () => {
     if (stopGenerating) {

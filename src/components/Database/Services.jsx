@@ -16,20 +16,20 @@ import {
  * Lấy danh sách thiết bị (có phân quyền cho admin).
  * @returns {Promise<Array>} Danh sách thiết bị
  */
-export const fetchDevices = async () => {
-  const user = auth.currentUser;
-  const devicesRef = collection(db, "devices");
+// export const fetchDevices = async () => {
+//   const user = auth.currentUser;
+//   const devicesRef = collection(db, "devices");
 
-  const q = user.email === "1@gmail.com"
-    ? query(devicesRef)
-    : query(devicesRef, where("userUID", "==", user.uid));
+//   const q = user.email === "1@gmail.com"
+//     ? query(devicesRef)
+//     : query(devicesRef, where("userUID", "==", user.uid));
 
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({
-    uid: doc.id,
-    ...doc.data()
-  }));
-};
+//   const snapshot = await getDocs(q);
+//   return snapshot.docs.map(doc => ({
+//     uid: doc.id,
+//     ...doc.data()
+//   }));
+// };
 
 /**
  * Lấy dữ liệu nhiệt độ và độ ẩm từ Firestore.
