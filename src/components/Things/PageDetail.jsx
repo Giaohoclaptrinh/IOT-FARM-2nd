@@ -10,7 +10,7 @@ import { auth } from "@/firebase/db.config";
 const PageDetail = ({ pageId, onBack }) => {
   const [linkedDevices, setLinkedDevices] = useState([]);
   const [availableDevices, setAvailableDevices] = useState([]);
-  const [showAddModal, setShowAddModal] = useState(false); // ✅
+  const [showAddModal, setShowAddModal] = useState(false); 
 
   const fetchData = async () => {
     const user = auth.currentUser;
@@ -29,7 +29,7 @@ const PageDetail = ({ pageId, onBack }) => {
 
   const handleAdd = async (device) => {
     await addDeviceToPage(pageId, device);
-    setShowAddModal(false); // ✅ Đóng bảng khi thêm
+    setShowAddModal(false); 
     fetchData();
   };
 

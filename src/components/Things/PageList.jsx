@@ -35,7 +35,7 @@ const PageList = ({ onSelectPage }) => {
           <li key={page.id}>
             <button
               onClick={() => onSelectPage(page.id)}
-              className="block w-full text-left p-2 bg-slate-100 hover:bg-slate-300 rounded"
+              className="block w-full text-left p-2 bg-slate-100 hover:bg-slate-300 rounded mb-2"
             >
               {page.id}
             </button>
