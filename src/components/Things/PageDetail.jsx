@@ -43,7 +43,7 @@ const PageDetail = ({ pageId, onBack }) => {
       <ul className="mb-4">
         {linkedDevices.map(device => (
           <li key={device.uid} className="flex justify-between bg-slate-100 p-2 rounded mb-2">
-            {device.uid}
+            {device.name}
             <button onClick={() => handleRemove(device.uid)} className="text-red-500">Xoá</button>
           </li>
         ))}
@@ -52,7 +52,7 @@ const PageDetail = ({ pageId, onBack }) => {
       <ul>
         {availableDevices.map(device => (
           <li key={device.uid} className="flex justify-between bg-green-50 p-2 rounded mb-2">
-            {device.uid}
+            {device.name}
             <button onClick={() => handleAdd(device)} className="text-green-600">Thêm</button>
           </li>
         ))}

@@ -17,7 +17,7 @@ export default function HomeWrap({children}) {
                        userName: user.displayName,
                        email: user.email,
                    });
-                   console.log(userCurrent);
+                   console.log(userCurrent.email);
                } else {
                    console.log("User not logged in");
                }

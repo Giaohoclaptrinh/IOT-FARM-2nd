@@ -18,10 +18,17 @@ const ControlsDevice = () => {
   const latest = data[data.length - 1] || {};
   const humidity = data.map(d => ({
     x: new Date(d.timestamp),
-    y: d.humidity
+    y: d.humidity 
   }));
+
   const temperature = data.map(d => d.temperature);
-  const humidityValues = data.map(d => d.humidity);
+  const humidityValues = data.map(d => (
+    {
+      x:  new Date(d.timestamp).getTime,
+      y: d.humidity
+    }
+
+  ));
 
   const handleFakeData = () => {
     if (stopGenerating) {
@@ -42,6 +49,8 @@ const ControlsDevice = () => {
       {stopGenerating ? "Dừng tạo dữ liệu giả" : "Tạo dữ liệu giả"}
     </button>
   );
+  console.log('AAA',humidityValues);
+  
 
   return (
     <HomeWrap>
@@ -63,7 +72,7 @@ const ControlsDevice = () => {
             <h3 className="text-lg font-semibold">Biểu đồ lưới</h3>
             {renderFakeButton()}
           </div>
-          <ChartGrid temperatureData={temperature} humidityData={humidityValues} />
+          <ChartGrid divID={"grid-item"}  humidityData={humidityValues} />
         </div>
 
         {/* Radial Bar Chart */}
