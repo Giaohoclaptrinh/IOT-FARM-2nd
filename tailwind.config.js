@@ -1,5 +1,5 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+// tailwind.config.js (ESM syntax cho Tailwind v4)
+export default {
   content: ["./src/**/*.{html,js,jsx,ts,tsx}"],
   theme: {
     extend: {
@@ -7,31 +7,38 @@ module.exports = {
         primary: 'var(--primary-font)',
         seconds: 'var(--seconds-font)',
       },
-      spacing:{
-        '30':'var(--my-padding)',
+      spacing: {
+        '30': 'var(--my-padding)',
         'top-bar': 'var(--top-bar)',
-
       },
-
-
       minWidth: {
-        'top-bar': 'var(--top-bar)', 
+        'top-bar': 'var(--top-bar)',
       },
-
-
-       colors: {
-        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
+      colors: {
+        primary: {
+          50: "#eff6ff",
+          100: "#dbeafe",
+          200: "#bfdbfe",
+          300: "#93c5fd",
+          400: "#60a5fa",
+          500: "#3b82f6",
+          600: "#2563eb",
+          700: "#1d4ed8",
+          800: "#1e40af",
+          900: "#1e3a8a",
+          950: "#172554"
+        },
         bgMain: "var(--primary-color)"
       }
     },
   },
   darkMode: 'media',
-  plugins: [require('flowbite/plugin')({
-    charts: true,
-}),],
-safelist: [
-  'datatable-header',
-  'datatable-row',
-  'datatable-footer',
-]
+  plugins: [
+    require('flowbite/plugin')({ charts: true }),
+  ],
+  safelist: [
+    'datatable-header',
+    'datatable-row',
+    'datatable-footer',
+  ]
 }

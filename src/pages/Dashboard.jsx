@@ -1,6 +1,7 @@
 
 // export default Dashboard; parameter
 import { useParams } from "react-router-dom";
+import React from 'react'
 import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/db.config";
 import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
