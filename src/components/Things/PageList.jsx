@@ -6,7 +6,8 @@ import AddPageModal from "./AddPageModal";
 const PageList = ({ onSelectPage }) => {
   const [pages, setPages] = useState([]);
   const [showModal, setShowModal] = useState(false);
-
+  
+  
   useEffect(() => {
     const fetchPages = async () => {
       const user = auth.currentUser;
@@ -16,6 +17,7 @@ const PageList = ({ onSelectPage }) => {
       }
     };
     fetchPages();
+    
   }, []);
 
   const handleAddPage = async (name) => {

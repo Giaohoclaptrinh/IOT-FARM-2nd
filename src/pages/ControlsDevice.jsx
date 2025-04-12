@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { startFakeDataGeneration } from "../components/Database/Services";
 import { useDeviceData } from "../components/Database/useDataRealtime";
-
+import React from 'react'
 import HomeWrap from "./HomeWrap";
 import ChartDynamic from "../components/Chart/ChartDynamic";
 import ChartGrid from "../components/Chart/ChartGrid";

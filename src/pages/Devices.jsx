@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import React from "react";
 import { db, auth } from "../firebase/db.config";
 import {
   collection,
@@ -10,11 +11,15 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import HomeWrap from "./HomeWrap";
+import AddDevice from "../components/Devices/AddDevice";
+import EditDevice from "../components/Devices/EditDevice";
 
 const Devices = () => {
   const navigate = useNavigate();
   const [deviceData, setDeviceData] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editDevice, setEditDevice] = useState(null); // Object chứa thiết bị cần sửa
 
   // Theo dõi người dùng hiện tại
   useEffect(() => {
@@ -55,18 +60,30 @@ const Devices = () => {
     }
   };
 
-  // ➜ Điều hướng khi nhấn "Sửa"
-  const handleWatch = (uid) => {
-    navigate(`/controlsdevices/${uid}`);
+  // Mở popup chỉnh sửa
+  const handleEditDevice = (deviceDoc) => {
+    setEditDevice({
+      id: deviceDoc.id,
+      ...deviceDoc.data(),
+    });
   };
 
   return (
     <HomeWrap>
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          onClick={() => setShowAddModal(true)}
+        >
+          Thêm thiết bị
+        </button>
+      </div>
+
       <div className="font-seconds border rounded-md">
         <table className="table-auto border-collapse divide-y relative text-left w-full">
           <thead>
-            <tr className="bg-slate-200 font-semibold text-md ">
-              <th className="py-2 rounded-tl-md pl-4 ">Name Device</th>
+            <tr className="bg-slate-200 font-semibold text-md">
+              <th className="py-2 rounded-tl-md pl-4">Name Device</th>
               <th className="py-2">Date</th>
               <th className="py-2">Status</th>
               <th className="py-2 rounded-tr-md"></th>
@@ -82,13 +99,13 @@ const Devices = () => {
 
               return (
                 <tr key={item.id} className="border-b last:border-none">
-                  <td className=" pl-4 font-semibold">{data.name}</td>
+                  <td className="pl-4 font-semibold">{data.name}</td>
                   <td className="text-gray-600">{formattedDate}</td>
                   <td className="text-gray-600">{data.status}</td>
                   <td className="text-gray-600 py-2 space-x-2">
                     <button
                       className="bg-blue-500 px-4 py-1 rounded-md text-white"
-                      onClick={() => handleWatch(item.id)} // 🔁 chuyển trang tại đây
+                      onClick={() => handleEditDevice(item)}
                     >
                       Sửa
                     </button>
@@ -105,6 +122,22 @@ const Devices = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal Thêm */}
+      {showAddModal && (
+        <AddDevice
+          onClose={() => setShowAddModal(false)}
+          onDeviceAdded={() => setShowAddModal(false)} // hoặc refetch nếu cần
+        />
+      )}
+
+      {/* Modal Sửa */}
+      {editDevice && (
+        <EditDevice
+          device={editDevice}
+          onClose={() => setEditDevice(null)}
+        />
+      )}
     </HomeWrap>
   );
 };

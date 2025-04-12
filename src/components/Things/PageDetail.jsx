@@ -50,46 +50,38 @@ const PageDetail = ({ pageId, onBack }) => {
 
   return (
     <div className="relative">
-      <div className="flex justify-between mb-2">
-      <button
-        onClick={() => setShowAddModal(true)}
-        className="inline-block px-6 py-2   bg-blue-500 rounded-md  text-white x"
-      >
-        Thêm thiết bị
-      </button>
-        <button
-          onClick={onBack}
-          className="inline-block px-6 py-2   bg-blue-500 rounded-md  text-white x"
-        >
-          {" "}
-          Quay lại
-        </button>
-      </div>
-      <h2 className="text-xl font-semibold mb-2">
-        Thiết bị trong Page{" "}
-        <span className="text-blue-600">{pageId}</span>
-      </h2>
-
+      <button onClick={onBack} className="mb-4 text-blue-500">← Quay lại</button>
+      <h2 className="text-xl font-semibold mb-2">Thiết bị trong Page <span className="text-blue-600">{pageId}</span></h2>
+      
       <ul className="mb-4">
-        {linkedDevices.map((device) => (
-          <li
-            key={device.uid}
-            className="flex justify-between bg-slate-100 p-2 rounded mb-2"
-          >
+        {linkedDevices.map(device => (
+          <li key={device.uid} className="flex justify-between items-center bg-slate-100 p-2 rounded mb-2">
             <span>{device.name}</span>
-            <button
-              onClick={() => handleRemove(device.uid)}
-              className="text-red-500"
-            >
-              Xoá
-            </button>
+            <div className="space-x-2">
+              <button
+                onClick={() => navigate(`/controlsdevices/${device.uid}`)}
+                className="bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Xem
+              </button>
+              <button
+                onClick={() => handleRemove(device.uid)}
+                className="bg-red-500 text-white px-3 py-1 rounded"
+              >
+                Xoá
+              </button>
+            </div>
           </li>
         ))}
       </ul>
 
-     
+      <button
+        onClick={() => setShowAddModal(true)}
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+      >
+        Thêm thiết bị
+      </button>
 
-      {/* Modal */}
       {showAddModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-[80vh] overflow-y-auto">
