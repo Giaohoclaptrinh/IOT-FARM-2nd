@@ -94,7 +94,7 @@
 
 // export default TopBar;
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { db, auth } from "@/firebase/db.config";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -103,6 +103,8 @@ import { FaRegUser, FaSignOutAlt, FaSearch } from "react-icons/fa";
 import { AiFillOpenAI } from "react-icons/ai";
 import { TfiWallet } from "react-icons/tfi";
 import { BiNotification } from "react-icons/bi";
+import { context } from "@/utils/Provide";
+import { HiOutlineXMark } from "react-icons/hi2";
 
 const TopBar = ({ onSearch }) => {
   const [user, setUser] = useState(null);
@@ -111,6 +113,9 @@ const TopBar = ({ onSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const  [isShowDevices,setIsShowDevices] = useState(false)
+  const {state,dispatch} = useContext(context)
+
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -268,7 +273,13 @@ const TopBar = ({ onSearch }) => {
 
           { (user) ?
             (<div className="flex  gap-x-4 ml-auto">
-            <div className="flex flex-row-reverse  min-w-24 px-4 py-px cursor-pointer bg-bgMain  hover:bg-slate-300 rounded-lg gap-x-4 items-center">
+              
+            <div className="flex flex-row-reverse  min-w-24 px-4 py-px cursor-pointer bg-bgMain  hover:bg-slate-300 rounded-lg gap-x-4 items-center"
+               onClick={(e)=>{
+               
+                setIsShowDevices(!isShowDevices)
+              }}
+              >
               <div className=""><b className="text-gray-600 pl-3">Device</b>
               <p className="font-seconds
               bg-gray-100
@@ -297,6 +308,30 @@ const TopBar = ({ onSearch }) => {
               </div>
             <BiNotification className="text-2xl"/>
             </div>
+           { (isShowDevices) && <div  id="allDevices" className="fixed inset-0 flex   p-4 bg-black/10 ">
+           
+              <div className="bg-white max-w-md w-[500px] min-h-min my-auto  space-y-4 shadow-sm mx-auto rounded-md p-2  overflow-y-auto">
+              <div className="mb-4 flex justify-end
+               
+              "><button onClick={(e)=>{
+                setIsShowDevices(false)
+              }} className="bg-gray-200 rounded-full w-8 h-8 inline-flex 
+               items-center justify-center shadow-sm "><HiOutlineXMark className="text-2xl text-gray-700 rounded-full "/></button></div>
+                  {
+                    state.devices.map((value)=>{
+                      return  (
+                        <div className="flex h-12 items-center text-gray-800  shadow-sm rounded-md
+                        bg-gradient-to-r from-indigo-300  px-2 to-purple-400 justify-between"><p className="">
+                          {value.name  }
+                        </p>
+                        <button className="px-4 py-2  bg-blue-500/90 hover:opacity-90 text-white font-medium  shadow-md rounded-md ">Online</button>
+                         </div>
+                      )
+                    })
+                  }
+              </div>
+              
+              </div>}
             
 
           </div>):(

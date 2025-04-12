@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { MdSpaceDashboard } from "react-icons/md";
 import { IoArrowUpCircleOutline } from "react-icons/io5";
-import React, { createElement, useEffect, useState } from "react";
+import React, { createElement, useContext, useEffect, useState } from "react";
 import { auth } from "@/firebase/db.config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { FaCaretDown } from "react-icons/fa";
@@ -15,8 +15,10 @@ import { RiUserSettingsLine } from "react-icons/ri";
 import { FaHornbill } from "react-icons/fa";
 import { VscSignOut } from "react-icons/vsc";
 import { LuUserRoundCog } from "react-icons/lu";
+import { context } from "@/utils/Provide";
 
 const Sidebar = () => {
+
     const urlList = [
         {
             title: "Home",
