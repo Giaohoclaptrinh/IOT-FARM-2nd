@@ -7,7 +7,7 @@
   },
   "include": [
     "src/**/*" // Bao gồm tất cả các file bên trong thư mục 'src'
-  ],
+, "functions/index.js"  ],
   "exclude": [
     "node_modules", // Loại bỏ 'node_modules' khỏi quá trình kiểm tra
     "dist" // Loại bỏ 'dist' (nếu có)
