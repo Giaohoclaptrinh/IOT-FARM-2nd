@@ -7,8 +7,11 @@ import {
 } from "@/utils/FireStoreUtils";
 import { auth } from "@/firebase/db.config";
 import { context, devicesObject } from "@/utils/Provide";
+import { useNavigate } from "react-router-dom";
+
 
 const PageDetail = ({ pageId, onBack }) => {
+  const navigate = useNavigate();
   const [linkedDevices, setLinkedDevices] = useState([]);
   const [availableDevices, setAvailableDevices] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);

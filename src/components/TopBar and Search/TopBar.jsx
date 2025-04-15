@@ -320,7 +320,7 @@ const TopBar = ({ onSearch }) => {
                   {
                     state.devices.map((value)=>{
                       return  (
-                        <div className="flex h-12 items-center text-gray-800  shadow-sm rounded-md
+                        <div key={value.id}  className="flex h-12 items-center text-gray-800  shadow-sm rounded-md
                         bg-gradient-to-r from-indigo-300  px-2 to-purple-400 justify-between"><p className="">
                           {value.name  }
                         </p>
