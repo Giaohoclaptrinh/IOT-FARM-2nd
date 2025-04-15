@@ -1,5 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Route,
+    Routes,
+    useLocation,
+} from "react-router-dom";
 
 // Layout components
 import Sidebar from "./components/SideBar/Sidebar";
@@ -26,67 +31,89 @@ import Things from "./pages/Things";
 
 // Others
 import TestAddPage from "./components/Devices/TestAddPage";
-// import ChatBox from "@/components/Chatbox/Chatbox.jsx"; 
+import { Home } from "lucide-react";
+import HomePage from "./pages/HomePage";
+// import ChatBox from "@/components/Chatbox/Chatbox.jsx";
 
 const App = () => {
-  const [showLayout, setShowLayout] = useState(true);
+    const [showLayout, setShowLayout] = useState(true);
 
-  return (
-    <Router>
-      <MainContent showLayout={showLayout} setShowLayout={setShowLayout} />
-    </Router>
-  );
+    return (
+        <Router>
+            <MainContent
+                showLayout={showLayout}
+                setShowLayout={setShowLayout}
+            />
+        </Router>
+    );
 };
 
 const MainContent = ({ showLayout, setShowLayout }) => {
-  const location = useLocation();
+    const location = useLocation();
 
-  // Xác định nếu là trang auth (ẩn layout)
-  const isAuthPage = useMemo(() => {
-    return ["/sign-in", "/sign-up"].includes(location.pathname);
-  }, [location.pathname]);
+    // Xác định nếu là trang auth (ẩn layout)
+    const isAuthPage = useMemo(() => {
+        return ["/sign-in", "/sign-up"].includes(location.pathname);
+    }, [location.pathname]);
 
-  // Cập nhật layout khi chuyển route
-  useEffect(() => {
-    setShowLayout(!isAuthPage);
-  }, [isAuthPage, setShowLayout]);
+    // Cập nhật layout khi chuyển route
+    useEffect(() => {
+        setShowLayout(!isAuthPage);
+    }, [isAuthPage, setShowLayout]);
 
-  return (
-    <div className="h-screen overflow-hidden">
-      {showLayout && <TopBar />}
-      <div className="flex h-screen overflow-auto max-w-full">
-        {showLayout && <Sidebar />}
+    return (
+        <div className="h-screen overflow-hidden">
+            {showLayout && <TopBar />}
+            <div className="flex h-screen overflow-auto max-w-full">
+                {showLayout && <Sidebar />}
 
-        <div className="flex-1 bg-gray-100 text-black overflow-auto">
-          <Routes>
-            {/* Auth Routes */}
-            <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/sign-up" element={<SignUp />} />
+                <div className="flex-1 bg-gray-100 text-black overflow-auto">
+                    <Routes>
+                        {/* Auth Routes */}
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/sign-in" element={<SignIn />} />
+                        <Route path="/sign-up" element={<SignUp />} />
 
-            {/* Dashboard & Main */}
-            <Route path="/dashboards/:deviceUid" element={<Dashboard />} />
-            <Route path="/user" element={<UserPage />} />
-            <Route path="/profile-settings" element={<ProfileSettings />} />
-            <Route path="/products" element={<Products />} />
+                        {/* Dashboard & Main */}
+                        <Route
+                            path="/dashboards/:deviceUid"
+                            element={<Dashboard />}
+                        />
+                        <Route path="/user" element={<UserPage />} />
+                        <Route
+                            path="/profile-settings"
+                            element={<ProfileSettings />}
+                        />
+                        <Route path="/products" element={<Products />} />
 
-            {/* Device */}
-            <Route path="/devices" element={<Devices />} />
-            <Route path="/device-overview" element={<DeviceOverview />} />
-            <Route path="/device/:id" element={<DeviceDetail />} />
-            <Route path="/controlsdevices" element={<ControlsDevice />} />
-            <Route path="/controlsdevices/:deviceUid" element={<ControlsDevice />} />
+                        {/* Device */}
+                        <Route path="/devices" element={<Devices />} />
+                        <Route
+                            path="/device-overview"
+                            element={<DeviceOverview />}
+                        />
+                        <Route path="/device/:id" element={<DeviceDetail />} />
+                        <Route
+                            path="/controlsdevices"
+                            element={<ControlsDevice />}
+                        />
+                        <Route
+                            path="/controlsdevices/:deviceUid"
+                            element={<ControlsDevice />}
+                        />
 
-            {/* Things / Pages */}
-            <Route path="/things" element={<Things />} />
+                        {/* Things / Pages */}
+                        <Route path="/things" element={<Things />} />
 
-            {/* Test / Dev */}
-            <Route path="/testaddpage" element={<TestAddPage />} />
-            
-          </Routes>
+
+                        {/* Test / Dev */}
+                        <Route path="/testaddpage" element={<TestAddPage />} />
+                    </Routes>
+                </div>
+            </div>
+
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default App;

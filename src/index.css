@@ -1,12 +1,46 @@
 @import "tailwindcss";
-
-
-
 :root {
     --primary-font: 'Poppins', sans-serif;
     --seconds-font: 'Roboto',sans-serif;
     --my-padding:30px;
     --primary-color:#ecf3f6;
     --top-bar:calc(100% - 260px);
-
   }
+
+@theme{
+  --spacing-widthcontainer:var(--top-bar);
+  --font-display:var(--primary-font);
+  --font-seconds:var(--seconds-font);
+
+}
+
+@layer base{
+  body{
+    @apply  font-display ;
+  }
+  h1{
+    @apply  font-semibold text-3xl;
+  }
+  h2{
+    @apply  font-semibold text-2xl;
+  }
+  input,textarea,button,label{
+    @apply  outline-none  ;
+  }
+  input{
+    @apply focus:border-blue-400;
+  }
+  button{
+    @apply  cursor-pointer 
+  }
+
+
+}
+@layer components{
+  .flex-center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+}
