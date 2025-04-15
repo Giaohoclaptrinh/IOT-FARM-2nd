@@ -28,7 +28,7 @@ export default function HomeWrap({ children }) {
                 userCurrent
                     ? "min-w-widthcontainer   "
                     : "min-w-widthcontainer  "
-            } h-full  max-w-widthcontainer mt-[70px] overflow-scroll p-2 min-h-16   border-b border-gray-300 top-0 right-0  bg-white`}
+            } h-full  max-w-widthcontainer mt-[70px] overflow-auto p-2 min-h-16   border-b border-gray-300 top-0 right-0  bg-white`}
         >
             {children}
         </div>

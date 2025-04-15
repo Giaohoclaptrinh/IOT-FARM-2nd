@@ -104,6 +104,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
 
                         {/* Things / Pages */}
                         <Route path="/things" element={<Things />} />
+                        <Route path="/things/:id" element={<Things />} />
 
                         {/* Test / Dev */}
                         <Route path="/testaddpage" element={<TestAddPage />} />

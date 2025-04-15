@@ -107,7 +107,7 @@ const TopBar = ({ onSearch }) => {
             className={
                 `fixed ${
                     user ? "min-w-widthcontainer" : "min-w-full"
-                } p-2 min-h-16 z-30 font-primary  border-b border-gray-300 top-0 right-0  bg-white` //fixed ${user ?('min-w-top-bar'):('min-w-full')} bị lỗi
+                } p-2 min-h-16  font-primary  border-b border-gray-300 top-0 right-0  bg-white` //fixed ${user ?('min-w-top-bar'):('min-w-full')} bị lỗi
                 //  "fixed w-full p-2 min-h-16 z-50 font-primary border-b border-gray-300 top-0 right-0 bg-white"
             }
         >

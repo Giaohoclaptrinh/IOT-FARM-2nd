@@ -99,7 +99,7 @@ const Sidebar = () => {
     };
 
     return auth.currentUser ? (
-        <aside className="fixed min-h-screen min-w-60 max-w-60 overflow-auto text-gray-700 border-r border-gray-300 top-0 left-0 bg-[#ffffff]">
+        <aside className="fixed min-h-screen font-seconds font-light min-w-60 max-w-60 overflow-auto text-gray-700 border-r border-gray-300 top-0 left-0 bg-[#ffffff]">
             <div className="px-2 relative">
                 <div
                     className={`flex mt-4 p-2 relative hover:bg-blue-100 hover:rounded-lg cursor-pointer
