@@ -16,6 +16,7 @@ import { FaHornbill } from "react-icons/fa";
 import { VscSignOut } from "react-icons/vsc";
 import { LuUserRoundCog } from "react-icons/lu";
 import { context } from "@/utils/Provide";
+import { AiFillCaretDown } from "react-icons/ai";
 
 const Sidebar = () => {
     const urlList = [
@@ -32,8 +33,11 @@ const Sidebar = () => {
         },
         {
             title: "Devices",
-            href: "/devices",
             icon: TfiWallet,
+            submenu: [
+                { title: "Device  Management", href: "devices" },
+                { title: "Device  View", href: "/PermissonDevices" },
+            ],
         },
         {
             title: "Things",
@@ -52,7 +56,8 @@ const Sidebar = () => {
             icon: GrResources,
         },
     ];
-
+    const [showIndex, setShowIndex] = useState(-1);
+    console.log(showIndex);
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -161,19 +166,126 @@ const Sidebar = () => {
                     })}
                 </div>
             </div>
-            {urlList.map((item) => (
-                <div className="px-2" key={item.href}>
-                    <Link
-                        to={item.href}
-                        className={`flex min-w-full items-center mt-4 p-2 relative
+            {urlList.map((item, index) => (
+                <div className="px-2" key={index}>
+                    {item.href ? (
+                        <Link
+                            to={item.href}
+                            className={`flex flex-wrap min-w-full items-center mt-4 p-2 relative
                             hover:bg-blue-100 hover:rounded-lg cursor-pointer
-${item.marker && "border border-l-0 border-r-0 hover:rounded-none"}`}
-                    >
-                        <div className="mr-2">
+                            ${
+                                item.marker &&
+                                "border border-l-0 border-r-0 hover:rounded-none"
+                            }`}
+                        >
+                            {/* <div className="mr-2">
                             {item.icon && React.createElement(item.icon)}
+                        </div> */}
+                            <div
+                                className={`flex-center justify-start ${
+                                    item.submenu ? "mb-2" : ""
+                                } w-full`}
+                            >
+                                <div className="mr-2">
+                                    {item.icon &&
+                                        React.createElement(item.icon)}
+                                </div>
+                                {item.title}{" "}
+                                {item.submenu && (
+                                    <AiFillCaretDown className="ml-auto" />
+                                )}
+                            </div>
+                            {item.submenu && (
+                                <div
+                                    className="flex-center max-h-32 items-start 
+                            gap-y-px flex-col w-full bg-white overflow-y-auto rounded-md"
+                                >
+                                    {item.submenu.map(
+                                        (itemChild, indexChild) => {
+                                            return (
+                                                <Link
+                                                    key={indexChild}
+                                                    className="block w-full rounded-xs px-2 py-2 hover:bg-amber-200 bg-white "
+                                                    to={{
+                                                        pathname: `${itemChild.href}`,
+                                                    }}
+                                                >
+                                                    {itemChild.title}
+                                                </Link>
+                                            );
+                                        }
+                                    )}
+                                </div>
+                            )}
+                        </Link>
+                    ) : (
+                        <div
+                            onClick={(e) => {
+                                if (showIndex === index) {
+                                    setShowIndex(-1);
+                                } else {
+                                    setShowIndex(index);
+                                }
+                            }}
+                            to={item.href}
+                            className={`flex flex-wrap min-w-full items-center mt-4 p-2 hover:bg-blue-100 hover:rounded-md relative
+                             cursor-pointer
+                            ${
+                                showIndex === index
+                                    ? "bg-blue-100 rounded-md"
+                                    : ""
+                            }
+                            ${
+                                item.marker &&
+                                "border border-l-0 border-r-0 hover:rounded-none"
+                            }`}
+                        >
+                            {/* <div className="mr-2">
+                            {item.icon && React.createElement(item.icon)}
+                        </div> */}
+                            <div
+                                className={`flex-center justify-start ${
+                                    item.submenu ? "mb-2" : ""
+                                } w-full`}
+                            >
+                                <div className="mr-2">
+                                    {item.icon &&
+                                        React.createElement(item.icon)}
+                                </div>
+                                {item.title}{" "}
+                                {item.submenu && (
+                                    <AiFillCaretDown className="ml-auto" />
+                                )}
+                            </div>
+                            {item.submenu && showIndex === index && (
+                                <div
+                                    className="flex-center max-h-32 items-start 
+                            gap-y-px flex-col w-full bg-white overflow-y-auto rounded-md"
+                                >
+                                    {item.submenu.map(
+                                        (itemChild, indexChild) => {
+                                            return (
+                                                <Link
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                    }}
+                                                    key={indexChild}
+                                                    className="block w-full  px-2 py-2 hover:bg-gray-200
+                                                    border-b border-gray-400 last:border-none
+                                                     bg-white "
+                                                    to={{
+                                                        pathname: `${itemChild.href}`,
+                                                    }}
+                                                >
+                                                    {itemChild.title}
+                                                </Link>
+                                            );
+                                        }
+                                    )}
+                                </div>
+                            )}
                         </div>
-                        <div>{item.title}</div>
-                    </Link>
+                    )}
                 </div>
             ))}
         </aside>

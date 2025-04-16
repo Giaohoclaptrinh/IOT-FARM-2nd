@@ -10,13 +10,15 @@ import {
 } from "@/components/Database/Services";
 import { addPage } from "@/utils/FireStoreUtils";
 import OverLay from "@/components/Utilities/OverLay";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const Things = () => {
     const [selectedPageId, setSelectedPageId] = useState(null);
     const [pageName, setPageName] = useState("");
     const [showOverlay, setShowOverlay] = useState(false);
     const [pageList, setPageList] = useState([]);
+    const url = useParams();
+    console.log("params", url.id);
     const handleSubmit = async (e) => {
         e.preventDefault();
         const addPage = async () => {
@@ -34,7 +36,7 @@ const Things = () => {
         };
         pageList();
     }, []);
-    return (
+    return !url.id ? (
         <HomeWrap>
             <div>
                 <button
@@ -121,6 +123,10 @@ const Things = () => {
                     </div>
                 </OverLay>
             )}
+        </HomeWrap>
+    ) : (
+        <HomeWrap>
+            
         </HomeWrap>
     );
 };

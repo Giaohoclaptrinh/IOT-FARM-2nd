@@ -226,3 +226,43 @@ export const deletePageid = (idPage) => {
         );
     });
 };
+
+export const getUser = async () => {
+    return new Promise((resolve, reject) => {
+        const unsubcribe = onAuthStateChanged(auth, async (user) => {
+            if (user.uid) {
+                const docRef = doc(db, `users/${user.uid}`);
+                const userData = (await getDoc(docRef)).data();
+                resolve(userData);
+            }
+        });
+    });
+};
+
+export const getDevices = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const collectionRef = collection(db, "devices");
+            const devices = await getDocs(collectionRef);
+            const data = devices.docs.map((item) => {
+                return { ...item.data(), idDevice: item.id };
+            });
+            resolve(data);
+        } catch (error) {
+            reject(error.message);
+        }
+    });
+};
+export const toggleDevice = async (idDevice) => {
+    return new Promise(async (resolve, reject) => {
+        const docRef = doc(db, `devices/${idDevice}`);
+        const data = (await getDoc(docRef)).data();
+        if (data.status === "Online") {
+            data.status = "Offline";
+        } else {
+            data.status = "Online";
+        }
+        const editDoc = await updateDoc(docRef, { ...data });
+        resolve("Sucess", "has update cucess");
+    });
+};
