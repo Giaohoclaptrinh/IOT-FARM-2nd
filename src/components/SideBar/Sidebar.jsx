@@ -254,7 +254,7 @@ const Sidebar = () => {
                                 </div>
                                 {item.title}{" "}
                                 {item.submenu && (
-                                    <AiFillCaretDown className="ml-auto" />
+                                    <AiFillCaretDown className="ml-auto text-xs" />
                                 )}
                             </div>
                             {item.submenu && showIndex === index && (

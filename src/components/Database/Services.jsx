@@ -13,7 +13,11 @@ import {
     addDoc,
     updateDoc,
     deleteDoc,
+    orderBy,
+    startAt,
+    endAt,
 } from "firebase/firestore";
+import { ref } from "firebase/database";
 
 /**
  * Lấy danh sách thiết bị (có phân quyền cho admin).
@@ -264,5 +268,30 @@ export const toggleDevice = async (idDevice) => {
         }
         const editDoc = await updateDoc(docRef, { ...data });
         resolve("Sucess", "has update cucess");
+    });
+};
+export const searchUserByName = async (name) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const userRef = collection(db, "/users/");
+            const queryUser = query(
+                userRef,
+                orderBy("name"),
+                startAt(name),
+                endAt(name + "\uf8ff")
+            );
+            const data = (await getDocs(queryUser)).docs;
+            const userList = data.map((user) => {
+                return {
+                    ...user.data(),
+                };
+            });
+            const cleanValue = userList.filter((userObject) => {
+                return userObject.role !== "admin";
+            });
+            resolve(cleanValue);
+        } catch (error) {
+            reject(["error", error.message]);
+        }
     });
 };

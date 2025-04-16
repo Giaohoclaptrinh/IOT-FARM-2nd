@@ -4,14 +4,11 @@ const OverLay = ({ children, onClose }) => {
     return (
         <div
             className="fixed inset-0 bg-black/10 z-50 flex items-center justify-center"
-            onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-            }}
+            onClick={onClose} // click nền đen thì đóng
         >
             <div
                 className="bg-white rounded-2xl relative"
-                onClick={(e) => e.stopPropagation()} // Ngăn nổi bọt
+                onClick={(e) => e.stopPropagation()} // click vào content thì không bị đóng
             >
                 {children}
             </div>

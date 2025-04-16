@@ -12,10 +12,13 @@ import { CiEdit } from "react-icons/ci";
 import { TiUserDeleteOutline } from "react-icons/ti";
 import { AiOutlineDelete } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import SearchUser from "@/components/TopBar and Search/SearchUser";
 
 const PermissonDevices = () => {
     const [userData, setUserData] = useState({});
     const [devices, setDevices] = useState([]);
+    const [addDeviceIntoUser, setaddDeviceIntoUser] = useState(false);
+    const [sendDevice, setSendDevice] = useState({});
     useEffect(() => {
         const User = async () => {
             setUserData(await getUser());
@@ -98,9 +101,36 @@ const PermissonDevices = () => {
                                                         }}
                                                     />
                                                 </Link>
-                                                <Link className="bg-gray-100 rounded-md hover:bg-gray-200 size-8 flex-center">
-                                                    <TiUserDeleteOutline className="text-xl " />
-                                                </Link>
+
+                                                {userData.role === "admin" && (
+                                                    <button
+                                                        className="bg-gray-100 cursor-pointer rounded-md
+                                                   hover:bg-gray-200 size-8 flex-center"
+                                                        onClick={async (e) => {
+                                                            setaddDeviceIntoUser(
+                                                                !addDeviceIntoUser
+                                                            );
+                                                            setSendDevice(item);
+                                                        }}
+                                                    >
+                                                        <TiUserDeleteOutline className="text-xl " />
+                                                        {addDeviceIntoUser && (
+                                                            <SearchUser
+                                                                deviceId={
+                                                                    sendDevice.idDevice
+                                                                }
+                                                                deviceName={
+                                                                    sendDevice.name
+                                                                }
+                                                                onClose={() => {
+                                                                    setaddDeviceIntoUser(
+                                                                        !addDeviceIntoUser
+                                                                    );
+                                                                }}
+                                                            />
+                                                        )}
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
