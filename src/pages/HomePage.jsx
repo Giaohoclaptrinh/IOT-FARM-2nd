@@ -5,7 +5,7 @@ import OverLay from "@/components/Utilities/OverLay";
 const HomePage = () => {
     return (
         <HomeWrap>
-            <div>home</div>
+            <div className="bg-testColor">home</div>
         </HomeWrap>
     );
 };

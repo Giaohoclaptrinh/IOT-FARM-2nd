@@ -33,6 +33,7 @@ import Things from "./pages/Things";
 import TestAddPage from "./components/Devices/TestAddPage";
 import { Home } from "lucide-react";
 import HomePage from "./pages/HomePage";
+import PermissonDevices from "./pages/PermissonDevices";
 // import ChatBox from "@/components/Chatbox/Chatbox.jsx";
 
 const App = () => {
@@ -85,6 +86,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                             element={<ProfileSettings />}
                         />
                         <Route path="/products" element={<Products />} />
+                    
 
                         {/* Device */}
                         <Route path="/devices" element={<Devices />} />
@@ -104,10 +106,13 @@ const MainContent = ({ showLayout, setShowLayout }) => {
 
                         {/* Things / Pages */}
                         <Route path="/things" element={<Things />} />
+                        <Route path="/things/:id" element={<Things />} />
 
 
                         {/* Test / Dev */}
                         <Route path="/testaddpage" element={<TestAddPage />} />
+
+                        <Route path="/PermissonDevices" element={<PermissonDevices/>}/>
                     </Routes>
                 </div>
             </div>
