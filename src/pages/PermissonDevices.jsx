@@ -1,4 +1,5 @@
 import {
+    getDeviceListByuser,
     getDevices,
     getUser,
     toggleDevice,
@@ -22,50 +23,62 @@ const PermissonDevices = () => {
     useEffect(() => {
         const User = async () => {
             setUserData(await getUser());
-            setDevices(await getDevices());
         };
         User();
     }, []);
-    console.log(devices);
+
+    useEffect(() => {
+        const _setDevice = async () => {
+            if (!userData || !userData.uid) return;
+            if (userData.role === "admin") {
+                console.log("chay vao day");
+                setDevices(await getDevices());
+            } else {
+                setDevices((await getDeviceListByuser(userData.uid)) || []);
+                console.log("co cai nit");
+            }
+        };
+        _setDevice();
+    }, [userData.uid]);
+    console.log("devices tai permisson", devices);
     return (
-        userData.role === "admin" && (
-            <HomeWrap>
-                <div>
-                    <table
-                        className="border-collapse  border  border-gray-300 table-auto 
+        <HomeWrap>
+            <div>
+                <table
+                    className="border-collapse  border  border-gray-300 table-auto 
                     w-full max-w-full"
-                    >
-                        <thead className="">
-                            <tr className="bg-blue-200">
-                                <th className="text-center text-xl font-semibold  text-gray-700 py-4">
-                                    Device
-                                </th>
-                                <th className="text-center text-xl font-semibold  text-gray-700  py-4">
-                                    Status
-                                </th>
-                                <th className="text-center text-xl font-semibold  text-gray-700 py-4"></th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-gray-500 ">
-                            {devices.map((item, index) => {
-                                return (
-                                    <tr
-                                        key={index}
-                                        className=" bg-white  border-b
+                >
+                    <thead className="">
+                        <tr className="bg-blue-200">
+                            <th className="text-center text-xl font-semibold  text-gray-700 py-4">
+                                Device
+                            </th>
+                            <th className="text-center text-xl font-semibold  text-gray-700  py-4">
+                                Status
+                            </th>
+                            <th className="text-center text-xl font-semibold  text-gray-700 py-4"></th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-gray-500 ">
+                        {devices.map((item, index) => {
+                            return (
+                                <tr
+                                    key={index}
+                                    className=" bg-white  border-b
                                      border-gray-400 
                                      "
-                                    >
-                                        <td className=" text-center  p-4 ">
-                                            <span
-                                                className=" block p-px bg-sky-400 shadow text-white
+                                >
+                                    <td className=" text-center  p-4 ">
+                                        <span
+                                            className=" block p-px bg-sky-400 shadow text-white
                                              rounded-lg"
-                                            >
-                                                {item.name}
-                                            </span>
-                                        </td>
-                                        <td className=" text-center px-8 border-box ">
-                                            <span
-                                                className={`
+                                        >
+                                            {item.name}
+                                        </span>
+                                    </td>
+                                    <td className=" text-center px-8 border-box ">
+                                        <span
+                                            className={`
                                                     inline-block  py-px px-2   ${
                                                         item.status.toLowerCase() ===
                                                         "online"
@@ -74,20 +87,21 @@ const PermissonDevices = () => {
                                                     }   shadow text-white
                                              rounded-lg
                                              `}
+                                        >
+                                            {item.status}
+                                        </span>
+                                    </td>
+                                    <td className=" text-center  w-4/6">
+                                        <div className="flex-center gap-x-2">
+                                            <Link
+                                                to={{
+                                                    pathname: `/controlsdevices/${item.idDevice}`,
+                                                }}
+                                                className="bg-gray-100 rounded-md hover:bg-gray-200 size-8 flex-center"
                                             >
-                                                {item.status}
-                                            </span>
-                                        </td>
-                                        <td className=" text-center  w-4/6">
-                                            <div className="flex-center gap-x-2">
-                                                <Link
-                                                    to={{
-                                                        pathname: `/controlsdevices/${item.idDevice}`,
-                                                    }}
-                                                    className="bg-gray-100 rounded-md hover:bg-gray-200 size-8 flex-center"
-                                                >
-                                                    <GrFormView className="text-xl " />
-                                                </Link>
+                                                <GrFormView className="text-xl " />
+                                            </Link>
+                                            {userData.role === "admin" && (
                                                 <Link className="bg-gray-100 rounded-md hover:bg-gray-200 size-8 flex-center">
                                                     <CiEdit
                                                         className="text-xl "
@@ -101,46 +115,45 @@ const PermissonDevices = () => {
                                                         }}
                                                     />
                                                 </Link>
-
-                                                {userData.role === "admin" && (
-                                                    <button
-                                                        className="bg-gray-100 cursor-pointer rounded-md
+                                            )}
+                                            {userData.role === "admin" && (
+                                                <button
+                                                    className="bg-gray-100 cursor-pointer rounded-md
                                                    hover:bg-gray-200 size-8 flex-center"
-                                                        onClick={async (e) => {
-                                                            setaddDeviceIntoUser(
-                                                                !addDeviceIntoUser
-                                                            );
-                                                            setSendDevice(item);
-                                                        }}
-                                                    >
-                                                        <TiUserDeleteOutline className="text-xl " />
-                                                        {addDeviceIntoUser && (
-                                                            <SearchUser
-                                                                deviceId={
-                                                                    sendDevice.idDevice
-                                                                }
-                                                                deviceName={
-                                                                    sendDevice.name
-                                                                }
-                                                                onClose={() => {
-                                                                    setaddDeviceIntoUser(
-                                                                        !addDeviceIntoUser
-                                                                    );
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            </HomeWrap>
-        )
+                                                    onClick={async (e) => {
+                                                        setaddDeviceIntoUser(
+                                                            !addDeviceIntoUser
+                                                        );
+                                                        setSendDevice(item);
+                                                    }}
+                                                >
+                                                    <TiUserDeleteOutline className="text-xl " />
+                                                    {addDeviceIntoUser && (
+                                                        <SearchUser
+                                                            deviceId={
+                                                                sendDevice.idDevice
+                                                            }
+                                                            deviceName={
+                                                                sendDevice.name
+                                                            }
+                                                            onClose={() => {
+                                                                setaddDeviceIntoUser(
+                                                                    !addDeviceIntoUser
+                                                                );
+                                                            }}
+                                                        />
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </HomeWrap>
     );
 };
 

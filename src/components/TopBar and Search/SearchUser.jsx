@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import OverLay from "../Utilities/OverLay";
 import { IoSearch } from "react-icons/io5";
-import { searchUserByName } from "../Database/Services";
+import { allowDeviceOfUser, allowDeviceofUsers, searchUserByName } from "../Database/Services";
 import { IoAddCircle } from "react-icons/io5";
 
 const SearchUser = ({ deviceId, deviceName, onClose }) => {
@@ -35,6 +35,7 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
     const onChangle = async (name) => {
         setUserList(await searchUserByName(name));
     };
+    console.log("list :", checkUSers);
     return (
         <OverLay onClose={onClose}>
             <div className="w-lg h-[700px] p-4">
@@ -48,7 +49,11 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
                         <span>{deviceName.toUpperCase()}</span>
                         <button
                             className="h-full w-16
-                            hover:bg-blue-600 transition-colors duran rounded-full absolute right-0 bg-blue-400 flex-center"
+                            hover:bg-blue-600 transition-colors duran rounded-full absolute right-0
+                             bg-blue-400 flex-center"
+                            onClick={async (e) => {
+                                await allowDeviceofUsers(checkUSers,deviceId);
+                            }}
                         >
                             <IoAddCircle className="text-5xl text-white" />
                         </button>

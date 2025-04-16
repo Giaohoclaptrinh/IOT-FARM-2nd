@@ -18,6 +18,7 @@ import {
     endAt,
 } from "firebase/firestore";
 import { ref } from "firebase/database";
+import { AddComment } from "@mui/icons-material";
 
 /**
  * Lấy danh sách thiết bị (có phân quyền cho admin).
@@ -257,6 +258,7 @@ export const getDevices = async () => {
         }
     });
 };
+
 export const toggleDevice = async (idDevice) => {
     return new Promise(async (resolve, reject) => {
         const docRef = doc(db, `devices/${idDevice}`);
@@ -294,4 +296,68 @@ export const searchUserByName = async (name) => {
             reject(["error", error.message]);
         }
     });
+};
+
+export const allowDeviceOfUser = async (userId, deviceId) => {
+    return new Promise(async (resolve, reject) => {
+        if (userId) {
+            try {
+                const createPath = doc(
+                    db,
+                    `users/${userId}/devicesList/${deviceId}`
+                );
+                const checkDoc = (await getDoc(createPath)).data();
+                if (!checkDoc) {
+                    await setDoc(createPath, {});
+                    resolve(["success", "sucess add device  into user"]);
+                } else {
+                    reject(["error", "device  already  exists "]);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    });
+};
+
+export const allowDeviceofUsers = async (Users, deviceId) => {
+    return new Promise(async (resolve, reject) => {
+        Users.forEach(async (uid, index) => {
+            await allowDeviceOfUser(uid, deviceId);
+        });
+        resolve(["sucess", ["add all  device  into user"]]);
+    });
+};
+
+export const getDevicesId = async (deviceId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const docRef = doc(db, `devices/${deviceId}`);
+            const device = await getDoc(docRef);
+            resolve(device.data());
+        } catch (error) {
+            reject(error.message);
+        }
+    });
+};
+export const getDeviceListByuser = async (uid) => {
+    if (!uid) return [];
+
+    try {
+        const collectionRef = collection(db, `users/${uid}/devicesList`);
+        const devices = await getDocs(collectionRef);
+        const docList = devices.docs;
+
+        const dataList = await Promise.all(
+            docList.map(async (deviceId) => {
+                const data = await getDevicesId(deviceId.id);
+                return { ...data, idDevice: deviceId.id }; 
+            })
+        );
+
+        return dataList;
+    } catch (error) {
+        console.error("getDeviceListByuser error: ", error);
+        return [];
+    }
 };

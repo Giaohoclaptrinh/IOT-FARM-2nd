@@ -30,6 +30,7 @@ const TopBar = ({ onSearch }) => {
             setLoading(true);
             if (currentUser) {
                 try {
+                    console.log('topbar-user',currentUser)
                     const userDocRef = doc(db, "users", currentUser.uid);
                     const userDocSnap = await getDoc(userDocRef);
                     setUserName(

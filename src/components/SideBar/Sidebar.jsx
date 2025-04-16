@@ -17,8 +17,10 @@ import { VscSignOut } from "react-icons/vsc";
 import { LuUserRoundCog } from "react-icons/lu";
 import { context } from "@/utils/Provide";
 import { AiFillCaretDown } from "react-icons/ai";
+import { getUser } from "../Database/Services";
 
 const Sidebar = () => {
+    const [admin, setAdmin] = useState({});
     const urlList = [
         {
             title: "Home",
@@ -98,6 +100,24 @@ const Sidebar = () => {
             }
         });
     }, []);
+    useEffect(() => {
+        let unsubscribe;
+
+        const checkAuth = async () => {
+            unsubscribe = onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const admin = await getUser();
+                    setAdmin(admin);
+                }
+            });
+        };
+
+        checkAuth();
+
+        return () => {
+            if (unsubscribe) unsubscribe();
+        };
+    }, []);
 
     const handleToggleSubMenu = (index) => {
         setOpenSubMenuIndex(openSubMenuIndex === index ? null : index);
@@ -111,14 +131,14 @@ const Sidebar = () => {
                     ${userDown && "bg-blue-100 rounded-lg"}`}
                     onClick={() => setUserDown(!userDown)}
                 >
-                    <span className="inline-flex rounded-full items-center justify-center w-12 h-12 bg-blue-400 text-white font-primary">
+                    <span className="inline-flex  rounded-full items-center justify-center w-12 h-12 bg-blue-400 text-white font-primary">
                         {userCurrent.userName.split("").slice(0, 2)}
                     </span>
                     <div className="ml-4  text-xs">
                         <b className="block max-w-36 text-nowrap overflow-hidden text-ellipsis text-md font-semibold">
                             {userCurrent.userName}{" "}
                         </b>
-                        <span className="block max-w-36 overflow-hidden text-[15px] text-gray-500 text-ellipsis whitespace-nowrap">
+                        <span className="block max-w-28 overflow-hidden text-[15px] text-gray-500 text-ellipsis whitespace-nowrap">
                             {userCurrent.email}
                         </span>
                     </div>
@@ -264,22 +284,45 @@ const Sidebar = () => {
                                 >
                                     {item.submenu.map(
                                         (itemChild, indexChild) => {
-                                            return (
-                                                <Link
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
-                                                    key={indexChild}
-                                                    className="block w-full  px-2 py-2 hover:bg-gray-200
-                                                    border-b border-gray-400 last:border-none
-                                                     bg-white "
-                                                    to={{
-                                                        pathname: `${itemChild.href}`,
-                                                    }}
-                                                >
-                                                    {itemChild.title}
-                                                </Link>
-                                            );
+                                            if (admin.role === "admin") {
+                                                return (
+                                                    <Link
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                        }}
+                                                        key={indexChild}
+                                                        className="block w-full  px-2 py-2 hover:bg-gray-200
+                                                        border-b border-gray-400 last:border-none
+                                                         bg-white "
+                                                        to={{
+                                                            pathname: `${itemChild.href}`,
+                                                        }}
+                                                    >
+                                                        {itemChild.title}
+                                                    </Link>
+                                                );
+                                            } else if (
+                                                admin.role !== "admin" &&
+                                                itemChild.title.toLowerCase() !==
+                                                    "Device  Management".toLowerCase()
+                                            ) {
+                                                return (
+                                                    <Link
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                        }}
+                                                        key={indexChild}
+                                                        className="block w-full  px-2 py-2 hover:bg-gray-200
+                                                        border-b border-gray-400 last:border-none
+                                                         bg-white "
+                                                        to={{
+                                                            pathname: `${itemChild.href}`,
+                                                        }}
+                                                    >
+                                                        {itemChild.title}
+                                                    </Link>
+                                                );
+                                            }
                                         }
                                     )}
                                 </div>
