@@ -32,7 +32,7 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
             setCheckAll(false);
         }
     };
-    const onChangle = async (name) => {
+    const onChange = async (name) => {
         setUserList(await searchUserByName(name));
     };
     console.log("list :", checkUSers);
@@ -83,7 +83,7 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
                             onChange={async (e) => {
                                 const name = e.target.value;
                                 setNameInput(name);
-                                await onChangle(nameInput);
+                                await onChange(name);
                             }}
                             className="px-4  size-full text-2xl pr-16 rounded-lg text-slate-600 placeholder:tracking-widest"
                             placeholder="User to Search..."
@@ -96,7 +96,7 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
                                     <tr className="bg-green-50 ">
                                         <th className="text-left flex items-center ">
                                             <input
-                                                oncheck
+                                                // oncheck
                                                 type="checkbox"
                                                 name=""
                                                 id="all"
