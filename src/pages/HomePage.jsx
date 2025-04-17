@@ -1,11 +1,12 @@
 import React from "react";
 import HomeWrap from "./HomeWrap";
 import OverLay from "@/components/Utilities/OverLay";
+import SearchUser from "@/components/TopBar and Search/SearchUser";
 
 const HomePage = () => {
     return (
         <HomeWrap>
-            <div className="bg-testColor">home</div>
+            <div>home</div>
         </HomeWrap>
     );
 };

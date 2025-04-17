@@ -37,6 +37,14 @@
 
 }
 @layer components{
+  @keyframes revealText {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
   .flex-center{
     display: flex;
     align-items: center;
