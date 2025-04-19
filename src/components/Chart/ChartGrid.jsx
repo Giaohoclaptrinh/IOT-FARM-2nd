@@ -1,156 +1,160 @@
-import React, { useEffect, useState } from 'react';
-import ApexCharts from 'apexcharts';
-import { fontFamily, fontSize, fontWeight } from '@mui/system';
+import React, { useEffect, useState } from "react";
+import ApexCharts from "apexcharts";
+import { fontFamily, fontSize, fontWeight } from "@mui/system";
 
-export default function ChartGrid({ humidity, temperature, ph, divID, typeChart = "line" }) {
-  const [options, setOption] = useState({});
-  const activeTime = ['1M', "6M", "YTD", "ALL"];
+export default function ChartGrid({
+    humidity,
+    temperature,
+    ph,
+    divID,
+    typeChart = "line",
+}) {
+    console.log(typeChart);
+    const [options, setOption] = useState({});
+    const activeTime = ["1M", "6M", "YTD", "ALL"];
 
-  const handleSwitch = (type) => {
-    let currentDate = new Date();
-    let beginDate;
-    
-   
-    let startDate = new Date(currentDate);
-  
-    switch (type) {
-      case "1M":
-        startDate.setMonth(currentDate.getMonth() - 1); 
-        beginDate = startDate;
-        break;
-      case "6M":
-        startDate.setMonth(currentDate.getMonth() - 6);
-        beginDate = startDate;
-        break;
-      case "YTD":
-        startDate.setDate(currentDate.getDate() - 1); 
-        beginDate = startDate;
-        break;
-      case "ALL":
-        return [null, null];
-        break;
-      default:
-        return undefined;
-    }
-  
-  
-    const beginUnix = beginDate.getTime();
-    const endUnix = currentDate.getTime();
-  
-    return [beginUnix, endUnix];
-  }
-  
+    const handleSwitch = (type) => {
+        let currentDate = new Date();
+        let beginDate;
 
-  const updateZoom = (beginUnix, endUnix) => {
-    if (Object.keys(options).length > 0 && divID !== undefined) {
-      let chart = new ApexCharts(document.getElementById(divID), options);
-      chart.render();
-      chart.zoomX(beginUnix, endUnix);
-      
-      return () => {
-        chart.destroy();
-      };
-    }
-  }
-  useEffect(() => {
-    const chartOptions = {
-      chart: {
-        type: typeChart,
-        height: 350,
-        width: "100%",
-        zoom: {
-          autoScaleYaxis: true
-        },
-      },
-      series: [
-        {
-          name: "Humidity",
-          data: humidity, // Dữ liệu dạng: [{ x: timestamp, y: value }]
+        let startDate = new Date(currentDate);
+
+        switch (type) {
+            case "1M":
+                startDate.setMonth(currentDate.getMonth() - 1);
+                beginDate = startDate;
+                break;
+            case "6M":
+                startDate.setMonth(currentDate.getMonth() - 6);
+                beginDate = startDate;
+                break;
+            case "YTD":
+                startDate.setDate(currentDate.getDate() - 1);
+                beginDate = startDate;
+                break;
+            case "ALL":
+                return [null, null];
+                break;
+            default:
+                return undefined;
         }
-      ],
-      tooltip: {
-        x: {
-          formatter: (val) => {
-            return new Date(val).toLocaleString("vi-VN", {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour12: false,
-              timeZone: 'Asia/Ho_Chi_Minh'
-            });
-          }
-        }
-      },
-      xaxis: {
-        type: 'datetime',
-        labels: {
-          formatter: (val) => {
-            return new Date(val).toLocaleTimeString("vi-VN", {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: false,
-              timeZone: 'Asia/Ho_Chi_Minh'
-            });
-          }
-        }
-      },
-     
-      stroke: {
-        show: true,
-        curve: "smooth"
-      },
-      dataLabels: {
-        enabled: false
-      },
-      markers: {
-        size: 0,
-        style: 'hollow',
-      },
+
+        const beginUnix = beginDate.getTime();
+        const endUnix = currentDate.getTime();
+
+        return [beginUnix, endUnix];
     };
-    
 
-    setOption(chartOptions);
+    const updateZoom = (beginUnix, endUnix) => {
+        if (Object.keys(options).length > 0 && divID !== undefined) {
+            let chart = new ApexCharts(document.getElementById(divID), options);
+            chart.render();
+            chart.zoomX(beginUnix, endUnix);
 
-  }, [humidity]);
-
-  useEffect(() => {
-    if (Object.keys(options).length > 0 && divID !== undefined) {
-      let chart = new ApexCharts(document.getElementById(divID), options);
-      chart.render();
-      
-      return () => {
-        chart.destroy();
-      };
-    }
-  }, [options, divID]);
-
-  
-  return (
-    <div>
-      <div className='ml-16 flex gap-x-2 text-xs font-primary text-white font-semibold'>
-        {
-          activeTime.map((item) => {
-            return (
-              <button
-                key={item}
-                className='py-2 px-4 bg-blue-500 shadow-md rounded-lg'
-                onClick={() => {
-                  const [beginDate, endDate] = handleSwitch(item);
-                 
-                  updateZoom(beginDate, endDate);
-                }}
-              >
-                {item}
-              </button>
-            )
-          })
+            return () => {
+                chart.destroy();
+            };
         }
-      </div>
-      <div className='w-full h-80' id={divID}></div>
-    </div>
-  )
+    };
+    useEffect(() => {
+        const chartOptions = {
+            chart: {
+                type: typeChart,
+                height: 350,
+                width: "100%",
+                zoom: {
+                    autoScaleYaxis: true,
+                },
+            },
+            series: [
+                {
+                    name: "Humidity",
+                    data: humidity, // Dữ liệu dạng: [{ x: timestamp, y: value }]
+                },
+            ],
+            tooltip: {
+                x: {
+                    formatter: (val) => {
+                        return new Date(val).toLocaleString("vi-VN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour12: false,
+                            timeZone: "Asia/Ho_Chi_Minh",
+                        });
+                    },
+                },
+            },
+            stroke: {
+                curve: "smooth", // ✅ smooth | straight | stepline
+                width: 2, // độ dày
+                dashArray: 0, // kiểu nét đứt
+            },
+            xaxis: {
+                type: "datetime",
+                labels: {
+                    formatter: (val) => {
+                        return new Date(val).toLocaleTimeString("vi-VN", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                            timeZone: "Asia/Ho_Chi_Minh",
+                        });
+                    },
+                },
+            },
+
+            stroke: {
+                show: true,
+                curve: "smooth",
+            },
+            dataLabels: {
+                enabled: false,
+            },
+            markers: {
+                size: 0,
+                style: "hollow",
+            },
+        };
+
+        setOption(chartOptions);
+    }, [humidity]);
+
+    useEffect(() => {
+        if (Object.keys(options).length > 0 && divID !== undefined) {
+            let chart = new ApexCharts(document.getElementById(divID), options);
+            chart.render();
+
+            return () => {
+                chart.destroy();
+            };
+        }
+    }, [options, divID]);
+
+    return (
+        <div>
+            <div className="ml-16 flex gap-x-2 text-xs font-primary text-white font-semibold">
+                {activeTime.map((item) => {
+                    return (
+                        <button
+                            key={item}
+                            className="py-2 px-4 bg-blue-500 shadow-md rounded-lg"
+                            onClick={() => {
+                                const [beginDate, endDate] = handleSwitch(item);
+
+                                updateZoom(beginDate, endDate);
+                            }}
+                        >
+                            {item}
+                        </button>
+                    );
+                })}
+            </div>
+            <div className="w-full h-80" id={divID}></div>
+        </div>
+    );
 }

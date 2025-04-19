@@ -55,4 +55,8 @@
      hover:bg-blue-500 transition-colors duration-200
   }
 
+  .btn-seconds{
+    @apply w-22 h-8 bg-green-400 rounded-lg font-semibold  text-white
+     hover:opacity-90 transition-colors duration-200
+  }
 }

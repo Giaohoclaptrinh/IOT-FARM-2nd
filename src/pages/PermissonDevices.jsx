@@ -20,6 +20,7 @@ const PermissonDevices = () => {
     const [devices, setDevices] = useState([]);
     const [addDeviceIntoUser, setaddDeviceIntoUser] = useState(false);
     const [sendDevice, setSendDevice] = useState({});
+    const notificationStatus = new Nt_alert().build();
     useEffect(() => {
         const User = async () => {
             setUserData(await getUser());
@@ -31,16 +32,13 @@ const PermissonDevices = () => {
         const _setDevice = async () => {
             if (!userData || !userData.uid) return;
             if (userData.role === "admin") {
-                console.log("chay vao day");
                 setDevices(await getDevices());
             } else {
                 setDevices((await getDeviceListByuser(userData.uid)) || []);
-                console.log("co cai nit");
             }
         };
         _setDevice();
     }, [userData.uid]);
-    console.log("devices tai permisson", devices);
     return (
         <HomeWrap>
             <div>
@@ -106,8 +104,12 @@ const PermissonDevices = () => {
                                                     <CiEdit
                                                         className="text-xl "
                                                         onClick={async (e) => {
-                                                            await toggleDevice(
-                                                                item.idDevice
+                                                            const status =
+                                                                await toggleDevice(
+                                                                    item.idDevice
+                                                                );
+                                                            notificationStatus.createNode(
+                                                                status
                                                             );
                                                             setDevices(
                                                                 await getDevices()

@@ -10,6 +10,7 @@ import { BiNotification } from "react-icons/bi";
 import { context } from "@/utils/Provide";
 import { HiOutlineXMark } from "react-icons/hi2";
 import OverLay from "../Utilities/OverLay";
+import { getDeviceListByuser } from "../Database/Services";
 
 const TopBar = ({ onSearch }) => {
     const [user, setUser] = useState(null);
@@ -20,6 +21,7 @@ const TopBar = ({ onSearch }) => {
     const [searchResults, setSearchResults] = useState([]);
     const [isShowDevices, setIsShowDevices] = useState(false);
     const { state, dispatch } = useContext(context);
+    const [totalDeviceOnline, setTotalDeviceOnline] = useState(0);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -30,14 +32,17 @@ const TopBar = ({ onSearch }) => {
             setLoading(true);
             if (currentUser) {
                 try {
-                    console.log('topbar-user',currentUser)
-                    const userDocRef = doc(db, "users", currentUser.uid);
-                    const userDocSnap = await getDoc(userDocRef);
-                    setUserName(
-                        userDocSnap.exists()
-                            ? userDocSnap.data().name || "Người dùng"
-                            : "Người dùng"
+                    const deviceListofUser = await getDeviceListByuser(
+                        currentUser.uid
                     );
+                    if (deviceListofUser) {
+                        setTotalDeviceOnline((prev) => {
+                            const count = deviceListofUser.filter((item) => {
+                                return item.status.toLowerCase() === "online";
+                            });
+                            return count.length;
+                        });
+                    }
                 } catch (error) {
                     console.error("Lỗi khi lấy thông tin người dùng:", error);
                 }
@@ -156,12 +161,18 @@ const TopBar = ({ onSearch }) => {
                                 <div className="">
                                     <b className="text-gray-600 pl-3">Device</b>
                                     <p
-                                        className="font-seconds
-                                        bg-gray-100
+                                        className={`font-seconds
+                                        
+                                        ${
+                                            totalDeviceOnline
+                                                ? "bg-green-400 text-white before:bg-white"
+                                                : "bg-gray-100 text-gray-700 before:bg-gray-500"
+                                        }
+                                        shadow
                                         rounded-md
                                         w-18
                                         px-4
-                                        text-gray-700
+                                        
                                         relative
                                         text-right
                                         before:content-['']
@@ -172,11 +183,13 @@ const TopBar = ({ onSearch }) => {
                                         before:bottom-0
                                         before:left-1
                                         before:-translate-y-[100%]
-                                        before:bg-gray-500
-              
-              "
+                                        `}
                                     >
-                                        Online
+                                        {totalDeviceOnline ? (
+                                            <span className="text-center block">{` ${totalDeviceOnline}`}</span>
+                                        ) : (
+                                            "Offline"
+                                        )}
                                     </p>
                                 </div>
 

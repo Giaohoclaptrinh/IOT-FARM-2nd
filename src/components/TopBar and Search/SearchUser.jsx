@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import OverLay from "../Utilities/OverLay";
 import { IoSearch } from "react-icons/io5";
-import { allowDeviceOfUser, allowDeviceofUsers, searchUserByName } from "../Database/Services";
+import {
+    allowDeviceOfUser,
+    allowDeviceofUsers,
+    searchUserByName,
+} from "../Database/Services";
 import { IoAddCircle } from "react-icons/io5";
 
 const SearchUser = ({ deviceId, deviceName, onClose }) => {
@@ -9,135 +13,128 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
     const [userList, setUserList] = useState([]);
     const [checkUSers, setCheckUser] = useState([]);
     const [checkAll, setCheckAll] = useState(false);
+    const notification = new Nt_alert().build();
 
     const handleCheck = (userID) => {
         setCheckUser((prev) => {
             return prev.includes(userID)
-                ? prev.filter((item) => {
-                      return item !== userID;
-                  })
+                ? prev.filter((item) => item !== userID)
                 : [...prev, userID];
         });
     };
+
     const handleCheckAll = () => {
         if (!checkAll && userList) {
-            setCheckUser(
-                userList.map((item) => {
-                    return item.uid;
-                })
-            );
+            setCheckUser(userList.map((item) => item.uid));
             setCheckAll(true);
         } else {
             setCheckUser([]);
             setCheckAll(false);
         }
     };
-    const onChangle = async (name) => {
-        setUserList(await searchUserByName(name));
+
+    const onChangle = useCallback(async (name) => {
+        if (name.trim() === "") return;
+        const users = await searchUserByName(name);
+        setUserList(users);
+    }, []);
+
+    const handleAddDevices = async () => {
+        const notificationItem = await allowDeviceofUsers(checkUSers, deviceId);
+        console.log(notification);
+
+        notification.createNode(notificationItem);
     };
-    console.log("list :", checkUSers);
+
+    const handleKeyDown = (e) => {
+        // Ngăn chặn sự kiện mặc định khi nhấn phím Space hoặc Enter
+        if (e.key === "Enter") {
+            e.preventDefault(); // Ngăn hành động mặc định
+        }
+    };
+
     return (
         <OverLay onClose={onClose}>
-            <div className="w-lg h-[700px] p-4">
-                <div className="flex-center">
-                    <div
-                        className="flex w-[90%] relative
-                          items-center rounded-full bg-blue-200 h-16 px-4 font-semibold 
-                     text-gray-700
-                      text-xl"
+            <div className="w-lg h-[700px] p-6 bg-white rounded-lg shadow-xl">
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold text-gray-800">
+                        {deviceName.toUpperCase()}
+                    </h3>
+                    <button
+                        className="h-14 w-14 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white flex items-center justify-center transition-all duration-300 hover:scale-105"
+                        onClick={handleAddDevices}
                     >
-                        <span>{deviceName.toUpperCase()}</span>
-                        <button
-                            className="h-full w-16
-                            hover:bg-blue-600 transition-colors duran rounded-full absolute right-0
-                             bg-blue-400 flex-center"
-                            onClick={async (e) => {
-                                await allowDeviceofUsers(checkUSers,deviceId);
-                            }}
-                        >
-                            <IoAddCircle className="text-5xl text-white" />
-                        </button>
-                    </div>
+                        <IoAddCircle className="text-4xl" />
+                    </button>
                 </div>
+
                 <form
                     action=""
                     onSubmit={(e) => {
-                        e.preventDefault();
+                        e.preventDefault(); // Ngăn submit form
                     }}
-                    className="w-full mt-4"
+                    className="w-full"
                 >
-                    <div
-                        className="w-full relative h-16 rounded-full flex inset-shadow-2xs 
-                            border focus-within:border-blue-400
-                            shadow-xs   "
-                    >
-                        <span className="relative   inline-block h-full w-20 rounded-md ">
-                            <IoSearch
-                                className="absolute animate-pulse  text-4xl top-1/2 left-4 text-slate-600 
-                                 -translate-y-1/2"
-                            />
+                    <div className="relative w-full h-16 rounded-full shadow-lg bg-gray-100 border border-gray-300">
+                        <span className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-500">
+                            <IoSearch className="text-3xl" />
                         </span>
                         <input
                             type="text"
                             value={nameInput}
-                            onChange={async (e) => {
-                                const name = e.target.value;
-                                setNameInput(name);
-                                await onChangle(nameInput);
+                            onChange={(e) => {
+                                setNameInput(e.target.value);
+                                onChangle(e.target.value);
                             }}
-                            className="px-4  size-full text-2xl pr-16 rounded-lg text-slate-600 placeholder:tracking-widest"
-                            placeholder="User to Search..."
+                            onKeyDown={handleKeyDown}
+                            className="w-full h-full pl-16 pr-6 text-lg text-gray-700 placeholder-gray-400 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                            placeholder="Search for a user..."
                         />
                     </div>
-                    {userList.length !== 0 && (
-                        <div className="size-full  mt-2 border ">
-                            <table className="table-auto size-full ">
-                                <thead className="">
-                                    <tr className="bg-green-50 ">
-                                        <th className="text-left flex items-center ">
+
+                    {userList.length > 0 && (
+                        <div className="mt-6 border-t border-gray-200">
+                            <table className="w-full table-auto">
+                                <thead className="bg-blue-100">
+                                    <tr>
+                                        <th className="px-4 py-2 text-left">
                                             <input
-                                                oncheck
                                                 type="checkbox"
-                                                name=""
-                                                id="all"
-                                                className="accent-gray-600 mx-2"
-                                                onChange={(e) => {
-                                                    handleCheckAll();
-                                                }}
+                                                className="accent-gray-600"
+                                                checked={checkAll}
+                                                onChange={handleCheckAll}
                                             />
-                                            <span>name</span>
+                                            <span className="ml-2 text-gray-600 font-medium">
+                                                Name
+                                            </span>
                                         </th>
-                                        <th className=""></th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {userList.map((item, index) => {
-                                        return (
-                                            <tr
-                                                key={index}
-                                                className="text-left flex items-center"
-                                            >
-                                                <td className="text-left">
-                                                    <input
-                                                        type="checkbox"
-                                                        name=""
-                                                        className="mx-2 accent-gray-400"
-                                                        id=""
-                                                        checked={checkUSers.includes(
-                                                            item.uid
-                                                        )}
-                                                        onChange={(e) => {
-                                                            handleCheck(
-                                                                item.uid
-                                                            );
-                                                        }}
-                                                    />
-                                                    <span>{item.name}</span>
-                                                </td>
-                                                <td></td>
-                                            </tr>
-                                        );
-                                    })}
+                                    {userList.map((item, index) => (
+                                        <tr
+                                            key={index}
+                                            className="hover:bg-gray-50 transition-all duration-200"
+                                        >
+                                            <td className="px-4 py-2 flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="accent-gray-600"
+                                                    checked={checkUSers.includes(
+                                                        item.uid
+                                                    )}
+                                                    onChange={() =>
+                                                        handleCheck(item.uid)
+                                                    }
+                                                />
+                                                <span className="text-gray-700 ml-2">
+                                                    {item.name}
+                                                </span>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
