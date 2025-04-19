@@ -54,7 +54,19 @@ const Things = () => {
                 );
             }
         });
-    }, []);
+    }, [url.id]);
+
+    // useEffect(() => {
+    //     const fetchDevices = async () => {
+    //         if (auth.currentUser && url?.id) {
+    //             const data = await getDeviceofThingPage(url.id, auth.currentUser.uid);
+    //             setDeviceListOfThings(data);
+    //         }
+    //     };
+
+    //     fetchDevices();
+    // }, [url.id]); // 👈 gọi lại khi route param thay đổi
+
     return !url.id ? (
         <HomeWrap>
             <div>
@@ -235,11 +247,11 @@ const Things = () => {
                     </div>
                 </OverLay>
             ) : (
-                <div>
-                    <ShowDevicePage deviceIdList={deviceListOfThings} />
-                </div>
+                ""
             )}
-            <div></div>
+            <div>
+                <ShowDevicePage deviceIdList={deviceListOfThings} />
+            </div>
         </HomeWrap>
     );
 };

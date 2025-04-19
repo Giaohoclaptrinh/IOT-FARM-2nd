@@ -17,31 +17,28 @@ import { Key } from "lucide-react";
 import { data } from "autoprefixer";
 
 export const convertDataRawToHumidity = function (arrayData) {
-    const getObject = JSON.parse(arrayData);
-    console.log("array Data", getObject);
-    const humidityItem = getObject.map((value) => {
-        return {
-            x: new Date(value.timestamp).getTime(),
-            y: value.humidity,
-        };
-    });
+    if (arrayData) {
+        const getObject = JSON.parse(arrayData);
+        const humidityItem = getObject.map((value) => {
+            return {
+                x: new Date(value.timestamp).getTime(),
+                y: value.humidity,
+            };
+        });
 
-    return humidityItem;
+        return humidityItem;
+    }
+    return null;
 };
 
-const ShowDevicePage = ({ deviceIdList }) => {
+const ShowDevicePage = ({ deviceIdList = [] }) => {
     const [deviceList, setDeviceList] = useState({});
-    console.log("show : ", deviceIdList);
     useEffect(() => {
         const unsubscribes = [];
 
         const fetchData = async () => {
-            console.log("chay fetch", Array.isArray(deviceIdList));
             try {
-                console.log("vo day", deviceIdList.length);
-
                 deviceIdList.forEach(async (item) => {
-                    console.log("item :", item);
                     const objectData = await getDeviceHuminity(item);
                     Object.entries(objectData).forEach(([keyframes, value]) => {
                         setDeviceList((prev) => {

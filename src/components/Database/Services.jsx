@@ -419,7 +419,7 @@ export const getDataDeviceByUid = (deviceId, deviceName, onData) => {
 //     });
 //     return nameDevice;
 // };
-export const getNameDevice = async (deviceId = "3tCPsGhujHuJFsTctmjd") => {
+export const getNameDevice = async (deviceId = "") => {
     try {
         const docRef = doc(db, "devices", deviceId);
         const snap = await getDoc(docRef);
@@ -469,13 +469,17 @@ export const getDeviceofThingPage = async (pageUrl, uid) => {
     if (pageUrl && uid) {
         const collectionRef = collection(db, `/users/${uid}/things`);
         const snapshot = (await getDocs(collectionRef)).docs;
-        const itemPage = snapshot
-            .filter((item) => {
-                return item.data().NamePage === pageUrl;
-            })[0]
-            .data();
-        return itemPage.DeviceOfThing;
-        console.log("doi tong Page Current : ", itemPage);
+        const itemPage = await snapshot.filter((item) => {
+            return item.data().NamePage === pageUrl;
+        }).length;
+        if (itemPage) {
+            const itemRefesh = await snapshot
+                .filter((item) => {
+                    return item.data().NamePage === pageUrl;
+                })[0]
+                .data();
+            return itemRefesh.DeviceOfThing;
+        }
     } else {
         console.log("saidk");
     }
