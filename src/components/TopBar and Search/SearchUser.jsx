@@ -32,10 +32,7 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
             setCheckAll(false);
         }
     };
-<<<<<<< HEAD
-    const onChange = async (name) => {
-        setUserList(await searchUserByName(name));
-=======
+
 
     const onChangle = useCallback(async (name) => {
         if (name.trim() === "") return;
@@ -48,7 +45,7 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
         console.log(notification);
 
         notification.createNode(notificationItem);
->>>>>>> origin/webhook
+
     };
 
     const handleKeyDown = (e) => {
@@ -106,10 +103,7 @@ const SearchUser = ({ deviceId, deviceName, onClose }) => {
                                     <tr>
                                         <th className="px-4 py-2 text-left">
                                             <input
-<<<<<<< HEAD
-                                                // oncheck
-=======
->>>>>>> origin/webhook
+
                                                 type="checkbox"
                                                 className="accent-gray-600"
                                                 checked={checkAll}
