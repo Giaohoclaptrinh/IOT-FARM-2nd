@@ -465,22 +465,49 @@ export const addDeviceIntoPage = async (pageUrl, idDevice, uid) => {
         console.log("null roi");
     }
 };
+// export const getDeviceofThingPage = async (pageUrl, uid) => {
+//     console.log(pageUrl, uid, "trong ham");
+//     if (pageUrl && uid) {
+//         const collectionRef = collection(db, `/users/${uid}/things`);
+//         const snapshot = (await getDocs(collectionRef)).docs;
+//         const itemPage = await snapshot.filter((item) => {
+//             return item.data().NamePage === pageUrl;
+//         });
+//         console.log(itemPage);
+//         if (itemPage) {
+//             const itemRefesh = await snapshot
+//                 .filter((item) => {
+//                     return item.data().NamePage === pageUrl;
+//                 })[0]
+//                 .data();
+//             return itemRefesh.DeviceOfThing;
+//         }
+//     } else {
+//         console.log("saidk");
+//     }
+// };
+
 export const getDeviceofThingPage = async (pageUrl, uid) => {
+    console.log(pageUrl, uid, "trong ham");
+
     if (pageUrl && uid) {
         const collectionRef = collection(db, `/users/${uid}/things`);
         const snapshot = (await getDocs(collectionRef)).docs;
-        const itemPage = await snapshot.filter((item) => {
-            return item.data().NamePage === pageUrl;
-        }).length;
+
+        const itemPage = snapshot.find(
+            (item) => item.data().NamePage.trim() === pageUrl.trim()
+        );
+
         if (itemPage) {
-            const itemRefesh = await snapshot
-                .filter((item) => {
-                    return item.data().NamePage === pageUrl;
-                })[0]
-                .data();
-            return itemRefesh.DeviceOfThing;
+            const itemData = itemPage.data();
+            console.log("✅ Tìm thấy page:", itemData);
+            return itemData.DeviceOfThing || [];
+        } else {
+            console.warn("⚠️ Không tìm thấy page khớp với", pageUrl);
+            return [];
         }
     } else {
-        console.log("saidk");
+        console.log("❌ Thiếu pageUrl hoặc uid");
+        return [];
     }
 };
