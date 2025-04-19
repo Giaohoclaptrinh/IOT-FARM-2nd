@@ -59,7 +59,6 @@ const Sidebar = () => {
         },
     ];
     const [showIndex, setShowIndex] = useState(-1);
-    console.log(showIndex);
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -94,7 +93,6 @@ const Sidebar = () => {
                     userName: user.displayName,
                     email: user.email,
                 });
-                console.log(userCurrent);
             } else {
                 console.log("User not logged in");
             }

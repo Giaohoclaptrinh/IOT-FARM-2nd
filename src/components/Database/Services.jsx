@@ -16,9 +16,11 @@ import {
     orderBy,
     startAt,
     endAt,
+    onSnapshot,
 } from "firebase/firestore";
 import { ref } from "firebase/database";
 import { AddComment } from "@mui/icons-material";
+import { data } from "autoprefixer";
 
 /**
  * Lấy danh sách thiết bị (có phân quyền cho admin).
@@ -178,13 +180,16 @@ export const CreatePage = (namePage) => {
                 const check = (await getDocs(getPageName)).docs;
 
                 if (check.length !== 0) {
-                    resolve(["error", "Tên trang đã tồn tại"]);
+                    resolve({ type: "error", message: "Tên trang đã tồn tại" });
                 } else {
                     await addDoc(CollectionRef, {
-                        ThingList: [],
+                        DeviceOfThing: [],
                         NamePage: namePage,
                     });
-                    resolve(["success", "Tạo trang thành công"]);
+                    resolve({
+                        type: "success",
+                        message: "Tạo trang thành công",
+                    });
                 }
 
                 unsubscribe(); // dọn dẹp listener
@@ -265,11 +270,18 @@ export const toggleDevice = async (idDevice) => {
         const data = (await getDoc(docRef)).data();
         if (data.status === "Online") {
             data.status = "Offline";
+            resolve({
+                type: "success",
+                message: `success turnOff  Device ${data.name} `,
+            });
         } else {
             data.status = "Online";
+            resolve({
+                type: "success",
+                message: `success turnOn  Device ${data.name} `,
+            });
         }
         const editDoc = await updateDoc(docRef, { ...data });
-        resolve("Sucess", "has update cucess");
     });
 };
 export const searchUserByName = async (name) => {
@@ -321,12 +333,18 @@ export const allowDeviceOfUser = async (userId, deviceId) => {
 };
 
 export const allowDeviceofUsers = async (Users, deviceId) => {
-    return new Promise(async (resolve, reject) => {
-        Users.forEach(async (uid, index) => {
-            await allowDeviceOfUser(uid, deviceId);
-        });
-        resolve(["sucess", ["add all  device  into user"]]);
-    });
+    try {
+        await Promise.all(Users.map((uid) => allowDeviceOfUser(uid, deviceId)));
+        return {
+            type: "success",
+            message: "Allowed permission for all users with device",
+        };
+    } catch (errorAllow) {
+        return {
+            type: "error",
+            message: "already  device axists  in user",
+        };
+    }
 };
 
 export const getDevicesId = async (deviceId) => {
@@ -351,7 +369,7 @@ export const getDeviceListByuser = async (uid) => {
         const dataList = await Promise.all(
             docList.map(async (deviceId) => {
                 const data = await getDevicesId(deviceId.id);
-                return { ...data, idDevice: deviceId.id }; 
+                return { ...data, idDevice: deviceId.id };
             })
         );
 
@@ -359,5 +377,110 @@ export const getDeviceListByuser = async (uid) => {
     } catch (error) {
         console.error("getDeviceListByuser error: ", error);
         return [];
+    }
+};
+export const getDataDeviceByUid = (deviceId, deviceName, onData) => {
+    let dataItem = null;
+    if (!deviceId) {
+        console.warn("Device ID không hợp lệ:", deviceId);
+        return () => {};
+    }
+
+    const docRef = doc(
+        db,
+        `devices/${deviceId}/temperatureAndHumidityLogs`,
+        deviceId
+    );
+
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+            const rawData = JSON.parse(docSnap.data().data || "[]");
+
+            dataItem = { NameDevice: deviceName, data: rawData };
+            onData(dataItem);
+        } else {
+            onData?.(null);
+        }
+    });
+
+    return unsubscribe;
+};
+// export const getNameDevice = async (deviceId = "3tCPsGhujHuJFsTctmjd") => {
+//     let nameDevice = "";
+//     const collectionRef = collection(db, "devices");
+//     const unsubscribe = onSnapshot(collectionRef, (snapshot) => {
+//         const docs = snapshot.docs;
+//         nameDevice = docs
+//             .filter((item) => {
+//                 return item.id === deviceId;
+//             })[0]
+//             .data().name;
+//         // console.log(nameDevice);
+//     });
+//     return nameDevice;
+// };
+export const getNameDevice = async (deviceId = "") => {
+    try {
+        const docRef = doc(db, "devices", deviceId);
+        const snap = await getDoc(docRef);
+
+        if (snap.exists()) {
+            return snap.data().name || "";
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Lỗi khi lấy tên thiết bị:", error);
+        return null;
+    }
+};
+export const getDeviceHuminity = async (deviceId) => {
+    console.log(deviceId);
+    const docref = doc(
+        db,
+        `devices/${deviceId}/temperatureAndHumidityLogs/${deviceId}`
+    );
+    const getName = await getNameDevice(deviceId);
+    const snapshot = await getDoc(docref);
+    const newObject = { [deviceId]: { ...snapshot.data(), name: getName } };
+    return newObject;
+};
+export const addDeviceIntoPage = async (pageUrl, idDevice, uid) => {
+    if (pageUrl && idDevice) {
+        const collectionRef = collection(db, `/users/${uid}/things`);
+        const snapshot = (await getDocs(collectionRef)).docs;
+        const itemPage = snapshot.filter((item) => {
+            console.log(item.data());
+            return item.data().NamePage === pageUrl;
+        })[0];
+
+        const dataItem = itemPage.data();
+        const pageDocRef = doc(db, `/users/${uid}/things/${itemPage.id}`);
+        const itemNew = {
+            ...dataItem,
+            DeviceOfThing: [...dataItem.DeviceOfThing, idDevice],
+        };
+        await updateDoc(pageDocRef, itemNew);
+    } else {
+        console.log("null roi");
+    }
+};
+export const getDeviceofThingPage = async (pageUrl, uid) => {
+    if (pageUrl && uid) {
+        const collectionRef = collection(db, `/users/${uid}/things`);
+        const snapshot = (await getDocs(collectionRef)).docs;
+        const itemPage = await snapshot.filter((item) => {
+            return item.data().NamePage === pageUrl;
+        }).length;
+        if (itemPage) {
+            const itemRefesh = await snapshot
+                .filter((item) => {
+                    return item.data().NamePage === pageUrl;
+                })[0]
+                .data();
+            return itemRefesh.DeviceOfThing;
+        }
+    } else {
+        console.log("saidk");
     }
 };
