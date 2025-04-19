@@ -28,126 +28,109 @@ const Things = () => {
     const notificationStatus = new Nt_alert().build();
     const url = useParams();
     console.log("params", url.id);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const addPage = async () => {
+        try {
             const message = await CreatePage(pageName);
             notificationStatus.createNode(message);
             const page = await getPageList();
             setPageList(page);
-        };
-
-        addPage();
+        } catch (error) {
+            console.error('Error creating page:', error);
+        }
     };
+
     useEffect(() => {
-        const pageList = async () => {
-            const page = await getPageList();
-            setPageList(page);
-        };
-        pageList();
-    }, []);
-    useEffect(() => {
-        onAuthStateChanged(auth, async (user) => {
-            if (user && url) {
-                setDeviceListOfThings(
-                    await getDeviceofThingPage(url.id, user.uid)
-                );
+        const fetchPageList = async () => {
+            try {
+                const page = await getPageList();
+                setPageList(page);
+            } catch (error) {
+                console.error('Error fetching page list:', error);
             }
-        });
+        };
+        fetchPageList();
+    }, []);
+
+    useEffect(() => {
+        const fetchDevices = async () => {
+            if (auth.currentUser && url.id) {
+                try {
+                    const data = await getDeviceofThingPage(url.id, auth.currentUser.uid);
+                    setDeviceListOfThings(data);
+                } catch (error) {
+                    console.error('Error fetching device list:', error);
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, fetchDevices);
+
+        // Cleanup on unmount
+        return () => {
+            setDeviceListOfThings([]); // Clear devices on unmount or change
+        };
     }, [url.id]);
-
-    // useEffect(() => {
-    //     const fetchDevices = async () => {
-    //         if (auth.currentUser && url?.id) {
-    //             const data = await getDeviceofThingPage(url.id, auth.currentUser.uid);
-    //             setDeviceListOfThings(data);
-    //         }
-    //     };
-
-    //     fetchDevices();
-    // }, [url.id]); // 👈 gọi lại khi route param thay đổi
 
     return !url.id ? (
         <HomeWrap>
             <div>
                 <button
-                    onClick={() => {
-                        setShowOverlay(!showOverlay);
-                    }}
+                    onClick={() => setShowOverlay(!showOverlay)}
                     className="btn-primary"
                 >
                     Create Page
                 </button>
             </div>
             <div className="flex flex-col justify-center mt-4 gap-y-2">
-                {pageList.map((item, index) => {
-                    return (
-                        <div
-                            key={index}
-                            className="flex-center justify-between py-2   bg-gray-100 px-2 rounded-md border
-                                 border-gray-300/70 hover:bg-gray-200"
+                {pageList.map((item, index) => (
+                    <div
+                        key={index}
+                        className="flex-center justify-between py-2 bg-gray-100 px-2 rounded-md border border-gray-300/70 hover:bg-gray-200"
+                    >
+                        <Link
+                            className="w-full text-md"
+                            to={`/things/${item.NamePage}`}
                         >
-                            <Link
-                                key={index}
-                                className="w-full text-md"
-                                to={{
-                                    pathname: `/things/${item.NamePage}`,
-                                }}
-                            >
-                                {item.NamePage}
-                            </Link>
-                            <span className="flex-center">
-                                <button
-                                    onClick={async (e) => {
+                            {item.NamePage}
+                        </Link>
+                        <span className="flex-center">
+                            <button
+                                onClick={async () => {
+                                    try {
                                         await deletePageid(item.idpage);
                                         const page = await getPageList();
                                         setPageList(page);
-                                    }}
-                                    className=" rounded-xs bg-sky-500"
-                                >
-                                    <HiOutlineXMark className="text-2xl font-semibold  text-white " />
-                                </button>
-                            </span>
-                        </div>
-                    );
-                })}
+                                    } catch (error) {
+                                        console.error('Error deleting page:', error);
+                                    }
+                                }}
+                                className="rounded-xs bg-sky-500"
+                            >
+                                <HiOutlineXMark className="text-2xl font-semibold text-white" />
+                            </button>
+                        </span>
+                    </div>
+                ))}
             </div>
 
             {showOverlay && (
-                <OverLay
-                    onClose={() => {
-                        setShowOverlay(!showOverlay);
-                    }}
-                >
+                <OverLay onClose={() => setShowOverlay(!showOverlay)}>
                     <div className="w-96 h-44 p-4">
-                        <form
-                            action=""
-                            onSubmit={handleSubmit}
-                            className="size-full "
-                        >
-                            <div
-                                className="w-full border rounded-md 
-                                border-gray-300 h-16 flex items-center bg-white
-                                focus-within:border-blue-400 p-2"
-                            >
+                        <form onSubmit={handleSubmit} className="size-full">
+                            <div className="w-full border rounded-md border-gray-300 h-16 flex items-center bg-white focus-within:border-blue-400 p-2">
                                 <input
                                     placeholder="Nhập tên trang . . ."
-                                    className="size-full  caret-gray-500 "
+                                    className="size-full caret-gray-500"
                                     type="text"
                                     value={pageName}
-                                    onChange={(e) => {
-                                        setPageName(e.target.value);
-                                    }}
+                                    onChange={(e) => setPageName(e.target.value)}
                                 />
                             </div>
-                            <div
-                                className="w-full h-12 bg-gradient-to-r
-                            bg-linear-to-r from-cyan-500 to-blue-500
-                            rounded-lg 
-                             mt-4 items-center flex-center text-xl text-white  font-semibold"
-                            >
+                            <div className="w-full h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg mt-4 items-center flex-center text-xl text-white font-semibold">
                                 <button className="size-full" type="submit">
-                                    submit
+                                    Submit
                                 </button>
                             </div>
                         </form>
@@ -157,97 +140,68 @@ const Things = () => {
         </HomeWrap>
     ) : (
         <HomeWrap>
-            <div className="w-full py-3 text-end ">
+            <div className="w-full py-3 text-end">
                 <button
-                    onClick={async (e) => {
+                    onClick={async () => {
                         setAddDevice(true);
-                        const getList = await getDeviceListByuser(
-                            auth.currentUser.uid
-                        );
-                        setDeviceListOfThings(getList);
-                        console.log(deviceListOfThings);
+                        try {
+                            const getList = await getDeviceListByuser(auth.currentUser.uid);
+                            setDeviceListOfThings(getList);
+                        } catch (error) {
+                            console.error('Error fetching devices:', error);
+                        }
                     }}
                     className="btn-primary"
                 >
                     AddDevice
                 </button>
-                <div></div>
             </div>
-            {addDevice ? (
-                <OverLay
-                    onClose={() => {
-                        setAddDevice(!addDevice);
-                    }}
-                >
+            {addDevice && (
+                <OverLay onClose={() => setAddDevice(!addDevice)}>
                     <div className="w-sm h-[600px] bg-white rounded-2xl p-4">
                         {deviceListOfThings && (
                             <div className="w-full">
                                 <table className="w-full">
-                                    <thead className="bg-slate-500 py-2  text-white w-full">
+                                    <thead className="bg-slate-500 py-2 text-white w-full">
                                         <tr>
-                                            <th className="text-start  px-6 text-md font-semibold ">
+                                            <th className="text-start px-6 text-md font-semibold">
                                                 Name
                                             </th>
-                                            <th className="text-start  px-6 text-md font-semibold ">
+                                            <th className="text-start px-6 text-md font-semibold">
                                                 Status
                                             </th>
-                                            <th className="text-start  px-6 text-md font-semibold ">
-                                                {" "}
+                                            <th className="text-start px-6 text-md font-semibold">
+                                                Action
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="h-full bg-gray-100/80 divide-slate-300 divide-y ">
-                                        {deviceListOfThings.map(
-                                            (item, index) => {
-                                                console.log(item);
-                                                return (
-                                                    <tr
-                                                        className=" "
-                                                        key={index}
+                                    <tbody className="h-full bg-gray-100/80 divide-slate-300 divide-y">
+                                        {deviceListOfThings.map((item, index) => (
+                                            <tr key={index}>
+                                                <td className="px-6">{item.name}</td>
+                                                <td className="px-6">{item.status}</td>
+                                                <td className="px-6">
+                                                    <button
+                                                        className="btn-seconds px-2 my-2"
+                                                        onClick={async () => {
+                                                            try {
+                                                                await addDeviceIntoPage(url.id, item.idDevice, auth.currentUser.uid);
+                                                            } catch (error) {
+                                                                console.error('Error adding device:', error);
+                                                            }
+                                                        }}
                                                     >
-                                                        <td className="px-6">
-                                                            {item.name}
-                                                        </td>
-                                                        <td className="px-6">
-                                                            {item.status}
-                                                        </td>
-                                                        <td className="px-6">
-                                                            <button
-                                                                className=" btn-seconds  px-2  my-2"
-                                                                onClick={async (
-                                                                    e
-                                                                ) => {
-                                                                    // console.log(
-                                                                    //     auth
-                                                                    //         .currentUser
-                                                                    //         .uid
-                                                                    // );
-                                                                    await addDeviceIntoPage(
-                                                                        url.id,
-                                                                        item.idDevice,
-                                                                        auth
-                                                                            .currentUser
-                                                                            .uid
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Add
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                );
-
-                                                // return <div>{item}</div>;
-                                            }
-                                        )}
+                                                        Add
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
                         )}
                     </div>
                 </OverLay>
-            ) : (
-                ""
             )}
             <div>
                 <ShowDevicePage deviceIdList={deviceListOfThings} />
