@@ -1,45 +1,237 @@
-// src/services/deviceService.js
+// ====================== FIREBASE & IMPORTS ======================
+import { collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, addDoc } from "firebase/firestore";
 import { db, auth } from "@/firebase/db.config";
-import Things from "@/pages/Things";
 import { onAuthStateChanged } from "firebase/auth";
-import {
-    collection,
-    getDocs,
-    query,
-    where,
-    doc,
-    setDoc,
-    getDoc,
-    addDoc,
-    updateDoc,
-    deleteDoc,
-    orderBy,
-    startAt,
-    endAt,
-    onSnapshot,
-} from "firebase/firestore";
-import { ref } from "firebase/database";
-import { AddComment } from "@mui/icons-material";
-import { data } from "autoprefixer";
+
+// ====================== AUTH HELPERS ======================
+// export const getUser = async () => {
+//   const usersRef = collection(db, "users");
+//   const usersSnapshot = await getDocs(usersRef);
+//   return usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+// };
+
+export const getUser = async () => {
+    return new Promise((resolve, reject) => {
+        const unsubcribe = onAuthStateChanged(auth, async (user) => {
+            if (user.uid) {
+                const docRef = doc(db, `users/${user.uid}`);
+                const userData = (await getDoc(docRef)).data();
+                resolve(userData);
+            }
+        });
+    });
+};
+
+
+// ====================== PAGE MANAGEMENT ======================
+export const createPage = async (namePage) => {
+  const pageRef = doc(collection(db, "pages"));
+  await setDoc(pageRef, { namePage, devices: [] });
+  return pageRef.id;
+};
 
 /**
- * Lấy danh sách thiết bị (có phân quyền cho admin).
- * @returns {Promise<Array>} Danh sách thiết bị
+ * Tạo page mới cho user.
+ * @param {string} userID ID của người dùng
+ * @param {string} deviceID ID thiết bị
  */
-// export const fetchDevices = async () => {
-//   const user = auth.currentUser;
-//   const devicesRef = collection(db, "devices");
+export const addPage = async (userID, deviceID) => {
+    try {
+        const pagesRef = collection(db, `users/${userID}/pages`);
+        const docRef = await addDoc(pagesRef, { allDevice: [] });
+        console.log(docRef);
+    } catch (error) {
+        console.error("Error adding page or updating allDevice:", error);
+    }
+};
 
-//   const q = user.email === "1@gmail.com"
-//     ? query(devicesRef)
-//     : query(devicesRef, where("userUID", "==", user.uid));
 
-//   const snapshot = await getDocs(q);
-//   return snapshot.docs.map(doc => ({
-//     uid: doc.id,
-//     ...doc.data()
-//   }));
+export const addDeviceToPage = async (pageId, deviceID) => {
+  const pageRef = doc(db, "pages", pageId);
+  const pageSnap = await getDoc(pageRef);
+  if (pageSnap.exists()) {
+    const data = pageSnap.data();
+    await updateDoc(pageRef, { devices: [...(data.devices || []), deviceID] });
+  }
+};
+export const getPageList = () => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user.uid) {
+                const collectionRef = collection(
+                    db,
+                    `users/${user.uid}/things`
+                );
+                const docs = (await getDocs(collectionRef)).docs;
+
+                const assignValue = docs.map((item, index) => {
+                    return { ...item.data(), idpage: item.id };
+                });
+                resolve(assignValue);
+            }
+            return unsubscribe();
+        });
+    });
+};
+export const deletePageid = (idPage) => {
+    return new Promise((resolve, reject) => {
+        if (
+            onAuthStateChanged(auth, async (user) => {
+                if (user.uid) {
+                    const collectionRef = collection(
+                        db,
+                        `users/${user.uid}/things`
+                    );
+                    const removeDoc = await deleteDoc(
+                        doc(db, `users/${user.uid}/things`, idPage)
+                    );
+                    resolve(["seccus", "alredy  has  delete"]);
+                }
+            })
+        );
+    });
+};
+
+export const deletePage = async (pageId) => {
+  await deleteDoc(doc(db, "pages", pageId));
+};
+
+
+export const getDeviceofThingPage = async (pageUrl, uid) => {
+    console.log(pageUrl, uid, "trong ham");
+
+    if (pageUrl && uid) {
+        const collectionRef = collection(db, `/users/${uid}/things`);
+        const snapshot = (await getDocs(collectionRef)).docs;
+
+        const itemPage = snapshot.find(
+            (item) => item.data().NamePage.trim() === pageUrl.trim()
+        );
+
+        if (itemPage) {
+            const itemData = itemPage.data();
+            console.log("✅ Tìm thấy page:", itemData);
+            return itemData.DeviceOfThing || [];
+        } else {
+            console.warn("⚠️ Không tìm thấy page khớp với", pageUrl);
+            return [];
+        }
+    } else {
+        console.log("❌ Thiếu pageUrl hoặc uid");
+        return [];
+    }
+};
+
+// ====================== DEVICE MANAGEMENT ======================
+// export const getDevices = async () => {
+//   const snapshot = await getDocs(collection(db, "devices"));
+//   return snapshot.docs.map(doc => ({ idDevice: doc.id, ...doc.data() }));
 // };
+/**
+ * Lấy toàn bộ thiết bị (dành cho admin).
+ * @returns {Promise<Array>} Mảng thiết bị
+ */
+export const getCollectionDevice = async () => {
+    const collectionRef = collection(db, "devices");
+    const getData = await getDocs(collectionRef);
+    return getData.docs;
+};
+
+
+export const CreatePage = (namePage) => {
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const CollectionRef = collection(
+                    db,
+                    `users/${user.uid}/things`
+                );
+
+                const getPageName = query(
+                    CollectionRef,
+                    where("NamePage", "==", namePage)
+                );
+
+                const check = (await getDocs(getPageName)).docs;
+
+                if (check.length !== 0) {
+                    resolve({ type: "error", message: "Tên trang đã tồn tại" });
+                } else {
+                    await addDoc(CollectionRef, {
+                        DeviceOfThing: [],
+                        NamePage: namePage,
+                    });
+                    resolve({
+                        type: "success",
+                        message: "Tạo trang thành công",
+                    });
+                }
+
+                unsubscribe(); // dọn dẹp listener
+            } else {
+                reject(["error", "Người dùng chưa đăng nhập"]);
+            }
+        });
+    });
+};
+
+
+
+
+export const getDevices = async () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const collectionRef = collection(db, "devices");
+            const devices = await getDocs(collectionRef);
+            const data = devices.docs.map((item) => {
+                return { ...item.data(), idDevice: item.id };
+            });
+            resolve(data);
+        } catch (error) {
+            reject(error.message);
+        }
+    });
+};
+
+export const toggleDevice = async (idDevice) => {
+    return new Promise(async (resolve, reject) => {
+        const docRef = doc(db, `devices/${idDevice}`);
+        const data = (await getDoc(docRef)).data();
+        if (data.status === "Online") {
+            data.status = "Offline";
+            resolve({
+                type: "success",
+                message: `success turnOff  Device ${data.name} `,
+            });
+        } else {
+            data.status = "Online";
+            resolve({
+                type: "success",
+                message: `success turnOn  Device ${data.name} `,
+            });
+        }
+        const editDoc = await updateDoc(docRef, { ...data });
+    });
+};
+export const getDeviceById = async (deviceId) => {
+  const docSnap = await getDoc(doc(db, "devices", deviceId));
+  return docSnap.exists() ? docSnap.data() : null;
+};
+
+export const getDevicesByUser = async (uid) => {
+  const q = query(collection(db, "devices"), where("uid", "==", uid));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export const toggleDeviceStatus = async (deviceId) => {
+  const deviceRef = doc(db, "devices", deviceId);
+  const deviceSnap = await getDoc(deviceRef);
+  if (deviceSnap.exists()) {
+    const { status } = deviceSnap.data();
+    await updateDoc(deviceRef, { status: status === "ON" ? "OFF" : "ON" });
+  }
+};
 
 /**
  * Lấy dữ liệu nhiệt độ và độ ẩm từ Firestore.
@@ -117,30 +309,43 @@ export const sendTemperatureHumidityData = async (
     }
 };
 
+// ====================== DEVICE DATA ======================
+export const fetchDeviceData = async (deviceId) => {
+  const q = query(collection(db, "devices", deviceId, "data"));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
 /**
- * Tạo page mới cho user.
- * @param {string} userID ID của người dùng
- * @param {string} deviceID ID thiết bị
+ * Lấy danh sách thiết bị (có phân quyền cho admin).
+ * @returns {Promise<Array>} Danh sách thiết bị
  */
-export const addPage = async (userID, deviceID) => {
-    try {
-        const pagesRef = collection(db, `users/${userID}/pages`);
-        const docRef = await addDoc(pagesRef, { allDevice: [] });
-        console.log(docRef);
-    } catch (error) {
-        console.error("Error adding page or updating allDevice:", error);
-    }
+// export const fetchDevices = async () => {
+//   const user = auth.currentUser;
+//   const devicesRef = collection(db, "devices");
+
+//   const q = user.email === "1@gmail.com"
+//     ? query(devicesRef)
+//     : query(devicesRef, where("userUID", "==", user.uid));
+
+//   const snapshot = await getDocs(q);
+//   return snapshot.docs.map(doc => ({
+//     uid: doc.id,
+//     ...doc.data()
+//   }));
+// };
+export const sendDeviceData = async (deviceId, temperature, humidity) => {
+  const newDoc = doc(collection(db, "devices", deviceId, "data"));
+  await setDoc(newDoc, { temperature, humidity, time: new Date().toISOString() });
 };
 
-/**
- * Lấy toàn bộ thiết bị (dành cho admin).
- * @returns {Promise<Array>} Mảng thiết bị
- */
-export const getCollectionDevice = async () => {
-    const collectionRef = collection(db, "devices");
-    const getData = await getDocs(collectionRef);
-    return getData.docs;
-};
+// export const startFakeDataGeneration = (deviceId) => {
+//   const interval = setInterval(() => {
+//     const temp = (Math.random() * 10 + 20).toFixed(2);
+//     const humi = (Math.random() * 30 + 40).toFixed(2);
+//     sendDeviceData(deviceId, parseFloat(temp), parseFloat(humi));
+//   }, 3000);
+//   return interval;
+// };
 
 /**
  * Bắt đầu phát sinh dữ liệu giả tự động mỗi 2s.
@@ -162,152 +367,63 @@ export const startFakeDataGeneration = (deviceId) => {
         console.log("Đã dừng tạo dữ liệu giả.");
     };
 };
+export const getNameDevice = async (deviceId = "") => {
+    try {
+        const docRef = doc(db, "devices", deviceId);
+        const snap = await getDoc(docRef);
 
-export const CreatePage = (namePage) => {
-    return new Promise((resolve, reject) => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const CollectionRef = collection(
-                    db,
-                    `users/${user.uid}/things`
-                );
-
-                const getPageName = query(
-                    CollectionRef,
-                    where("NamePage", "==", namePage)
-                );
-
-                const check = (await getDocs(getPageName)).docs;
-
-                if (check.length !== 0) {
-                    resolve({ type: "error", message: "Tên trang đã tồn tại" });
-                } else {
-                    await addDoc(CollectionRef, {
-                        DeviceOfThing: [],
-                        NamePage: namePage,
-                    });
-                    resolve({
-                        type: "success",
-                        message: "Tạo trang thành công",
-                    });
-                }
-
-                unsubscribe(); // dọn dẹp listener
-            } else {
-                reject(["error", "Người dùng chưa đăng nhập"]);
-            }
-        });
-    });
-};
-export const getPageList = () => {
-    return new Promise((resolve, reject) => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user.uid) {
-                const collectionRef = collection(
-                    db,
-                    `users/${user.uid}/things`
-                );
-                const docs = (await getDocs(collectionRef)).docs;
-
-                const assignValue = docs.map((item, index) => {
-                    return { ...item.data(), idpage: item.id };
-                });
-                resolve(assignValue);
-            }
-            return unsubscribe();
-        });
-    });
-};
-export const deletePageid = (idPage) => {
-    return new Promise((resolve, reject) => {
-        if (
-            onAuthStateChanged(auth, async (user) => {
-                if (user.uid) {
-                    const collectionRef = collection(
-                        db,
-                        `users/${user.uid}/things`
-                    );
-                    const removeDoc = await deleteDoc(
-                        doc(db, `users/${user.uid}/things`, idPage)
-                    );
-                    resolve(["seccus", "alredy  has  delete"]);
-                }
-            })
-        );
-    });
-};
-
-export const getUser = async () => {
-    return new Promise((resolve, reject) => {
-        const unsubcribe = onAuthStateChanged(auth, async (user) => {
-            if (user.uid) {
-                const docRef = doc(db, `users/${user.uid}`);
-                const userData = (await getDoc(docRef)).data();
-                resolve(userData);
-            }
-        });
-    });
-};
-
-export const getDevices = async () => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const collectionRef = collection(db, "devices");
-            const devices = await getDocs(collectionRef);
-            const data = devices.docs.map((item) => {
-                return { ...item.data(), idDevice: item.id };
-            });
-            resolve(data);
-        } catch (error) {
-            reject(error.message);
-        }
-    });
-};
-
-export const toggleDevice = async (idDevice) => {
-    return new Promise(async (resolve, reject) => {
-        const docRef = doc(db, `devices/${idDevice}`);
-        const data = (await getDoc(docRef)).data();
-        if (data.status === "Online") {
-            data.status = "Offline";
-            resolve({
-                type: "success",
-                message: `success turnOff  Device ${data.name} `,
-            });
+        if (snap.exists()) {
+            return snap.data().name || "";
         } else {
-            data.status = "Online";
-            resolve({
-                type: "success",
-                message: `success turnOn  Device ${data.name} `,
-            });
+            return null;
         }
-        const editDoc = await updateDoc(docRef, { ...data });
-    });
+    } catch (error) {
+        console.error("Lỗi khi lấy tên thiết bị:", error);
+        return null;
+    }
 };
-export const searchUserByName = async (name) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const userRef = collection(db, "/users/");
-            const queryUser = query(
-                userRef,
-                orderBy("name"),
-                startAt(name),
-                endAt(name + "\uf8ff")
-            );
-            const data = (await getDocs(queryUser)).docs;
-            const userList = data.map((user) => {
-                return {
-                    ...user.data(),
-                };
-            });
-            const cleanValue = userList.filter((userObject) => {
-                return userObject.role !== "admin";
-            });
-            resolve(cleanValue);
-        } catch (error) {
-            reject(["error", error.message]);
-        }
-    });
+export const getDeviceHuminity = async (deviceId) => {
+    console.log(deviceId);
+    const docref = doc(
+        db,
+        `devices/${deviceId}/temperatureAndHumidityLogs/${deviceId}`
+    );
+    const getName = await getNameDevice(deviceId);
+    const snapshot = await getDoc(docref);
+    const newObject = { [deviceId]: { ...snapshot.data(), name: getName } };
+    return newObject;
+};
+export const addDeviceIntoPage = async (pageUrl, idDevice, uid) => {
+    if (pageUrl && idDevice) {
+        const collectionRef = collection(db, `/users/${uid}/things`);
+        const snapshot = (await getDocs(collectionRef)).docs;
+        const itemPage = snapshot.filter((item) => {
+            console.log(item.data());
+            return item.data().NamePage === pageUrl;
+        })[0];
+
+        const dataItem = itemPage.data();
+        const pageDocRef = doc(db, `/users/${uid}/things/${itemPage.id}`);
+        const itemNew = {
+            ...dataItem,
+            DeviceOfThing: [...dataItem.DeviceOfThing, idDevice],
+        };
+        await updateDoc(pageDocRef, itemNew);
+    } else {
+        console.log("null roi");
+    }
+};
+
+// ====================== USER DEVICE PERMISSIONS ======================
+export const allowDeviceToUser = async (userId, deviceId) => {
+  const userDeviceRef = doc(db, "users", userId, "devices", deviceId);
+  await setDoc(userDeviceRef, { allowed: true });
+};
+
+export const allowDeviceToMultipleUsers = async (userIds, deviceId) => {
+  for (const uid of userIds) {
+    await allowDeviceToUser(uid, deviceId);
+  }
 };
 
 export const allowDeviceOfUser = async (userId, deviceId) => {
@@ -405,6 +521,44 @@ export const getDataDeviceByUid = (deviceId, deviceName, onData) => {
 
     return unsubscribe;
 };
+// ====================== SEARCH ======================
+export const searchUserByName = async (name) => {
+  const q = query(collection(db, "users"), where("name", "==", name));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+
+
+
+
+
+// export const searchUserByName = async (name) => {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             const userRef = collection(db, "/users/");
+//             const queryUser = query(
+//                 userRef,
+//                 orderBy("name"),
+//                 startAt(name),
+//                 endAt(name + "\uf8ff")
+//             );
+//             const data = (await getDocs(queryUser)).docs;
+//             const userList = data.map((user) => {
+//                 return {
+//                     ...user.data(),
+//                 };
+//             });
+//             const cleanValue = userList.filter((userObject) => {
+//                 return userObject.role !== "admin";
+//             });
+//             resolve(cleanValue);
+//         } catch (error) {
+//             reject(["error", error.message]);
+//         }
+//     });
+// };
+
 // export const getNameDevice = async (deviceId = "3tCPsGhujHuJFsTctmjd") => {
 //     let nameDevice = "";
 //     const collectionRef = collection(db, "devices");
@@ -419,52 +573,7 @@ export const getDataDeviceByUid = (deviceId, deviceName, onData) => {
 //     });
 //     return nameDevice;
 // };
-export const getNameDevice = async (deviceId = "") => {
-    try {
-        const docRef = doc(db, "devices", deviceId);
-        const snap = await getDoc(docRef);
 
-        if (snap.exists()) {
-            return snap.data().name || "";
-        } else {
-            return null;
-        }
-    } catch (error) {
-        console.error("Lỗi khi lấy tên thiết bị:", error);
-        return null;
-    }
-};
-export const getDeviceHuminity = async (deviceId) => {
-    console.log(deviceId);
-    const docref = doc(
-        db,
-        `devices/${deviceId}/temperatureAndHumidityLogs/${deviceId}`
-    );
-    const getName = await getNameDevice(deviceId);
-    const snapshot = await getDoc(docref);
-    const newObject = { [deviceId]: { ...snapshot.data(), name: getName } };
-    return newObject;
-};
-export const addDeviceIntoPage = async (pageUrl, idDevice, uid) => {
-    if (pageUrl && idDevice) {
-        const collectionRef = collection(db, `/users/${uid}/things`);
-        const snapshot = (await getDocs(collectionRef)).docs;
-        const itemPage = snapshot.filter((item) => {
-            console.log(item.data());
-            return item.data().NamePage === pageUrl;
-        })[0];
-
-        const dataItem = itemPage.data();
-        const pageDocRef = doc(db, `/users/${uid}/things/${itemPage.id}`);
-        const itemNew = {
-            ...dataItem,
-            DeviceOfThing: [...dataItem.DeviceOfThing, idDevice],
-        };
-        await updateDoc(pageDocRef, itemNew);
-    } else {
-        console.log("null roi");
-    }
-};
 // export const getDeviceofThingPage = async (pageUrl, uid) => {
 //     console.log(pageUrl, uid, "trong ham");
 //     if (pageUrl && uid) {
@@ -487,27 +596,3 @@ export const addDeviceIntoPage = async (pageUrl, idDevice, uid) => {
 //     }
 // };
 
-export const getDeviceofThingPage = async (pageUrl, uid) => {
-    console.log(pageUrl, uid, "trong ham");
-
-    if (pageUrl && uid) {
-        const collectionRef = collection(db, `/users/${uid}/things`);
-        const snapshot = (await getDocs(collectionRef)).docs;
-
-        const itemPage = snapshot.find(
-            (item) => item.data().NamePage.trim() === pageUrl.trim()
-        );
-
-        if (itemPage) {
-            const itemData = itemPage.data();
-            console.log("✅ Tìm thấy page:", itemData);
-            return itemData.DeviceOfThing || [];
-        } else {
-            console.warn("⚠️ Không tìm thấy page khớp với", pageUrl);
-            return [];
-        }
-    } else {
-        console.log("❌ Thiếu pageUrl hoặc uid");
-        return [];
-    }
-};

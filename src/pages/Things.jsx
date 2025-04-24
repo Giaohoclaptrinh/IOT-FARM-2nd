@@ -153,7 +153,7 @@ const Things = () => {
                     }}
                     className="btn-primary"
                 >
-                    AddDevice
+                    Thêm thiết bị vào trang
                 </button>
             </div>
             {addDevice && (
