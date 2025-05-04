@@ -58,7 +58,7 @@ const Devices = () => {
     setSelectedDevice(device); // Cập nhật thiết bị đã chọn
     navigate(`/dashboards/${deviceUid}`); // Điều hướng đến trang Dashboard
   };
-
+  console.log("detaill  device test  hello")
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold">Danh sách thiết bị</h2>
