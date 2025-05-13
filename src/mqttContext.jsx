@@ -5,18 +5,31 @@ export const MqttContext = createContext();
 export const MqttProvider = ({ children }) => {
     const [mqttData, setMqttData] = useState(null);
 
-    // Lấy dữ liệu từ server MQTT sau mỗi 3 giây
     useEffect(() => {
-        const interval = setInterval(() => {
-            fetch("http://localhost:4000/mqtt/latest")
-                .then(res => res.json())   // Dữ liệu nhận được là JSON
-                .then(data => setMqttData(data))  // Lưu dữ liệu vào state
-                .catch(err => console.error("MQTT fetch error:", err));
-        }, 3000);
+        // Kết nối WebSocket
+        const socket = new WebSocket("ws://localhost:4000");
 
-        // Dọn dẹp interval khi component unmount
-        return () => clearInterval(interval);
-    }, []);
+        // Khi WebSocket mở kết nối
+        socket.onopen = () => {
+            console.log("WebSocket connection established");
+        };
+
+        // Khi nhận được dữ liệu từ WebSocket
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            setMqttData(data); // Lưu dữ liệu MQTT vào state
+        };
+
+        // Khi WebSocket đóng kết nối
+        socket.onclose = () => {
+            console.log("WebSocket connection closed");
+        };
+
+        // Dọn dẹp khi component unmount (đóng WebSocket)
+        return () => {
+            socket.close();
+        };
+    }, []); // Chỉ chạy một lần khi component mount
 
     // Cung cấp dữ liệu MQTT cho các component con
     return (

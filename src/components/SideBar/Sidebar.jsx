@@ -38,7 +38,7 @@ const Sidebar = () => {
             icon: TfiWallet,
             submenu: [
                 { title: "Device  Management", href: "devices" },
-                { title: "Device  View", href: "/PermissonDevices" },
+                { title: "Device  View", href: "/devicesList" },
             ],
         },
         {

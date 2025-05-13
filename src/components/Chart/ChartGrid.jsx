@@ -56,6 +56,7 @@ export default function ChartGrid({
             };
         }
     };
+
     useEffect(() => {
         const chartOptions = {
             chart: {
@@ -89,6 +90,7 @@ export default function ChartGrid({
                 },
             },
             stroke: {
+                show: true,
                 curve: "smooth", // ✅ smooth | straight | stepline
                 width: 2, // độ dày
                 dashArray: 0, // kiểu nét đứt
@@ -108,10 +110,6 @@ export default function ChartGrid({
                 },
             },
 
-            stroke: {
-                show: true,
-                curve: "smooth",
-            },
             dataLabels: {
                 enabled: false,
             },

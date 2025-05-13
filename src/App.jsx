@@ -1,12 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
-import Sever from "../model"; 
-// import { MqttProvider } from "./mqttContext"; // Import the MqttProvider
+import Server from "../model";
 import {
     BrowserRouter as Router,
     Route,
     Routes,
     useLocation,
 } from "react-router-dom";
+
+// MQTT context provider
+import { MqttProvider } from "./mqttContext"; // 👈 Đã bật
 
 // Layout components
 import Sidebar from "./components/SideBar/Sidebar";
@@ -40,11 +42,14 @@ const App = () => {
     const [showLayout, setShowLayout] = useState(true);
 
     return (
-        // <MqttProvider>
+        <MqttProvider> {/* ✅ Đặt ở ngoài Router */}
             <Router>
-                <MainContent showLayout={showLayout} setShowLayout={setShowLayout} />
+                <MainContent
+                    showLayout={showLayout}
+                    setShowLayout={setShowLayout}
+                />
             </Router>
-        // </MqttProvider>
+        </MqttProvider>
     );
 };
 
@@ -59,26 +64,24 @@ const MainContent = ({ showLayout, setShowLayout }) => {
         setShowLayout(!isAuthPage);
     }, [isAuthPage, setShowLayout]);
 
-    // MQTT init (⚠️ test-only, KHÔNG dùng production)
+    // MQTT init trực tiếp (nếu bạn vẫn dùng Server)
     useEffect(() => {
-        const mqttClient = new Sever({
-            url: "wss://eu1.cloud.thethings.network:8884/mqtt",
-            topic: "v3/fire-warn@ttn/devices/+/up",
-            username: "fire-warn@ttn",
-            password:
-                "NNSXS.GMZDCPJKWKAQWY77RU54UHT7BHAUMWPF5GFQFTY.XSD7T74KSXYNLFGZ43BH2QJ5FTNZLIPMZ7RZCDPPJGAQSRYS26VQ",
-        });
+        // const mqttClient = new Server({
+        //     url: "wss://eu1.cloud.thethings.network:8884/mqtt",
+        //     topic: "v3/fire-warn@ttn/devices/+/up",
+        //     username: "fire-warn@ttn",
+        //     password:
+        //         "NNSXS.GMZDCPJKWKAQWY77RU54UHT7BHAUMWPF5GFQFTY.XSD7T74KSXYNLFGZ43BH2QJ5FTNZLIPMZ7RZCDPPJGAQSRYS26VQ",
+        // });
 
-        mqttClient.innit(); // hoặc async/await nếu cần
-    }, []); // chỉ chạy một lần sau khi load
+        // mqttClient.innit();
+    }, []);
 
     return (
-        
         <div className="h-screen overflow-hidden">
             {showLayout && <TopBar />}
             <div className="flex h-screen overflow-auto max-w-full">
                 {showLayout && <Sidebar />}
-
                 <div className="flex-1 bg-gray-100 text-black overflow-auto">
                     <Routes>
                         {/* Auth Routes */}
@@ -119,16 +122,15 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                         <Route path="/things/:id" element={<Things />} />
 
                         {/* Test / Dev */}
-                        <Route path="/testaddpage" element={<TestAddPage />} />
+                        {/* <Route path="/testaddpage" element={<TestAddPage />} />
                         <Route
                             path="/PermissonDevices"
                             element={<PermissonDevices />}
-                        />
+                        /> */}
                     </Routes>
                 </div>
             </div>
         </div>
-        
     );
 };
 
