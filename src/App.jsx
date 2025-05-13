@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
+import Sever from "../model"; 
+// import { MqttProvider } from "./mqttContext"; // Import the MqttProvider
 import {
     BrowserRouter as Router,
     Route,
@@ -31,38 +33,47 @@ import Things from "./pages/Things";
 
 // Others
 import TestAddPage from "./components/Devices/TestAddPage";
-import { Home } from "lucide-react";
 import HomePage from "./pages/HomePage";
 import PermissonDevices from "./pages/PermissonDevices";
-// import ChatBox from "@/components/Chatbox/Chatbox.jsx";
 
 const App = () => {
     const [showLayout, setShowLayout] = useState(true);
 
     return (
-        <Router>
-            <MainContent
-                showLayout={showLayout}
-                setShowLayout={setShowLayout}
-            />
-        </Router>
+        // <MqttProvider>
+            <Router>
+                <MainContent showLayout={showLayout} setShowLayout={setShowLayout} />
+            </Router>
+        // </MqttProvider>
     );
 };
 
 const MainContent = ({ showLayout, setShowLayout }) => {
     const location = useLocation();
 
-    // Xác định nếu là trang auth (ẩn layout)
     const isAuthPage = useMemo(() => {
         return ["/sign-in", "/sign-up"].includes(location.pathname);
     }, [location.pathname]);
 
-    // Cập nhật layout khi chuyển route
     useEffect(() => {
         setShowLayout(!isAuthPage);
     }, [isAuthPage, setShowLayout]);
 
+    // MQTT init (⚠️ test-only, KHÔNG dùng production)
+    useEffect(() => {
+        const mqttClient = new Sever({
+            url: "wss://eu1.cloud.thethings.network:8884/mqtt",
+            topic: "v3/fire-warn@ttn/devices/+/up",
+            username: "fire-warn@ttn",
+            password:
+                "NNSXS.GMZDCPJKWKAQWY77RU54UHT7BHAUMWPF5GFQFTY.XSD7T74KSXYNLFGZ43BH2QJ5FTNZLIPMZ7RZCDPPJGAQSRYS26VQ",
+        });
+
+        mqttClient.innit(); // hoặc async/await nếu cần
+    }, []); // chỉ chạy một lần sau khi load
+
     return (
+        
         <div className="h-screen overflow-hidden">
             {showLayout && <TopBar />}
             <div className="flex h-screen overflow-auto max-w-full">
@@ -86,7 +97,6 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                             element={<ProfileSettings />}
                         />
                         <Route path="/products" element={<Products />} />
-                    
 
                         {/* Device */}
                         <Route path="/devices" element={<Devices />} />
@@ -108,16 +118,17 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                         <Route path="/things" element={<Things />} />
                         <Route path="/things/:id" element={<Things />} />
 
-
                         {/* Test / Dev */}
                         <Route path="/testaddpage" element={<TestAddPage />} />
-
-                        <Route path="/PermissonDevices" element={<PermissonDevices/>}/>
+                        <Route
+                            path="/PermissonDevices"
+                            element={<PermissonDevices />}
+                        />
                     </Routes>
                 </div>
             </div>
-
         </div>
+        
     );
 };
 
