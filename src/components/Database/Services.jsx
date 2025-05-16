@@ -1,5 +1,5 @@
 // ====================== FIREBASE & IMPORTS ======================
-import { collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, addDoc } from "firebase/firestore";
+import { collection, doc, getDocs, getDoc, setDoc, updateDoc, deleteDoc, query, where, addDoc , arrayUnion, onSnapshot } from "firebase/firestore";
 import { db, auth } from "@/firebase/db.config";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -394,24 +394,33 @@ export const getDeviceHuminity = async (deviceId) => {
     return newObject;
 };
 export const addDeviceIntoPage = async (pageUrl, idDevice, uid) => {
-    if (pageUrl && idDevice) {
-        const collectionRef = collection(db, `/users/${uid}/things`);
-        const snapshot = (await getDocs(collectionRef)).docs;
-        const itemPage = snapshot.filter((item) => {
-            console.log(item.data());
-            return item.data().NamePage === pageUrl;
-        })[0];
+  if (!pageUrl || !idDevice) {
+    console.log("Thiếu pageUrl hoặc idDevice");
+    return;
+  }
 
-        const dataItem = itemPage.data();
-        const pageDocRef = doc(db, `/users/${uid}/things/${itemPage.id}`);
-        const itemNew = {
-            ...dataItem,
-            DeviceOfThing: [...dataItem.DeviceOfThing, idDevice],
-        };
-        await updateDoc(pageDocRef, itemNew);
-    } else {
-        console.log("null roi");
+  try {
+    const collectionRef = collection(db, `users/${uid}/things`);
+    const snapshot = await getDocs(collectionRef);
+
+    const itemPage = snapshot.docs.find((item) => item.data().NamePage === pageUrl);
+
+    if (!itemPage) {
+      console.log(`Không tìm thấy trang với NamePage = ${pageUrl}`);
+      return;
     }
+
+    const pageDocRef = doc(db, `users/${uid}/things/${itemPage.id}`);
+
+    // Dùng arrayUnion để thêm idDevice vào mảng DeviceOfThing, tránh ghi đè
+    await updateDoc(pageDocRef, {
+      DeviceOfThing: arrayUnion(idDevice),
+    });
+
+    console.log("Thêm thiết bị thành công");
+  } catch (error) {
+    console.error("Lỗi khi thêm thiết bị vào trang:", error);
+  }
 };
 
 // ====================== USER DEVICE PERMISSIONS ======================

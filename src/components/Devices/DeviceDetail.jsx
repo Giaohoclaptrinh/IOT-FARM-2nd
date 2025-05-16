@@ -11,7 +11,7 @@ const DeviceDetail = () => {
   useEffect(() => {
     const fetchDevice = async () => {
       try {
-        const docRef = doc(db, "devices", id); // ⚡ Kiểm tra tên collection
+        const docRef = doc(db, "devices", id); 
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {

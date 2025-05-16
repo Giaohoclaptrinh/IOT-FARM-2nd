@@ -84,6 +84,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                 {showLayout && <Sidebar />}
                 <div className="flex-1 bg-gray-100 text-black overflow-auto">
                     <Routes>
+                         
                         {/* Auth Routes */}
                         <Route path="/" element={<HomePage />} />
                         <Route path="/sign-in" element={<SignIn />} />
@@ -127,6 +128,7 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                             path="/PermissonDevices"
                             element={<PermissonDevices />}
                         /> */}
+                        
                     </Routes>
                 </div>
             </div>
