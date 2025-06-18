@@ -1,62 +1,60 @@
 import React, { useEffect, useRef } from 'react';
 import ApexCharts from 'apexcharts';
+import { instance } from '../API/devices';
 
-function ChartDynamic({ humidity, divID }) {
+function ChartDynamic({ humidity,data, divID }) {
   const chartRef = useRef(null); // Lưu thể hiện chart
-  const containerID = `chart-dynamic-${divID}`; // ID của div
+  const containerID = `chart-dynamic-${divID ?? "default"}`; // ID của div
 
+  useEffect(()=>{
+    // console.log(data.payload);
+  },[])
   // Render chart lần đầu
   useEffect(() => {
-    const options = {
-      chart: {
-        id: 'realtime-humidity',
-        type: 'line',
-        height: 350,
-        animations: {
-          enabled: true,
-          easing: 'linear',
-          dynamicAnimation: {
-            speed: 1000,
-          },
-        },
-        zoom: { enabled: true },
-        toolbar: { show: true },
-      },
-      stroke: {
-        curve: 'smooth',
-      },
+    var options = {
       series: [
         {
-          name: 'Humidity',
-          data: humidity,
+          name: 'pH',
+          data: data.payload.map((el) => el.ph),
+        },
+        {
+          name: 'Temprature',
+          data: data.payload.map((el) => el.temp),
         },
       ],
-      xaxis: {
-        type: 'datetime',
-        range: 30000,
-        labels: {
-          formatter: (value) =>
-            new Date(value).toLocaleTimeString("vi-VN", {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: false,
-              timeZone: "Asia/Ho_Chi_Minh"
-            }),
+      title: {
+        text: `${data.id}`,
+        align: 'center',
+        margin: 10,
+        offsetX: 0,
+        offsetY: 0,
+        floating: false,
+        style: {
+          fontSize: '14px',
+          fontWeight: 'bold',
+          fontFamily: 'Poppins',
+          color: '#263238',
         },
       },
-      yaxis: {
-        max: 100,
+      chart: {
+        height: 350,
+        type: 'area',
       },
       dataLabels: {
         enabled: false,
       },
-      markers: {
-        size: 0,
+      stroke: {
+        curve: 'smooth',
       },
-      title: {
-        text: 'Realtime Humidity',
-        align: 'left',
+      xaxis: {
+        type: 'datetime',
+        categories: data.payload.map((el) => el.timestamp),
+      },
+      
+      tooltip: {
+        x: {
+          format: 'dd/MM/yy HH:mm',
+        },
       },
     };
     
@@ -71,16 +69,7 @@ function ChartDynamic({ humidity, divID }) {
   }, [containerID]);
 
 
-  useEffect(() => {
-    if (chartRef.current && humidity) {
-      chartRef.current.updateSeries([
-        {
-          name: 'Humidity',
-          data: humidity,
-        },
-      ]);
-    }
-  }, [humidity]);
+
 
   return <div id={containerID}></div>;
 }

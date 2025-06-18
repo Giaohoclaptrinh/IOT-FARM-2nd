@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import Server from "../model";
+
 import {
     BrowserRouter as Router,
     Route,
@@ -7,8 +7,6 @@ import {
     useLocation,
 } from "react-router-dom";
 
-// MQTT context provider
-import { MqttProvider } from "./mqttContext"; // 👈 Đã bật
 
 // Layout components
 import Sidebar from "./components/SideBar/Sidebar";
@@ -37,19 +35,19 @@ import Things from "./pages/Things";
 import TestAddPage from "./components/Devices/TestAddPage";
 import HomePage from "./pages/HomePage";
 import PermissonDevices from "./pages/PermissonDevices";
+import Testdevice from "./components/Devices/testdevice";
+import StreamDevice from "./pages/StreamDevice";
 
 const App = () => {
     const [showLayout, setShowLayout] = useState(true);
 
     return (
-        <MqttProvider> {/* ✅ Đặt ở ngoài Router */}
             <Router>
                 <MainContent
                     showLayout={showLayout}
                     setShowLayout={setShowLayout}
                 />
             </Router>
-        </MqttProvider>
     );
 };
 
@@ -64,18 +62,6 @@ const MainContent = ({ showLayout, setShowLayout }) => {
         setShowLayout(!isAuthPage);
     }, [isAuthPage, setShowLayout]);
 
-    // MQTT init trực tiếp (nếu bạn vẫn dùng Server)
-    useEffect(() => {
-        // const mqttClient = new Server({
-        //     url: "wss://eu1.cloud.thethings.network:8884/mqtt",
-        //     topic: "v3/fire-warn@ttn/devices/+/up",
-        //     username: "fire-warn@ttn",
-        //     password:
-        //         "NNSXS.GMZDCPJKWKAQWY77RU54UHT7BHAUMWPF5GFQFTY.XSD7T74KSXYNLFGZ43BH2QJ5FTNZLIPMZ7RZCDPPJGAQSRYS26VQ",
-        // });
-
-        // mqttClient.innit();
-    }, []);
 
     return (
         <div className="h-screen overflow-hidden">
@@ -100,10 +86,16 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                             path="/profile-settings"
                             element={<ProfileSettings />}
                         />
+                        <Route
+                            path="/testdevice"
+                            element={<Testdevice />}
+                        />
                         <Route path="/products" element={<Products />} />
 
                         {/* Device */}
                         <Route path="/devices" element={<Devices />} />
+                        <Route path="/devices/:id" element={<Devices />} />
+                        <Route path="/devices/stream/:id" element={<StreamDevice />} />
                         <Route
                             path="/device-overview"
                             element={<DeviceOverview />}
@@ -121,13 +113,6 @@ const MainContent = ({ showLayout, setShowLayout }) => {
                         {/* Things / Pages */}
                         <Route path="/things" element={<Things />} />
                         <Route path="/things/:id" element={<Things />} />
-
-                        {/* Test / Dev */}
-                        {/* <Route path="/testaddpage" element={<TestAddPage />} />
-                        <Route
-                            path="/PermissonDevices"
-                            element={<PermissonDevices />}
-                        /> */}
                         
                     </Routes>
                 </div>

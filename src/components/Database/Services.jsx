@@ -382,11 +382,11 @@ export const getNameDevice = async (deviceId = "") => {
         return null;
     }
 };
-export const getDeviceHuminity = async (deviceId) => {
+export const getDeviceHuminity = async (deviceId, storageDataID) => {
     console.log(deviceId);
     const docref = doc(
         db,
-        `devices/${deviceId}/temperatureAndHumidityLogs/${deviceId}`
+        `devices/${deviceId}/storageData/${storageDataID}`
     );
     const getName = await getNameDevice(deviceId);
     const snapshot = await getDoc(docref);
@@ -422,6 +422,24 @@ export const addDeviceIntoPage = async (pageUrl, idDevice, uid) => {
     console.error("Lỗi khi thêm thiết bị vào trang:", error);
   }
 };
+
+
+
+
+export const getDeviceData = async (deviceId) => {
+  try {
+    const ref = collection(db, `devices/${deviceId}/storageData`);
+    const snap = await getDocs(ref);
+    return snap.docs.map((doc) => ({
+      timestamp: doc.data().timestamp, // bạn có thể đổi sang "time", "createdAt", v.v.
+      value: doc.data().value || 0,    // hoặc "temperature", "humidity", v.v.
+    }));
+  } catch (error) {
+    console.error("Lỗi khi lấy dữ liệu thiết bị:", error);
+    return [];
+  }
+};
+
 
 // ====================== USER DEVICE PERMISSIONS ======================
 export const allowDeviceToUser = async (userId, deviceId) => {

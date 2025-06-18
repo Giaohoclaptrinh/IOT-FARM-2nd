@@ -8,29 +8,40 @@ import {
     getDeviceListByuser,
     getDeviceofThingPage,
     getPageList,
+    getDeviceData,
 } from "@/components/Database/Services";
 import OverLay from "@/components/Utilities/OverLay";
 import { Link, useParams } from "react-router-dom";
 import { auth } from "@/firebase/db.config";
 import { onAuthStateChanged } from "firebase/auth";
 import ShowDevicePage from "./ShowDevicePage";
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+} from "recharts";
+import randomColor from "randomcolor";
 
 const Things = () => {
     const { id: pageId } = useParams();
 
-    // State quản lý
     const [pageName, setPageName] = useState("");
     const [showOverlay, setShowOverlay] = useState(false);
     const [pageList, setPageList] = useState([]);
-
     const [addDevice, setAddDevice] = useState(false);
     const [deviceListOfThings, setDeviceListOfThings] = useState([]);
     const [availableDevices, setAvailableDevices] = useState([]);
     const [allUserDevices, setAllUserDevices] = useState([]);
+    const [selectedDevices, setSelectedDevices] = useState([]);
+    const [compareData, setCompareData] = useState([]);
 
     const notify = (message) => window.alert(message);
 
-    // Tạo trang mới
     const handleCreatePage = async (e) => {
         e.preventDefault();
         try {
@@ -46,7 +57,6 @@ const Things = () => {
         }
     };
 
-    // Xoá trang
     const handleDeletePage = async (id) => {
         try {
             await deletePageid(id);
@@ -58,14 +68,12 @@ const Things = () => {
         }
     };
 
-    // Lấy danh sách page ban đầu
     useEffect(() => {
         getPageList()
             .then(setPageList)
             .catch((error) => console.error("Error fetching page list:", error));
     }, []);
 
-    // Lấy danh sách thiết bị trong page
     const fetchDevices = async (uid) => {
         try {
             const all = await getDeviceListByuser(uid);
@@ -95,7 +103,26 @@ const Things = () => {
         };
     }, [pageId]);
 
-    // Giao diện tạo trang
+    useEffect(() => {
+        const fetchMultipleDeviceData = async () => {
+            if (selectedDevices.length < 2) return;
+
+            try {
+                const results = await Promise.all(
+                    selectedDevices.map(async (deviceId) => {
+                        const data = await getDeviceData(deviceId);
+                        return { deviceId, data };
+                    })
+                );
+                setCompareData(results);
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu so sánh nhiều thiết bị:", error);
+            }
+        };
+
+        fetchMultipleDeviceData();
+    }, [selectedDevices]);
+
     const renderCreatePageOverlay = () => (
         <OverLay onClose={() => setShowOverlay(false)}>
             <div className="w-96 p-4">
@@ -121,7 +148,6 @@ const Things = () => {
         </OverLay>
     );
 
-    // Giao diện chọn thiết bị
     const renderAddDeviceOverlay = () => (
         <OverLay onClose={() => setAddDevice(false)}>
             <div className="w-sm h-[600px] bg-white rounded-2xl p-4 overflow-auto">
@@ -167,7 +193,6 @@ const Things = () => {
         </OverLay>
     );
 
-    // Giao diện danh sách trang
     const renderPageList = () => (
         <HomeWrap>
             <div>
@@ -199,7 +224,6 @@ const Things = () => {
         </HomeWrap>
     );
 
-    // Giao diện thiết bị trong một page cụ thể
     const renderDevicePage = () => (
         <HomeWrap>
             <div className="w-full py-3 text-end">
@@ -213,6 +237,59 @@ const Things = () => {
             <div>
                 <ShowDevicePage deviceIdList={deviceListOfThings} />
             </div>
+
+            {deviceListOfThings.length >= 2 && (
+                <div className="my-6">
+                    <h2 className="text-lg font-semibold mb-2">Chọn các thiết bị để so sánh:</h2>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {deviceListOfThings.map((device) => {
+                            const isSelected = selectedDevices.includes(device.idDevice);
+                            return (
+                                <button
+                                    key={device.idDevice}
+                                    onClick={() => {
+                                        setSelectedDevices((prev) =>
+                                            isSelected
+                                                ? prev.filter((id) => id !== device.idDevice)
+                                                : [...prev, device.idDevice]
+                                        );
+                                    }}
+                                    className={`px-3 py-1 rounded-full border ${
+                                        isSelected ? "bg-blue-600 text-white" : "bg-gray-200"
+                                    }`}
+                                >
+                                    {device.name}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {compareData.length >= 2 && (
+                        <div className="h-96">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="timestamp" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    {compareData.map((device) => (
+                                        <Line
+                                            key={device.deviceId}
+                                            type="monotone"
+                                            data={device.data}
+                                            dataKey="value"
+                                            name={`Thiết bị ${device.deviceId}`}
+                                            stroke={randomColor({ luminosity: "dark" })}
+                                            dot={false}
+                                        />
+                                    ))}
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+                </div>
+            )}
         </HomeWrap>
     );
 

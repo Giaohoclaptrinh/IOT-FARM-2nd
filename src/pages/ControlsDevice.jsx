@@ -7,7 +7,7 @@ import HomeWrap from "./HomeWrap";
 import ChartDynamic from "../components/Chart/ChartDynamic";
 import ChartGrid from "../components/Chart/ChartGrid";
 import ChartRadialBar from "../components/Chart/ChartRadialBar";
-import DeviceChart from "../components/Chart/DeviceChart";
+// import DeviceChart from "../components/Chart/DeviceChart";
 
 const ControlsDevice = () => {
     const { deviceUid } = useParams();

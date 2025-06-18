@@ -1,7 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import React from "react";
-import { db, auth } from "../firebase/db.config";
+
+import React, { useEffect, useState } from "react";
+
 import {
     collection,
     query,
@@ -11,150 +10,78 @@ import {
     deleteDoc,
 } from "firebase/firestore";
 import HomeWrap from "./HomeWrap";
-import AddDevice from "../components/Devices/AddDevice";
-import EditDevice from "../components/Devices/EditDevice";
+import { instance } from "@/components/API/devices";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import ViewDevice from "./ViewDevice";
+
 
 const Devices = () => {
-    const navigate = useNavigate();
-    const [deviceData, setDeviceData] = useState([]);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [editDevice, setEditDevice] = useState(null); // Object chứa thiết bị cần sửa
-
-    // Theo dõi người dùng hiện tại
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            setCurrentUser(user);
+    const {id} = useParams();
+   
+    const [data,setData] = useState([])
+    useEffect(()=>{
+        instance.get('/device').then((value) => {
+            console.log(id);
+            setData(value.data)
         });
-        return () => unsubscribe();
-    }, []);
+    },[])
 
-    // Lấy danh sách thiết bị
-    useEffect(() => {
-        if (!currentUser) return;
-
-        const deviceRef = collection(db, "devices");
-        const isAdmin = currentUser.email === "1@gmail.com"; // Đổi thành email admin thực tế
-
-        const q = isAdmin
-            ? deviceRef
-            : query(deviceRef, where("userUID", "==", currentUser.uid));
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            setDeviceData(snapshot.docs);
-        });
-
-        return () => unsubscribe();
-    }, [currentUser]);
-
-    // Xoá thiết bị
-    const handleDeleteDevice = async (id) => {
-        const confirm = window.confirm("Bạn có chắc muốn xoá thiết bị này?");
-        if (!confirm) return;
-
-        try {
-            await deleteDoc(doc(db, "devices", id));
-            setDeviceData((prev) => prev.filter((device) => device.id !== id));
-        } catch (error) {
-            console.error("Lỗi khi xoá thiết bị:", error);
-        }
-    };
-
-    // Mở popup chỉnh sửa
-    const handleEditDevice = (deviceDoc) => {
-        setEditDevice({
-            id: deviceDoc.id,
-            ...deviceDoc.data(),
-        });
-    };
     return (
-        <HomeWrap>
-            <div className="flex justify-end mb-4">
-                <button
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                    onClick={() => setShowAddModal(true)}
-                >
-                    Thêm thiết bị
-                </button>
-            </div>
+      <HomeWrap>
+        {
+           id ?(
+            <ViewDevice id={id}/>
+           )
+           :
+        (<div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  Device name
+                </th>
 
-            <div className="font-seconds border rounded-md">
-                <table className="table-auto border-collapse divide-y relative text-left w-full">
-                    <thead>
-                        <tr className="bg-slate-400 text-white font-semibold text-md">
-                            <th className="py-2 rounded-tl-md pl-4">
-                                Name Device
-                            </th>
-                            <th className="py-2">Date</th>
-                            <th className="py-2">Status</th>
-                            <th className="py-2 rounded-tr-md"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {deviceData.map((item) => {
-                            const data = item.data();
-                            const createdAt = data.createdAt?.toDate();
-                            const formattedDate = createdAt
-                                ? `${createdAt.getDate()}-${
-                                      createdAt.getMonth() + 1
-                                  }-${createdAt.getFullYear()}`
-                                : "N/A";
+                <th scope="col" className="px-6 py-3">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((el, index) => {
+                return (
+                  <tr
+                    key={index}
+                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
+                  >
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      {el}
+                    </th>
 
-                            return (
-                                <tr
-                                    key={item.id}
-                                    className="border-b last:border-none even:bg-gray-100 last:rounded-b-md"
-                                >
-                                    <td className="pl-4 font-semibold rounded-bl-md ">
-                                        {data.name}
-                                    </td>
-                                    <td className="text-gray-600">
-                                        {formattedDate}
-                                    </td>
-                                    <td className="text-gray-600">
-                                        {data.status}
-                                    </td>
-                                    <td className="text-gray-600 py-2 space-x-2 last:rounded-md">
-                                        <button
-                                            className="bg-blue-500 px-4 py-1 rounded-md text-white"
-                                            onClick={() =>
-                                                handleEditDevice(item)
-                                            }
-                                        >
-                                            Sửa
-                                        </button>
-                                        <button
-                                            className="bg-red-500 px-4 py-1 rounded-md text-white"
-                                            onClick={() =>
-                                                handleDeleteDevice(item.id)
-                                            }
-                                        >
-                                            Xoá
-                                        </button>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Modal Thêm */}
-            {showAddModal && (
-                <AddDevice
-                    onClose={() => setShowAddModal(false)}
-                    onDeviceAdded={() => setShowAddModal(false)} // hoặc refetch nếu cần
-                />
-            )}
-
-            {/* Modal Sửa */}
-            {editDevice && (
-                <EditDevice
-                    device={editDevice}
-                    onClose={() => setEditDevice(null)}
-                />
-            )}
-        </HomeWrap>
+                    <td className="px-6 py-4 flex gap-x-2">
+                      <Link
+                        to={`/devices/${el}`}
+                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      >
+                        View
+                      </Link>
+                      <Link
+                        to={`/devices/stream/${el}`}
+                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                      >
+                        Stream
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>)
+        }
+      </HomeWrap>
     );
 };
 

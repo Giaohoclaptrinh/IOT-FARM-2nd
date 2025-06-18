@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/db.config";
 import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
 
-import TemperatureAndHumidityChart from "@/components/Chart/DeviceChart";
-import TemperatureAndHumidityInput from "@/components/Chart/TemperatureAndHumidityInput";
+// import TemperatureAndHumidityChart from "@/components/Chart/DeviceChart";
+// import TemperatureAndHumidityInput from "@/components/Chart/TemperatureAndHumidityInput";
 
 import HomeWrap from "./HomeWrap";
 import ChartGrid from "@/components/Chart/ChartGrid";
