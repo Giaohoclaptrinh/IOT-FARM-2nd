@@ -1,3 +1,4 @@
+// src/pages/Things.jsx
 import React, { useEffect, useState } from "react";
 import HomeWrap from "@/pages/HomeWrap";
 import { HiOutlineXMark } from "react-icons/hi2";
@@ -6,9 +7,11 @@ import {
     CreatePage,
     deletePageid,
     getDeviceListByuser,
+    getDevices,
     getDeviceofThingPage,
     getPageList,
     getDeviceData,
+    removeDeviceFromThingPage, // <== Thêm dòng này
 } from "@/components/Database/Services";
 import OverLay from "@/components/Utilities/OverLay";
 import { Link, useParams } from "react-router-dom";
@@ -29,7 +32,7 @@ import randomColor from "randomcolor";
 
 const Things = () => {
     const { id: pageId } = useParams();
-
+    const [devices, setDevices] = useState([]);
     const [pageName, setPageName] = useState("");
     const [showOverlay, setShowOverlay] = useState(false);
     const [pageList, setPageList] = useState([]);
@@ -42,31 +45,35 @@ const Things = () => {
 
     const notify = (message) => window.alert(message);
 
-    const handleCreatePage = async (e) => {
-        e.preventDefault();
-        try {
-            const message = await CreatePage(pageName);
-            notify(message);
-            const pages = await getPageList();
-            setPageList(pages);
-            setPageName("");
-            setShowOverlay(false);
-        } catch (error) {
-            console.error("Error creating page:", error);
-            notify("Tạo trang thất bại");
-        }
-    };
+   const handleCreatePage = async (e) => {
+    e.preventDefault();
+    try {
+        const uid = auth.currentUser.uid;
+        const message = await CreatePage(pageName, uid); 
+        notify(message);
+        const pages = await getPageList(uid);
+        setPageList(pages);
+        setPageName("");
+        setShowOverlay(false);
+    } catch (error) {
+        console.error("Error creating page:", error);
+        notify("Tạo trang thất bại");
+    }
+};
 
-    const handleDeletePage = async (id) => {
-        try {
-            await deletePageid(id);
-            setPageList(await getPageList());
-            notify("Xóa trang thành công");
-        } catch (error) {
-            console.error("Error deleting page:", error);
-            notify("Xóa trang thất bại");
-        }
-    };
+const handleDeletePage = async (id) => {
+    try {
+        const uid = auth.currentUser.uid;
+        await deletePageid(id, uid); 
+        const updated = await getPageList(uid);
+        setPageList(updated);
+        notify("Xóa trang thành công");
+    } catch (error) {
+        console.error("Error deleting page:", error);
+        notify("Xóa trang thất bại");
+    }
+};
+
 
     useEffect(() => {
         getPageList()
@@ -74,34 +81,50 @@ const Things = () => {
             .catch((error) => console.error("Error fetching page list:", error));
     }, []);
 
-    const fetchDevices = async (uid) => {
-        try {
-            const all = await getDeviceListByuser(uid);
-            const added = await getDeviceofThingPage(pageId, uid);
+   
 
-            setAllUserDevices(all);
-            setDeviceListOfThings(added);
+const fetchDevices = async () => {
+    try {
+        const allDevices = await getDevices(); // Tất cả thiết bị trong hệ thống
+        console.log("📦 Tất cả thiết bị:", allDevices);
 
-            const addedIds = new Set(added.map((d) => d.idDevice));
-            setAvailableDevices(all.filter((d) => !addedIds.has(d.idDevice)));
-        } catch (error) {
-            console.error("Error fetching devices:", error);
-        }
-    };
+        const user = auth.currentUser;
+        if (!user || !pageId) return;
 
-    useEffect(() => {
-        if (!pageId) return;
+        const addedIds = await getDeviceofThingPage(pageId, user.uid); // ID của thiết bị đã gán vào trang
+        console.log("✅ Thiết bị đã thêm vào trang:", addedIds);
 
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) fetchDevices(user.uid);
-        });
+        const addedDevices = allDevices.filter((d) => addedIds.includes(d.idDevice));
+        setDeviceListOfThings(addedDevices);
 
-        return () => {
-            unsubscribe();
-            setDeviceListOfThings([]);
-            setAvailableDevices([]);
-        };
-    }, [pageId]);
+        const addedIdSet = new Set(addedIds);
+        const available = allDevices.filter((d) => !addedIdSet.has(d.idDevice));
+        setAvailableDevices(available);
+
+        // Nếu cần dùng riêng mảng đầy đủ:
+        setAllUserDevices(allDevices);
+    } catch (error) {
+        console.error("Lỗi khi fetch devices:", error);
+    }
+};
+
+
+
+            useEffect(() => {
+            if (!pageId) return;
+
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                if (user) fetchDevices(user.uid);
+            });
+
+            return () => {
+                unsubscribe();
+                setDeviceListOfThings([]);
+                setAvailableDevices([]);
+            };
+        }, [pageId]);
+
+        
 
     useEffect(() => {
         const fetchMultipleDeviceData = async () => {
@@ -155,15 +178,13 @@ const Things = () => {
                     <thead className="bg-slate-500 text-white">
                         <tr>
                             <th className="text-left px-6">Name</th>
-                            <th className="text-left px-6">Status</th>
-                            <th className="text-left px-6">Action</th>
+                            <th className="text-left px-6">Action</th> {/* chỉ còn 2 cột */}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-300">
                         {availableDevices.map((item) => (
                             <tr key={item.idDevice}>
-                                <td className="px-6">{item.name}</td>
-                                <td className="px-6">{item.status}</td>
+                                <td className="px-6">{item.name || item.idDevice || "Không có tên"}</td>
                                 <td className="px-6">
                                     <button
                                         className="btn-seconds px-2"
@@ -175,7 +196,8 @@ const Things = () => {
                                                     auth.currentUser.uid
                                                 );
                                                 notify("Thêm thiết bị thành công");
-                                                fetchDevices(auth.currentUser.uid);
+                                                await fetchDevices(); // gọi lại fetch sau khi thêm
+                                                setAddDevice(false); // đóng overlay sau khi thêm
                                             } catch (error) {
                                                 console.error("Error adding device:", error);
                                                 notify("Thêm thiết bị thất bại");
@@ -188,7 +210,13 @@ const Things = () => {
                             </tr>
                         ))}
                     </tbody>
+
                 </table>
+                {availableDevices.length === 0 && (
+                    <div className="text-center text-gray-500 mt-4">
+                        Không có thiết bị nào để thêm.
+                    </div>
+                )}
             </div>
         </OverLay>
     );
@@ -234,9 +262,52 @@ const Things = () => {
 
             {addDevice && renderAddDeviceOverlay()}
 
-            <div>
-                <ShowDevicePage deviceIdList={deviceListOfThings} />
-            </div>
+            {deviceListOfThings.length === 0 ? (
+                <div className="text-center text-gray-400 my-10">
+                    Chưa có thiết bị nào trong trang này.<br />
+                    Hãy nhấn <span className="font-semibold text-blue-600">"Thêm thiết bị vào trang"</span> để bắt đầu.
+                </div>
+            ) : (
+                <div className="my-6">
+                    <h2 className="text-lg font-semibold mb-2">Danh sách thiết bị trong trang:</h2>
+                    <div className="overflow-auto rounded-lg border border-gray-200">
+                        <table className="min-w-full bg-white divide-y divide-gray-200">
+                            <thead className="bg-gray-100">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên thiết bị</th>
+                                    
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {deviceListOfThings.map((device) => (
+                                    <tr key={device.idDevice}>
+                                        <td className="px-6 py-4">{device.id}</td>
+                                        {/* <td className="px-6 py-4">{device.status}</td> */}
+                                        <td className="px-6 py-4">
+                                            <button
+                                                onClick={async () => {
+                                                    try {
+                                                        await removeDeviceFromThingPage(pageId, device.idDevice, auth.currentUser.uid);
+                                                        notify("Đã xoá thiết bị khỏi trang");
+                                                        fetchDevices(auth.currentUser.uid);
+                                                    } catch (err) {
+                                                        console.error("Lỗi khi xoá thiết bị:", err);
+                                                        notify("Xoá thiết bị thất bại");
+                                                    }
+                                                }}
+                                                className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                                            >
+                                                Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             {deviceListOfThings.length >= 2 && (
                 <div className="my-6">
@@ -290,10 +361,13 @@ const Things = () => {
                     )}
                 </div>
             )}
+            <ShowDevicePage key={deviceListOfThings.length} />
         </HomeWrap>
     );
+    
 
     return pageId ? renderDevicePage() : renderPageList();
+
 };
 
 export default Things;

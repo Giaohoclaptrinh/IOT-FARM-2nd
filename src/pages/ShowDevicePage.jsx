@@ -1,84 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/firebase/db.config";
-import ApexCharts from "apexcharts";
+import { db, auth } from "@/firebase/db.config";
+import ChartGrid from "@/components/Chart/ChartGrid";
+import { onAuthStateChanged } from "firebase/auth";
+import { useParams } from "react-router-dom";
+import { getDeviceofThingPage } from "@/components/Database/Services";
 
-const ChartGrid = ({ divID, series, typeChart = "line" }) => {
-  useEffect(() => {
-    const chartOptions = {
-      chart: {
-        type: typeChart,
-        height: 350,
-        width: "100%",
-        zoom: {
-          autoScaleYaxis: true,
-        },
-      },
-      series: series,
-      tooltip: {
-        x: {
-          formatter: (val) => {
-            return new Date(val).toLocaleString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-              hour12: false,
-              timeZone: "Asia/Ho_Chi_Minh",
-            });
-          },
-        },
-      },
-      stroke: {
-        show: true,
-        curve: "smooth",
-        width: 2,
-        dashArray: 0,
-      },
-      xaxis: {
-        type: "datetime",
-        labels: {
-          formatter: (val) => {
-            return new Date(val).toLocaleTimeString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-              hour12: false,
-              timeZone: "Asia/Ho_Chi_Minh",
-            });
-          },
-        },
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      markers: {
-        size: 0,
-        style: "hollow",
-      },
-    };
-
-    const chart = new ApexCharts(document.getElementById(divID), chartOptions);
-    chart.render();
-
-    return () => {
-      chart.destroy();
-    };
-  }, [divID, series, typeChart]);
-
-  return <div className="w-full h-80" id={divID}></div>;
+// Làm mượt
+const smoothData = (data, windowSize = 3) => {
+  return data.map((point, idx, arr) => {
+    const start = Math.max(0, idx - Math.floor(windowSize / 2));
+    const end = Math.min(arr.length, idx + Math.ceil(windowSize / 2));
+    const window = arr.slice(start, end).map((d) => d.y).filter((v) => v !== null);
+    const avg = window.length ? window.reduce((a, b) => a + b, 0) / window.length : null;
+    return { ...point, y: avg !== null ? Number(avg.toFixed(2)) : null };
+  });
 };
 
 const ShowDevicePage = () => {
+  const { id: pageId } = useParams(); // lấy pageId từ URL
   const [deviceData, setDeviceData] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAllDeviceData = async () => {
+    const fetchDevicesInPage = async (uid) => {
       try {
-        const devicesSnapshot = await getDocs(collection(db, "devices"));
-        const deviceIds = devicesSnapshot.docs.map((doc) => doc.id);
+        const deviceIds = await getDeviceofThingPage(pageId, uid); // lấy các thiết bị của trang
 
         const allData = await Promise.all(
           deviceIds.map(async (deviceId) => {
@@ -89,10 +36,7 @@ const ShowDevicePage = () => {
 
             storageSnapshot.forEach((dataDoc) => {
               const rawData = dataDoc.data();
-              let pH = null,
-                pH_do = null,
-                pH_temp = null,
-                timestamp = null;
+              let pH = null, pH_do = null, pH_temp = null, timestamp = null;
 
               if (rawData.decoded_payload) {
                 const payload = rawData.decoded_payload;
@@ -118,48 +62,67 @@ const ShowDevicePage = () => {
 
         const deviceList = {};
         allData.forEach(({ deviceId, dataPoints }) => {
-          deviceList[deviceId] = dataPoints;
+          if (deviceId && !deviceList[deviceId]) {
+            const smoothed = dataPoints
+              .sort((a, b) => a.timestamp - b.timestamp)
+              .map((point, idx, arr) => {
+                const windowSize = 3;
+                const start = Math.max(0, idx - Math.floor(windowSize / 2));
+                const end = Math.min(arr.length, idx + Math.ceil(windowSize / 2));
+                const window = arr.slice(start, end);
+                const avg = (key) => {
+                  const vals = window.map((d) => d[key]).filter((v) => v !== null && v !== undefined);
+                  return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+                };
+                return {
+                  ...point,
+                  pH: avg("pH"),
+                  pH_do: avg("pH_do"),
+                  pH_temp: avg("pH_temp"),
+                };
+              });
+
+            deviceList[deviceId] = smoothed;
+          }
         });
 
         setDeviceData(deviceList);
-      } catch (error) {
-        console.error("Lỗi lấy dữ liệu từ Firestore:", error);
+      } catch (err) {
+        console.error("Lỗi lấy dữ liệu thiết bị trong trang:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAllDeviceData();
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchDevicesInPage(user.uid);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [pageId]);
+
+  if (loading) return <div className="p-6">Đang tải dữ liệu thiết bị...</div>;
 
   if (Object.keys(deviceData).length === 0) {
-    return <div className="p-6">Đang tải dữ liệu thiết bị...</div>;
+    return <div className="p-6 text-gray-500">Không có thiết bị nào trong trang.</div>;
   }
 
   return (
     <div className="p-6 flex flex-col gap-y-8">
-      {Object.entries(deviceData).map(([deviceId, dataPoints]) => (
-        <div key={deviceId} className="bg-white shadow rounded p-4">
-          <h2 className="text-xl font-semibold mb-4">Thiết bị: {deviceId}</h2>
+      {Object.entries(deviceData).map(([deviceId, dataPoints]) => {
+        const humidity = smoothData(dataPoints.filter((d) => d.pH_do !== null).map((d) => ({ x: d.timestamp, y: d.pH_do })));
+        const temperature = smoothData(dataPoints.filter((d) => d.pH_temp !== null).map((d) => ({ x: d.timestamp, y: d.pH_temp })));
+        const ph = smoothData(dataPoints.filter((d) => d.pH !== null).map((d) => ({ x: d.timestamp, y: d.pH })));
 
-          <ChartGrid
-            divID={`chart-${deviceId}`}
-            typeChart="line"
-            series={[
-              {
-                name: "pH",
-                data: dataPoints.map((d) => [d.timestamp, d.pH]),
-              },
-              {
-                name: "DO",
-                data: dataPoints.map((d) => [d.timestamp, d.pH_do]),
-              },
-              {
-                name: "Nhiệt độ",
-                data: dataPoints.map((d) => [d.timestamp, d.pH_temp]),
-              },
-            ]}
-          />
-        </div>
-      ))}
+        return (
+          <div key={deviceId} className="bg-white shadow rounded p-4">
+            <h2 className="text-xl font-semibold mb-4">Thiết bị: {deviceId}</h2>
+            <ChartGrid divID={deviceId} humidity={humidity} temperature={temperature} ph={ph} />
+          </div>
+        );
+      })}
     </div>
   );
 };
