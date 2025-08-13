@@ -32,9 +32,7 @@ import ControlsDevice from "./pages/ControlsDevice";
 import Things from "./pages/Things";
 
 // Others
-import TestAddPage from "./components/Devices/TestAddPage";
 import HomePage from "./pages/HomePage";
-import PermissonDevices from "./pages/PermissonDevices";
 import Testdevice from "./components/Devices/testdevice";
 import StreamDevice from "./pages/StreamDevice";
 

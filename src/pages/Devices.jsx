@@ -1,17 +1,8 @@
 
 import React, { useEffect, useState } from "react";
-
-import {
-    collection,
-    query,
-    where,
-    onSnapshot,
-    doc,
-    deleteDoc,
-} from "firebase/firestore";
 import HomeWrap from "./HomeWrap";
 import { instance } from "@/components/API/devices";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ViewDevice from "./ViewDevice";
 
 
